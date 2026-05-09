@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Pembelajaran - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Utama</a>
+                <a href="modul.html" class="active">Modul</a>
+                <a href="templat.html">Templat</a>
+                <a href="login.html" id="loginNavBtn">Log Masuk</a>
+                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container modul-container">
+        <h2>📚 Modul Pembelajaran Interaktif</h2>
+        <p class="section-desc">Pelajari asas perniagaan digital melalui video pendek, infografik dan panduan bergambar — semuanya dalam Bahasa Melayu.</p>
+
+        <!-- Tab Navigation -->
+        <div class="modul-tabs">
+            <button class="tab-btn active" data-tab="pemasaran">📢 Pemasaran Digital</button>
+            <button class="tab-btn" data-tab="epayment">💳 e-Pembayaran</button>
+            <button class="tab-btn" data-tab="keselamatan">🛡️ Keselamatan Dalam Talian</button>
+        </div>
+
+        <!-- Tab 1: Pemasaran Digital -->
+        <div id="pemasaran" class="tab-content active">
+            <div class="modul-grid">
+                <div class="modul-card video-card">
+                    <div class="modul-badge">📹 Video Pendek</div>
+                    <h3>Cara Buat Iklan Facebook Mudah</h3>
+                    <div class="video-preview">
+                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Cara+Buat+Iklan+FB" alt="Preview video">
+                    </div>
+                    <a href="https://youtu.be/41kLQ0_LK_0?si=0bL0TtEW1D6D9ElN" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    <p class="modul-desc">Belajar cara sasarkan pelanggan tepat guna Facebook Ads. Sesuai untuk perniagaan kecil.</p>
+                </div>
+
+                <div class="modul-card infografik-card">
+                    <div class="modul-badge">🖼️ Infografik</div>
+                    <h3>5 Strategi Media Sosial Untuk Kedai Kecil</h3>
+                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Strategi+Media+Sosial" alt="Infografik strategi media sosial" class="infografik-img">
+                    <a href="#" class="download-link" onclick="alert('Demo: Muat turun PDF akan tersedia. Sila guna fail contoh yang telah disediakan.')">📥 Muat Turun PDF (Infografik)</a>
+                </div>
+
+                <div class="modul-card panduan-card">
+                    <div class="modul-badge">📷 Panduan Bergambar</div>
+                    <h3>Setup Instagram Untuk Bisnes (Langkah Demi Langkah)</h3>
+                    <div class="step-gallery">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                    </div>
+                    <a href="#" class="download-link" onclick="alert('Demo: PDF panduan penuh akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: e-Pembayaran -->
+        <div id="epayment" class="tab-content">
+            <div class="modul-grid">
+                <div class="modul-card video-card">
+                    <div class="modul-badge">📹 Video Pendek</div>
+                    <h3>Cara Guna Touch 'n Go eWallet Untuk Jualan</h3>
+                    <div class="video-preview">
+                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Cara+Guna+TNG+eWallet" alt="Preview video eWallet">
+                    </div>
+                    <a href="https://youtu.be/ZcOJJY-wHxA?si=fUGmWaxrDgUqsT4L" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    <p class="modul-desc">Panduan lengkap terima pembayaran guna QR code dan eWallet.</p>
+                </div>
+
+                <div class="modul-card infografik-card">
+                    <div class="modul-badge">🖼️ Infografik</div>
+                    <h3>Perbandingan E-wallet Popular Malaysia</h3>
+                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Perbandingan+E-wallet" alt="Infografik e-wallet" class="infografik-img">
+                    <a href="#" class="download-link" onclick="alert('Demo: Muat turun PDF infografik akan tersedia.')">📥 Muat Turun PDF</a>
+                </div>
+
+                <div class="modul-card panduan-card">
+                    <div class="modul-badge">📷 Panduan Bergambar</div>
+                    <h3>Terima Pembayaran Online Banking (FPX)</h3>
+                    <div class="step-gallery">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                    </div>
+                    <a href="#" class="download-link" onclick="alert('Demo: PDF panduan penuh akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Keselamatan Dalam Talian -->
+        <div id="keselamatan" class="tab-content">
+            <div class="modul-grid">
+                <div class="modul-card video-card">
+                    <div class="modul-badge">📹 Video Pendek</div>
+                    <h3>10 Tanda Scam Online Yang Perlu Anda Tahu</h3>
+                    <div class="video-preview">
+                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Tanda+Scam+Online" alt="Preview video scam">
+                    </div>
+                    <a href="https://youtu.be/lQTrhX8ZX8c?si=UAAWbBHfgUv2-qTl" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                </div>
+
+                <div class="modul-card infografik-card">
+                    <div class="modul-badge">🖼️ Infografik</div>
+                    <h3>Cara Lindungi Data Perniagaan Anda</h3>
+                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Keselamatan+Data+Bisnes" alt="Infografik keselamatan data" class="infografik-img">
+                    <a href="#" class="download-link" onclick="alert('Demo: PDF infografik akan tersedia.')">📥 Muat Turun PDF</a>
+                </div>
+
+                <div class="modul-card panduan-card">
+                    <div class="modul-badge">📷 Panduan Bergambar</div>
+                    <h3>Password Selamat: Cara Buat & Simpan</h3>
+                    <div class="step-gallery">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                    </div>
+                    <a href="#" class="download-link" onclick="alert('Demo: PDF panduan kata laluan selamat akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+        </div>
+    </footer>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

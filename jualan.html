@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekod Jualan - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Utama</a>
+                <a href="modul.html">Modul</a>
+                <a href="jualan.html" class="active">Rekod Jualan</a>
+                <a href="templat.html">Templat</a>
+                <a href="login.html" id="loginNavBtn">Log Masuk</a>
+                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>💰 Rekod Jualan & Perbelanjaan</h2>
+        <p class="section-desc">Catat semua transaksi perniagaan anda di sini. Jana laporan PDF untuk simpanan.</p>
+
+        <!-- Form Tambah Rekod -->
+        <div class="form-card">
+            <h3>Tambah Rekod Baru</h3>
+            <form id="jualanForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tarikh</label>
+                        <input type="date" id="tarikh" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select id="jenis" required>
+                            <option value="jualan">💰 Jualan (Pendapatan)</option>
+                            <option value="belanja">📉 Perbelanjaan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="kategori" required>
+                            <option value="produk">Produk</option>
+                            <option value="perkhidmatan">Perkhidmatan</option>
+                            <option value="stok">Stok/Bahan Mentah</option>
+                            <option value="operasi">Operasi (Sewa, Elektrik)</option>
+                            <option value="lain">Lain-lain</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Jumlah (RM)</label>
+                        <input type="number" id="jumlah" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Keterangan (Optional)</label>
+                        <input type="text" id="keterangan" placeholder="contoh: Jualan kek coklat">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Simpan Rekod</button>
+            </form>
+        </div>
+
+        <!-- Senarai Rekod -->
+        <div class="rekod-header">
+            <h3>Senarai Rekod Terkini</h3>
+            <div class="filter-section">
+                <select id="filterJenis" onchange="filterRecords()">
+                    <option value="semua">Semua</option>
+                    <option value="jualan">Jualan Sahaja</option>
+                    <option value="belanja">Perbelanjaan Sahaja</option>
+                </select>
+                <button id="generateReportBtn" class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
+            </div>
+        </div>
+
+        <div id="rekodList" class="rekod-list">
+            <p class="loading-text">Loading rekod...</p>
+        </div>
+
+        <!-- Ringkasan -->
+        <div class="summary-card">
+            <h3>Ringkasan</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span>Jumlah Jualan (Bulan Ini)</span>
+                    <strong id="totalJualan">RM0.00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Jumlah Perbelanjaan</span>
+                    <strong id="totalBelanja">RM0.00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Untung Bersih</span>
+                    <strong id="keuntungan">RM0.00</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/jualan.js"></script>
+</body>
+</html>

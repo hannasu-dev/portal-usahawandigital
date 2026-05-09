@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar dashboard-nav">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="modul.html">Modul</a>
+                <a href="jualan.html">Rekod Jualan</a>
+                <a href="templat.html">Templat</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="welcome-card">
+                <h2>Selamat Datang, <span id="userName">Usahawan</span>!</h2>
+                <p>Teruskan pembelajaran dan urus perniagaan anda dengan lebih sistematik.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <a href="modul.html" class="dashboard-card">
+                    <div class="card-icon">📚</div>
+                    <h3>Modul Pembelajaran</h3>
+                    <p>Video, infografik & panduan bergambar</p>
+                </a>
+                
+                <a href="jualan.html" class="dashboard-card">
+                    <div class="card-icon">💰</div>
+                    <h3>Rekod Jualan</h3>
+                    <p>Catat jualan & perbelanjaan harian</p>
+                </a>
+                
+                <a href="templat.html" class="dashboard-card">
+                    <div class="card-icon">📄</div>
+                    <h3>Templat Perniagaan</h3>
+                    <p>Invois, caption & dokumen perniagaan</p>
+                </a>
+
+                <div class="dashboard-card tip-card">
+                    <div class="card-icon">💡</div>
+                    <h3>Tip Hari Ini</h3>
+                    <p>"Gunakan kata laluan yang berbeza untuk setiap akaun perniagaan anda."</p>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <h3>Kemajuan Anda</h3>
+                <div class="progress-bar-container">
+                    <div class="progress-label">Modul Pemasaran Digital</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-label">Modul e-Pembayaran</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-label">Modul Keselamatan Dalam Talian</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                </div>
+                <p class="progress-note">✨ Selepas login, anda boleh tandakan modul yang sudah selesai (akan datang)</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

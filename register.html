@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akaun - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Utama</a>
+                <a href="modul.html">Modul</a>
+                <a href="templat.html">Templat</a>
+                <a href="login.html">Log Masuk</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Daftar Akaun Baru</h2>
+            <p class="auth-subtitle">Percuma selama-lamanya untuk usahawan mikro</p>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Emel</label>
+                    <input type="email" id="email" placeholder="email@contoh.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Kata Laluan (minimum 6 aksara)</label>
+                    <input type="password" id="password" placeholder="********" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Perniagaan (optional)</label>
+                    <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade">
+                </div>
+                
+                <button type="submit" class="btn-primary btn-full" id="registerBtn">Daftar Sekarang →</button>
+            </form>
+            
+            <p class="auth-footer">
+                Sudah ada akaun? <a href="login.html">Log Masuk di sini</a>
+            </p>
+            <div id="registerMessage" class="message-box"></div>
+        </div>
+    </div>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Masuk - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Utama</a>
+                <a href="modul.html">Modul</a>
+                <a href="templat.html">Templat</a>
+                <a href="register.html">Daftar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Log Masuk</h2>
+            <p class="auth-subtitle">Selamat kembali ke Portal UsahawanDigital</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Emel</label>
+                    <input type="email" id="email" placeholder="email@contoh.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Kata Laluan</label>
+                    <input type="password" id="password" placeholder="********" required>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-full" id="loginBtn">Log Masuk →</button>
+            </form>
+            
+            <p class="auth-footer">
+                Tiada akaun? <a href="register.html">Daftar Percuma</a>
+            </p>
+            <div id="loginMessage" class="message-box"></div>
+        </div>
+    </div>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templat Percuma - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Utama</a>
+                <a href="modul.html">Modul</a>
+                <a href="templat.html" class="active">Templat</a>
+                <a href="login.html" id="loginNavBtn">Log Masuk</a>
+                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>📄 Templat Perniagaan Percuma</h2>
+        <p class="section-desc">Muat turun dan guna terus untuk perniagaan anda. Format Word/Excel/PDF sedia guna.</p>
+
+        <div class="templat-grid">
+            <div class="templat-card">
+                <div class="templat-icon">📊</div>
+                <h3>Template Invois Mudah</h3>
+                <p>Format jadual ringkas untuk rekod jualan harian. Boleh edit guna Word/Excel.</p>
+                <button class="btn-outline" onclick="downloadTemplate('invois')">📥 Muat Turun (PDF)</button>
+            </div>
+
+            <div class="templat-card">
+                <div class="templat-icon">💰</div>
+                <h3>Sebut Harga (Quotation)</h3>
+                <p>Template profesional untuk hantar sebut harga kepada pelanggan.</p>
+                <button class="btn-outline" onclick="downloadTemplate('quotation')">📥 Muat Turun (Word)</button>
+            </div>
+
+            <div class="templat-card">
+                <div class="templat-icon">📱</div>
+                <h3>Caption Media Sosial</h3>
+                <p>10 template caption untuk Instagram, Facebook & WhatsApp Business.</p>
+                <button class="btn-outline" onclick="downloadTemplate('caption')">📥 Muat Turun (PDF)</button>
+            </div>
+
+            <div class="templat-card">
+                <div class="templat-icon">📋</div>
+                <h3>Senarai Semak Stok</h3>
+                <p>Template untuk rekod masuk keluar stok barang.</p>
+                <button class="btn-outline" onclick="downloadTemplate('stok')">📥 Muat Turun (Excel)</button>
+            </div>
+
+            <div class="templat-card">
+                <div class="templat-icon">📅</div>
+                <h3>Perancang Bulanan Bisnes</h3>
+                <p>Template untuk rancang tugasan & target jualan bulanan.</p>
+                <button class="btn-outline" onclick="downloadTemplate('perancang')">📥 Muat Turun (PDF)</button>
+            </div>
+
+            <div class="templat-card">
+                <div class="templat-icon">📧</div>
+                <h3>Email Promosi (Copy Paste)</h3>
+                <p>5 template email untuk hantar kepada pelanggan lama & baru.</p>
+                <button class="btn-outline" onclick="downloadTemplate('email')">📥 Muat Turun (Word)</button>
+            </div>
+        </div>
+
+        <div class="templat-note">
+            <p>💡 <strong>Tip:</strong> Semua template boleh diedit mengikut perniagaan anda. Selepas muat turun, ubah suai nama, harga dan butiran perniagaan anda.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+        </div>
+    </footer>
+
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function downloadTemplate(type) {
+            const templates = {
+                invois: 'Invois Mudah - UsahawanDigital.pdf',
+                quotation: 'Sebut Harga - UsahawanDigital.docx',
+                caption: 'Caption Media Sosial - UsahawanDigital.pdf',
+                stok: 'Template Rekod Stok - UsahawanDigital.xlsx',
+                perancang: 'Perancang Bulanan Bisnes - UsahawanDigital.pdf',
+                email: 'Template Email Promosi - UsahawanDigital.docx'
+            };
+            alert(`📥 Demo: Fail "${templates[type]}" akan dimuat turun. Untuk projek sebenar, sila gantikan dengan fail template sebenar dalam folder uploads/`);
+        }
+    </script>
+</body>
+</html>
