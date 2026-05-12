@@ -6,21 +6,6 @@
     <title>Modul Pembelajaran - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Tambahan CSS ringkas untuk fungsi Tab dan Butang Kembali */
-        .back-button-container { margin-bottom: 20px; }
-        .back-btn { 
-            text-decoration: none; 
-            color: #1a5f7a; 
-            font-weight: 600; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 5px;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -40,87 +25,213 @@
 
     <div class="container modul-container">
         <div class="back-button-container">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+            <a href="dashboard.html" class="back-btn">Kembali ke Dashboard</a>
         </div>
-
+        
         <h2>📚 Modul Pembelajaran Kendiri</h2>
         <p class="section-desc">Pelajari asas perniagaan digital melalui video pendek, infografik dan panduan bergambar — semuanya dalam Bahasa Melayu.</p>
 
+        <!-- Tab Navigation -->
         <div class="modul-tabs">
             <button class="tab-btn active" data-tab="pemasaran">📢 Pemasaran Digital</button>
             <button class="tab-btn" data-tab="epayment">💳 e-Pembayaran</button>
             <button class="tab-btn" data-tab="keselamatan">🛡️ Keselamatan Dalam Talian</button>
         </div>
 
+        <!-- ========= TAB 1: PEMASARAN DIGITAL ========= -->
         <div id="pemasaran" class="tab-content active">
-            <div class="modul-grid">
-                <div class="modul-card video-card">
-                    <div class="modul-badge">📹 Video Pendek</div>
-                    <h3>Cara Buat Iklan Facebook Mudah</h3>
-                    <div class="video-preview">
-                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Cara+Buat+Iklan+FB" alt="Preview video">
+            
+            <!-- Sub-topik 1: Pengenalan Pemasaran Digital -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 1. Pengenalan Pemasaran Digital</h3>
+                <div class="modul-grid">
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>Apa Itu Pemasaran Digital?</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Pengenalan+Pemasaran+Digital" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/41kLQ0_LK_0?si=0bL0TtEW1D6D9ElN" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                        <p class="modul-desc">Ketahui asas pemasaran digital dan kenapa penting untuk perniagaan kecil.</p>
                     </div>
-                    <a href="https://youtu.be/41kLQ0_LK_0?si=0bL0TtEW1D6D9ElN" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
-                    <p class="modul-desc">Belajar cara sasarkan pelanggan tepat guna Facebook Ads. Sesuai untuk perniagaan kecil.</p>
-                </div>
-
-                <div class="modul-card infografik-card">
-                    <div class="modul-badge">🖼️ Infografik</div>
-                    <h3>5 Strategi Media Sosial Untuk Kedai Kecil</h3>
-                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Strategi+Media+Sosial" alt="Infografik strategi media sosial" class="infografik-img">
-                    <a href="#" class="download-link" onclick="alert('Nota: Fail PDF akan dimuat turun dalam versi penuh.')">📥 Muat Turun PDF (Infografik)</a>
-                </div>
-
-                <div class="modul-card panduan-card">
-                    <div class="modul-badge">📷 Panduan Bergambar</div>
-                    <h3>Setup Instagram Untuk Bisnes</h3>
-                    <div class="step-gallery">
-                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
-                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
-                        <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                    <div class="modul-card infografik-card">
+                        <div class="modul-badge">🖼️ Infografik</div>
+                        <h4>Strategi Media Sosial Untuk Kedai Kecil</h4>
+                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Strategi+Media+Sosial" alt="Infografik strategi media sosial" class="infografik-img">
+                        <a href="#" class="download-link" onclick="alert('📥 Muat turun PDF: Infografik Strategi Media Sosial akan tersedia.')">📥 Muat Turun PDF</a>
                     </div>
-                    <a href="#" class="download-link" onclick="alert('Nota: PDF panduan penuh akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                </div>
+            </div>
+
+            <!-- Sub-topik 2: Cara Buat Iklan di Facebook -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 2. Cara Buat Iklan di Facebook</h3>
+                <div class="modul-grid">
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>Langkah Mudah Buat Iklan Facebook</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Cara+Buat+Iklan+Facebook" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/41kLQ0_LK_0?si=0bL0TtEW1D6D9ElN" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                        <p class="modul-desc">Belajar cara sasarkan pelanggan tepat guna Facebook Ads. Sesuai untuk perniagaan kecil.</p>
+                    </div>
+                    <div class="modul-card panduan-card">
+                        <div class="modul-badge">📷 Panduan Bergambar</div>
+                        <h4>Panduan Setup Iklan Facebook (Step by Step)</h4>
+                        <div class="step-gallery">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                        </div>
+                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan iklan Facebook akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- ========= TAB 2: e-PEMBAYARAN ========= -->
         <div id="epayment" class="tab-content">
-            <div class="modul-grid">
-                <div class="modul-card video-card">
-                    <div class="modul-badge">📹 Video Pendek</div>
-                    <h3>Cara Guna Touch 'n Go eWallet</h3>
-                    <div class="video-preview">
-                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Cara+Guna+TNG+eWallet" alt="Preview video eWallet">
+            
+            <!-- Sub-topik 1: Cara Guna QR Code -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 1. Cara Guna QR Code</h3>
+                <div class="modul-grid">
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>QR Code: Cara Mudah Terima Bayaran</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Cara+Guna+QR+Code" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/ZcOJJY-wHxA?si=fUGmWaxrDgUqsT4L" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
                     </div>
-                    <a href="https://youtu.be/ZcOJJY-wHxA?si=fUGmWaxrDgUqsT4L" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
-                    <p class="modul-desc">Panduan lengkap terima pembayaran guna QR code untuk peniaga.</p>
+                    <div class="modul-card infografik-card">
+                        <div class="modul-badge">🖼️ Infografik</div>
+                        <h4>Perbandingan E-wallet Popular Malaysia</h4>
+                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Perbandingan+E-wallet" alt="Infografik perbandingan e-wallet" class="infografik-img">
+                        <a href="#" class="download-link" onclick="alert('📥 PDF infografik perbandingan e-wallet akan tersedia.')">📥 Muat Turun PDF</a>
+                    </div>
                 </div>
+            </div>
 
-                <div class="modul-card infografik-card">
-                    <div class="modul-badge">🖼️ Infografik</div>
-                    <h3>Perbandingan E-wallet Malaysia</h3>
-                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Perbandingan+E-wallet" alt="Infografik e-wallet" class="infografik-img">
-                    <a href="#" class="download-link" onclick="alert('Nota: Fail PDF sedang disediakan.')">📥 Muat Turun PDF</a>
+            <!-- Sub-topik 2: Touch 'n Go eWallet -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 2. Touch 'n Go eWallet</h3>
+                <div class="modul-grid">
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>Cara Guna Touch 'n Go eWallet Untuk Jualan</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+TNG+eWallet" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/ZcOJJY-wHxA?si=fUGmWaxrDgUqsT4L" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    </div>
+                    <div class="modul-card panduan-card">
+                        <div class="modul-badge">📷 Panduan Bergambar</div>
+                        <h4>Panduan Setup TNG eWallet untuk Bisnes</h4>
+                        <div class="step-gallery">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                        </div>
+                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan TNG eWallet akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-topik 3: Perbankan Internet (FPX) -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 3. Perbankan Internet (FPX)</h3>
+                <div class="modul-grid">
+                    <div class="modul-card infografik-card">
+                        <div class="modul-badge">🖼️ Infografik</div>
+                        <h4>Cara Terima Pembayaran Online Banking</h4>
+                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Online+Banking+FPX" alt="Infografik online banking" class="infografik-img">
+                        <a href="#" class="download-link" onclick="alert('📥 PDF infografik online banking akan tersedia.')">📥 Muat Turun PDF</a>
+                    </div>
+                    <div class="modul-card panduan-card">
+                        <div class="modul-badge">📷 Panduan Bergambar</div>
+                        <h4>Panduan Terima Bayaran FPX</h4>
+                        <div class="step-gallery">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                        </div>
+                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan FPX akan tersedia.')">📥 Muat Turun PDF Penuh</a>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- ========= TAB 3: KESELAMATAN DALAM TALIAN ========= -->
         <div id="keselamatan" class="tab-content">
-            <div class="modul-grid">
-                <div class="modul-card video-card">
-                    <div class="modul-badge">📹 Video Pendek</div>
-                    <h3>10 Tanda Scam Online</h3>
-                    <div class="video-preview">
-                        <img src="https://placehold.co/600x340/1a5f7a/white?text=Preview+Video+Tanda+Scam+Online" alt="Preview video scam">
+            
+            <!-- Sub-topik 1: Tips Keselamatan Harian -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 1. Tips Keselamatan Harian</h3>
+                <div class="modul-grid">
+                    <div class="modul-card infografik-card">
+                        <div class="modul-badge">🖼️ Infografik</div>
+                        <h4>Cara Lindungi Data Perniagaan Anda</h4>
+                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Lindungi+Data+Bisnes" alt="Infografik keselamatan data" class="infografik-img">
+                        <a href="#" class="download-link" onclick="alert('📥 PDF infografik keselamatan data akan tersedia.')">📥 Muat Turun PDF</a>
                     </div>
-                    <a href="https://youtu.be/lQTrhX8ZX8c?si=UAAWbBHfgUv2-qTl" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>5 Tips Keselamatan Digital Setiap Hari</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Tips+Keselamatan+Harian" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/lQTrhX8ZX8c?si=UAAWbBHfgUv2-qTl" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    </div>
                 </div>
+            </div>
 
-                <div class="modul-card infografik-card">
-                    <div class="modul-badge">🖼️ Infografik</div>
-                    <h3>Cara Lindungi Data Bisnes</h3>
-                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Keselamatan+Data+Bisnes" alt="Infografik keselamatan data" class="infografik-img">
-                    <a href="#" class="download-link" onclick="alert('Nota: PDF akan dimuat turun.')">📥 Muat Turun PDF</a>
+            <!-- Sub-topik 2: Scam Panggilan Telefon -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 2. Scam Panggilan Telefon</h3>
+                <div class="modul-grid">
+                    <div class="modul-card video-card">
+                        <div class="modul-badge">📹 Video Pendek</div>
+                        <h4>Kenali 10 Tanda Scam Panggilan Telefon</h4>
+                        <div class="video-preview">
+                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Scam+Panggilan+Telefon" alt="Preview video">
+                        </div>
+                        <a href="https://youtu.be/lQTrhX8ZX8c?si=UAAWbBHfgUv2-qTl" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
+                    </div>
+                    <div class="modul-card panduan-card">
+                        <div class="modul-badge">📷 Panduan Bergambar</div>
+                        <h4>Apa Yang Perlu Buat Jika Terima Panggilan Scam?</h4>
+                        <div class="step-gallery">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                        </div>
+                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan tindakan scam panggilan akan tersedia.')">📥 Muat Turun PDF</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-topik 3: Scam WhatsApp -->
+            <div class="submodul-section">
+                <h3 class="submodul-title">📌 3. Scam WhatsApp</h3>
+                <div class="modul-grid">
+                    <div class="modul-card infografik-card">
+                        <div class="modul-badge">🖼️ Infografik</div>
+                        <h4>Jenis-jenis Scam WhatsApp Yang Perlu Tahu</h4>
+                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Scam+WhatsApp" alt="Infografik scam WhatsApp" class="infografik-img">
+                        <a href="#" class="download-link" onclick="alert('📥 PDF infografik scam WhatsApp akan tersedia.')">📥 Muat Turun PDF</a>
+                    </div>
+                    <div class="modul-card panduan-card">
+                        <div class="modul-badge">📷 Panduan Bergambar</div>
+                        <h4>Cara Blokir & Lapor Akaun Scam WhatsApp</h4>
+                        <div class="step-gallery">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+1" alt="Step 1">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+2" alt="Step 2">
+                            <img src="https://placehold.co/150x150/3b82f6/white?text=Step+3" alt="Step 3">
+                        </div>
+                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan blokir scam WhatsApp akan tersedia.')">📥 Muat Turun PDF</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -128,30 +239,20 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2026 Portal UsahawanDigital | Memperkasakan Peniaga Kecil Malaysia</p>
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
         </div>
     </footer>
 
+    <!-- Supabase Library CDN - MUST BE FIRST -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Then supabase.js -->
     <script src="js/supabase.js"></script>
+    
+    <!-- Then auth.js -->
     <script src="js/auth.js"></script>
+    
+    <!-- Tab functionality -->
     <script src="js/main.js"></script>
-
-    <script>
-        // Logik Tab Switcher
-        document.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const tabTarget = button.getAttribute('data-tab');
-
-                // Buang class active dari semua button dan content
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-                // Tambah class active pada button yang diklik dan content yang sepadan
-                button.classList.add('active');
-                document.getElementById(tabTarget).classList.add('active');
-            });
-        });
-    </script>
 </body>
 </html>
