@@ -327,89 +327,52 @@ function generateReport() {
     
     const keuntungan = totalJualan - totalBelanja;
     
-    let reportHtml = `
-        <html>
-        <head>
-            <title>Laporan Jualan - UsahawanDigital</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
-                h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
-                .summary { margin: 20px 0; padding: 20px; background: #f0f7ff; border-radius: 8px; display: flex; justify-content: space-between; }
-                .summary-item { text-align: center; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-                th { background: #1a5f7a; color: white; }
-                tr:nth-child(even) { background-color: #f9f9f9; }
-                .jualan-text { color: green; font-weight: bold; }
-                .belanja-text { color: red; font-weight: bold; }
-            </style>
-        </head>
-        <body>
-            <h1>Laporan Kewangan UsahawanDigital</h1>
-            <p>Tarikh laporan: ${new Date().toLocaleDateString('ms-MY')}</p>
-            
-            <div class="summary">
-                <div class="summary-item">
-                    <p>Jumlah Jualan</p>
-                    <p class="jualan-text">RM ${totalJualan.toFixed(2)}</p>
-                </div>
-                <div class="summary-item">
-                    <p>Jumlah Perbelanjaan</p>
-                    <p class="belanja-text">RM ${totalBelanja.toFixed(2)}</p>
-                </div>
-                <div class="summary-item">
-                    <p>Untung Bersih</p>
-                    <p style="font-weight:bold; color: ${keuntungan >= 0 ? 'green' : 'red'}">RM ${keuntungan.toFixed(2)}</p>
-                </div>
-            </div>
-            
-            <h3>Senarai Transaksi (${currentFilter.toUpperCase()})</h3>
-            <table>
-                <thead>
+    // Create PDF using html2pdf library
+    // First, create a hidden div for PDF content
+    const pdfContent = document.createElement('div');
+    pdfContent.style.padding = '20px';
+    pdfContent.style.fontFamily = 'Arial, sans-serif';
+    
+    pdfContent.innerHTML = `
+        <h1 style="color: #1a5f7a;">Laporan Jualan & Perbelanjaan</h1>
+        <p>Tarikh laporan: ${new Date().toLocaleDateString('ms-MY')}</p>
+        
+        <div style="margin: 20px 0; padding: 15px; background: #f0f7ff; border-radius: 8px;">
+            <p><strong>Ringkasan Kewangan</strong></p>
+            <p>Jumlah Jualan: RM ${totalJualan.toFixed(2)}</p>
+            <p>Jumlah Perbelanjaan: RM ${totalBelanja.toFixed(2)}</p>
+            <p>Untung Bersih: RM ${keuntungan.toFixed(2)}</p>
+        </div>
+        
+        <h3>Senarai Transaksi</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #1a5f7a; color: white;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Tarikh</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Jenis</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Kategori</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Jumlah (RM)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filtered.map(record => `
                     <tr>
-                        <th>Tarikh</th>
-                        <th>Jenis</th>
-                        <th>Kategori</th>
-                        <th>Keterangan</th>
-                        <th>Jumlah (RM)</th>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${record.tarikh}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan'}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${record.kategori}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${record.jumlah.toFixed(2)}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${record.keterangan || '-'}</td>
                     </tr>
-                </thead>
-                <tbody>
+                `).join('')}
+            </tbody>
+        </table>
+        <p style="margin-top: 20px;">Dijana oleh Portal UsahawanDigital</p>
     `;
     
-    filtered.forEach(record => {
-        reportHtml += `
-            <tr>
-                <td>${new Date(record.tarikh).toLocaleDateString('ms-MY')}</td>
-                <td>${record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan'}</td>
-                <td>${record.kategori}</td>
-                <td>${record.keterangan || '-'}</td>
-                <td class="${record.jenis === 'jualan' ? 'jualan-text' : 'belanja-text'}">
-                    ${record.jenis === 'jualan' ? '+' : '-'} ${record.jumlah.toFixed(2)}
-                </td>
-            </tr>
-        `;
-    });
-    
-    reportHtml += `
-                </tbody>
-            </table>
-            <footer style="margin-top: 40px; font-size: 0.8em; text-align: center; color: #777;">
-                Dijana secara automatik oleh Portal UsahawanDigital.
-            </footer>
-        </body>
-        </html>
-    `;
-    
-    const blob = new Blob([reportHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Laporan_Kewangan_${new Date().toISOString().split('T')[0]}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert('Laporan siap dimuat turun!');
+    // Open print window (which can save as PDF)
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(pdfContent.innerHTML);
+    printWindow.document.close();
+    printWindow.print();
 }
