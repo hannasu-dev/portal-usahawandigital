@@ -29,7 +29,7 @@
         </div>
         
         <div class="modul-header">
-            <h2>📚 Pembelajaran Kendiri</h2>
+            <h2>📚 Pembelajaran Interaktif</h2>
             <p class="section-desc">Tingkatkan kemahiran perniagaan digital anda</p>
         </div>
 
@@ -45,18 +45,15 @@
                 <ul class="subtopic-list">
                     <li>
                         <span class="topic-icon">🎬</span>
-                        <span>Pengenalan Pemasaran Digital</span>
-                        <button class="view-btn" onclick="showContent('pemasaran1')">Lihat →</button>
+                        <a href="modul-pemasaran1.html">Pengenalan Pemasaran Digital</a>
                     </li>
                     <li>
                         <span class="topic-icon">📱</span>
-                        <span>Cara Buat Iklan Facebook</span>
-                        <button class="view-btn" onclick="showContent('pemasaran2')">Lihat →</button>
+                        <a href="modul-pemasaran2.html">Cara Buat Iklan Facebook</a>
                     </li>
                     <li>
                         <span class="topic-icon">📸</span>
-                        <span>Marketing di Instagram</span>
-                        <button class="view-btn" onclick="showContent('pemasaran3')">Lihat →</button>
+                        <a href="modul-pemasaran3.html">Marketing di Instagram</a>
                     </li>
                 </ul>
             </div>
@@ -70,18 +67,15 @@
                 <ul class="subtopic-list">
                     <li>
                         <span class="topic-icon">💡</span>
-                        <span>Tips Keselamatan Harian</span>
-                        <button class="view-btn" onclick="showContent('keselamatan1')">Lihat →</button>
+                        <a href="modul-keselamatan1.html">Tips Keselamatan Harian</a>
                     </li>
                     <li>
                         <span class="topic-icon">📞</span>
-                        <span>Scam Panggilan Telefon</span>
-                        <button class="view-btn" onclick="showContent('keselamatan2')">Lihat →</button>
+                        <a href="modul-keselamatan2.html">Scam Panggilan Telefon</a>
                     </li>
                     <li>
                         <span class="topic-icon">💬</span>
-                        <span>Scam WhatsApp</span>
-                        <button class="view-btn" onclick="showContent('keselamatan3')">Lihat →</button>
+                        <a href="modul-keselamatan3.html">Scam WhatsApp</a>
                     </li>
                 </ul>
             </div>
@@ -95,30 +89,17 @@
                 <ul class="subtopic-list">
                     <li>
                         <span class="topic-icon">📷</span>
-                        <span>Cara Guna QR Code</span>
-                        <button class="view-btn" onclick="showContent('epayment1')">Lihat →</button>
+                        <a href="modul-epayment1.html">Cara Guna QR Code</a>
                     </li>
                     <li>
                         <span class="topic-icon">📱</span>
-                        <span>Touch n Go eWallet</span>
-                        <button class="view-btn" onclick="showContent('epayment2')">Lihat →</button>
+                        <a href="modul-epayment2.html">Touch n Go eWallet</a>
                     </li>
                     <li>
                         <span class="topic-icon">🏦</span>
-                        <span>Perbankan Internet</span>
-                        <button class="view-btn" onclick="showContent('epayment3')">Lihat →</button>
+                        <a href="modul-epayment3.html">Perbankan Internet (FPX)</a>
                     </li>
                 </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Popup untuk Content -->
-    <div id="contentModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div id="modalBody">
-                <!-- Content will be injected here -->
             </div>
         </div>
     </div>
@@ -129,138 +110,9 @@
         </div>
     </footer>
 
-    <!-- Supabase Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
-    
-    <script>
-        // Content data for each subtopic
-        const contentData = {
-            pemasaran1: {
-                title: "Pengenalan Pemasaran Digital",
-                video: "https://youtu.be/41kLQ0_LK_0",
-                infografik: "Infografik Strategi Media Sosial",
-                pdfUrl: "#"
-            },
-            pemasaran2: {
-                title: "Cara Buat Iklan Facebook",
-                video: "https://youtu.be/41kLQ0_LK_0",
-                panduan: "Panduan Langkah Demi Langkah Setup Iklan Facebook",
-                pdfUrl: "#"
-            },
-            pemasaran3: {
-                title: "Marketing di Instagram",
-                video: "https://youtu.be/41kLQ0_LK_0",
-                infografik: "Infografik Tips Marketing Instagram",
-                pdfUrl: "#"
-            },
-            keselamatan1: {
-                title: "Tips Keselamatan Harian",
-                video: "https://youtu.be/lQTrhX8ZX8c",
-                infografik: "Infografik Cara Lindungi Data Perniagaan",
-                pdfUrl: "#"
-            },
-            keselamatan2: {
-                title: "Scam Panggilan Telefon",
-                video: "https://youtu.be/lQTrhX8ZX8c",
-                panduan: "Apa Yang Perlu Buat Jika Terima Panggilan Scam?",
-                pdfUrl: "#"
-            },
-            keselamatan3: {
-                title: "Scam WhatsApp",
-                infografik: "Jenis-jenis Scam WhatsApp Yang Perlu Tahu",
-                panduan: "Cara Blokir & Lapor Akaun Scam WhatsApp",
-                pdfUrl: "#"
-            },
-            epayment1: {
-                title: "Cara Guna QR Code",
-                video: "https://youtu.be/ZcOJJY-wHxA",
-                infografik: "Perbandingan E-wallet Popular Malaysia",
-                pdfUrl: "#"
-            },
-            epayment2: {
-                title: "Touch n Go eWallet",
-                video: "https://youtu.be/ZcOJJY-wHxA",
-                panduan: "Panduan Setup TNG eWallet untuk Bisnes",
-                pdfUrl: "#"
-            },
-            epayment3: {
-                title: "Perbankan Internet",
-                infografik: "Cara Terima Pembayaran Online Banking (FPX)",
-                panduan: "Panduan Terima Bayaran FPX",
-                pdfUrl: "#"
-            }
-        };
-
-        function showContent(id) {
-            const data = contentData[id];
-            if (!data) return;
-            
-            let contentHtml = `
-                <h2>${data.title}</h2>
-                <div class="modal-modul-grid">
-            `;
-            
-            // Video section
-            if (data.video) {
-                contentHtml += `
-                    <div class="modal-card">
-                        <div class="modal-badge">📹 Video Pendek</div>
-                        <div class="video-preview">
-                            <img src="https://placehold.co/600x340/1a5f7a/white?text=Video+${encodeURIComponent(data.title)}" alt="Preview video">
-                        </div>
-                        <a href="${data.video}" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
-                    </div>
-                `;
-            }
-            
-            // Infographic section
-            if (data.infografik) {
-                contentHtml += `
-                    <div class="modal-card">
-                        <div class="modal-badge">🖼️ Infografik</div>
-                        <h4>${data.infografik}</h4>
-                        <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+${encodeURIComponent(data.title)}" alt="Infografik" class="infografik-img">
-                        <a href="#" class="download-link" onclick="alert('📥 PDF akan dimuat turun tidak lama lagi.')">📥 Muat Turun PDF</a>
-                    </div>
-                `;
-            }
-            
-            // Step-by-step guide section
-            if (data.panduan) {
-                contentHtml += `
-                    <div class="modal-card">
-                        <div class="modal-badge">📷 Panduan Bergambar</div>
-                        <h4>${data.panduan}</h4>
-                        <div class="step-gallery">
-                            <img src="https://placehold.co/150x150/3b82f6/white?text=Langkah+1" alt="Step 1">
-                            <img src="https://placehold.co/150x150/3b82f6/white?text=Langkah+2" alt="Step 2">
-                            <img src="https://placehold.co/150x150/3b82f6/white?text=Langkah+3" alt="Step 3">
-                        </div>
-                        <a href="#" class="download-link" onclick="alert('📥 PDF panduan akan dimuat turun tidak lama lagi.')">📥 Muat Turun PDF Penuh</a>
-                    </div>
-                `;
-            }
-            
-            contentHtml += `</div>`;
-            
-            document.getElementById('modalBody').innerHTML = contentHtml;
-            document.getElementById('contentModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('contentModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('contentModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-    </script>
 </body>
 </html>
