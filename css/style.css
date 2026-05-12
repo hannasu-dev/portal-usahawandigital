@@ -170,31 +170,22 @@ body {
     min-width: 30px;
 }
 
-.subtopic-list li span:not(.topic-icon) {
+.subtopic-list li a {
     flex: 1;
-    font-size: 0.95rem;
+    text-decoration: none;
     color: #334155;
+    font-size: 0.95rem;
+    transition: color 0.3s;
 }
 
-.view-btn {
-    background: none;
-    border: none;
+.subtopic-list li a:hover {
     color: #1a5f7a;
-    font-size: 0.8rem;
-    cursor: pointer;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 20px;
-    transition: background 0.3s;
-}
-
-.view-btn:hover {
-    background: #e0f2fe;
+    text-decoration: underline;
 }
 
 /* --- MODAL SYSTEM --- */
 .modal {
-    display: none; /* Tersembunyi secara default */
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -235,31 +226,6 @@ body {
     color: #1a5f7a;
 }
 
-.modal-modul-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-.modal-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.modal-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    background: #e0f2fe;
-    color: #0369a1;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-}
-
 /* --- FOOTER & UTILITY --- */
 footer {
     background: #1e293b;
@@ -285,7 +251,7 @@ footer {
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 900px) {
     .modul-three-columns {
-        grid-template-columns: 1fr; /* Bertukar ke 1 kolum pada tablet/mobile */
+        grid-template-columns: 1fr;
         gap: 1.5rem;
     }
     
