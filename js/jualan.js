@@ -99,10 +99,13 @@ async function loadRecords() {
         
         if (error) throw error;
         
+        // Simpan data ke dalam variable global
         currentRecords = data || [];
         
-        // Kemaskini paparan senarai, ringkasan, dan carta
+        // 1. Tapis dan papar senarai
         filterRecords();
+        
+        // 2. Sediakan dan kemaskini carta (Langkah 5)
         prepareChartData(currentRecords);
         
     } catch (error) {
