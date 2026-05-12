@@ -87,7 +87,7 @@
                 <div class="templat-icon">💰</div>
                 <h3>Sebut Harga (Quotation)</h3>
                 <p>Template profesional untuk hantar sebut harga kepada pelanggan.</p>
-                <button class="btn-outline" onclick="downloadTemplate('quotation')">📥 Muat Turun (Word)</button>
+                <button class="btn-outline" onclick="downloadTemplate('quotation')">📥 Muat Turun (PDF)</button>
             </div>
 
             <div class="templat-card">
@@ -148,18 +148,22 @@
                 fileUrl = 'uploads/templatequotation.pdf';
                 fileName = 'Template_Sebut_Harga_UsahawanDigital.pdf';
                 break;
-            case 'caption':
-                alert('📱 Demo: File caption media sosial akan tersedia tidak lama lagi.');
-                return;
             case 'stok':
-                alert('📋 Demo: Template rekod stok akan tersedia tidak lama lagi.');
-                return;
+                fileUrl = 'uploads/template_senarai_semak_stok.xlsx';
+                fileName = 'Template_Senarai_Semak_Stok.xlsx';
+                break;
+            case 'caption':
+                fileUrl = 'uploads/template_captionmediasosial.pdf';
+                fileName = 'Template_Caption_Media_Sosial.pdf';
+                break;
             case 'perancang':
-                alert('📅 Demo: Template perancang bulanan akan tersedia tidak lama lagi.');
-                return;
+                fileUrl = 'uploads/Template_Perancangan_Bulanan_Bisnes.pdf';
+                fileName = 'Template_Perancangan_Bulanan_Bisnes.pdf';
+                break;
             case 'email':
-                alert('📧 Demo: Template email promosi akan tersedia tidak lama lagi.');
-                return;
+                fileUrl = 'uploads/Templat_Emel_Promosi_Bisnes.docx';
+                fileName = 'Templat_Emel_Promosi_Bisnes.docx';
+                break;
             default:
                 alert('Template sedang dalam pembinaan.');
                 return;
