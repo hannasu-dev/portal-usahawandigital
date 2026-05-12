@@ -1,12 +1,3 @@
-/* UsahawanDigital - Main Stylesheet 
-    Color Palette: 
-    - Primary: #1a5f7a (Deep Blue)
-    - Secondary: #2c7da0 (Ocean Blue)
-    - Accent: #ffd166 (Yellow)
-    - Success: #16a34a (Green)
-    - Danger: #dc2626 (Red)
-*/
-
 * {
     margin: 0;
     padding: 0;
@@ -26,7 +17,7 @@ body {
     padding: 0 20px;
 }
 
-/* --- NAVBAR --- */
+/* Navbar */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -76,7 +67,7 @@ body {
     cursor: pointer;
 }
 
-/* --- BUTTONS --- */
+/* Buttons */
 .btn-primary, .btn-outline {
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
@@ -120,7 +111,7 @@ body {
     text-align: center;
 }
 
-/* --- HERO SECTION --- */
+/* Hero Section */
 .hero {
     background: linear-gradient(135deg, #1a5f7a 0%, #2c7da0 100%);
     color: white;
@@ -177,7 +168,7 @@ body {
     opacity: 0.9;
 }
 
-/* --- FEATURES SECTION --- */
+/* Features Section */
 .features {
     padding: 4rem 0;
 }
@@ -185,14 +176,8 @@ body {
 .section-title {
     text-align: center;
     font-size: 2rem;
-    margin-bottom: 0.5rem;
-    color: #1e293b;
-}
-
-.section-desc {
-    text-align: center;
-    color: #64748b;
     margin-bottom: 2rem;
+    color: #1e293b;
 }
 
 .features-grid {
@@ -224,42 +209,34 @@ body {
     color: #1a5f7a;
 }
 
-/* --- CHART CARD (NEW) --- */
-.chart-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.chart-card h3 {
-    margin-bottom: 1rem;
-    color: #1a5f7a;
+/* Auth Pages */
+.auth-container {
+    min-height: calc(100vh - 200px);
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    padding: 3rem 1rem;
 }
 
-#salesChart {
-    max-height: 300px; /* Hadkan ketinggian pada skrin besar */
-    width: 100% !important;
-}
-
-/* --- FORM & INPUTS --- */
-.form-card {
+.auth-card {
     background: white;
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 16px;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    max-width: 480px;
+    width: 100%;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
+.auth-card h2 {
+    text-align: center;
+    color: #1a5f7a;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 1.5rem;
 }
 
 .form-group {
@@ -273,8 +250,7 @@ body {
     color: #334155;
 }
 
-.form-group input, 
-.form-group select {
+.form-group input, .form-group select {
     width: 100%;
     padding: 0.8rem;
     border: 1px solid #cbd5e1;
@@ -288,14 +264,272 @@ body {
     border-color: #1a5f7a;
 }
 
-/* --- REKOD JUALAN LIST --- */
+.message-box {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.message-box.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.message-box.success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #64748b;
+}
+
+.auth-footer a {
+    color: #1a5f7a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Dashboard */
+.dashboard-container {
+    padding: 2rem 0;
+}
+
+.welcome-card {
+    background: linear-gradient(135deg, #1a5f7a, #2c7da0);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1e293b;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: block;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.dashboard-card h3 {
+    color: #1a5f7a;
+    margin-bottom: 0.4rem;
+}
+
+.tip-card {
+    background: #fef3c7;
+}
+
+.progress-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.progress-bar-container {
+    margin-bottom: 1rem;
+}
+
+.progress-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: #1a5f7a;
+    height: 100%;
+    border-radius: 4px;
+    width: 0%;
+}
+
+.progress-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 1rem;
+}
+
+/* Modul Page */
+.modul-container {
+    padding: 2rem 0;
+}
+
+.modul-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: #1a5f7a;
+    border-color: #1a5f7a;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.modul-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.modul-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 1.2rem;
+}
+
+.modul-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+}
+
+.modul-card h3 {
+    margin-bottom: 0.8rem;
+    color: #1e293b;
+}
+
+.video-preview img, .infografik-img {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 0.8rem;
+}
+
+.video-link, .download-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #1a5f7a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.step-gallery {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.8rem 0;
+    flex-wrap: wrap;
+}
+
+.step-gallery img {
+    width: calc(33% - 0.5rem);
+    border-radius: 8px;
+}
+
+.modul-desc {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+/* Templat Page */
+.templat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.templat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.templat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.templat-card h3 {
+    margin-bottom: 0.5rem;
+    color: #1a5f7a;
+}
+
+.templat-note {
+    background: #dcfce7;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+/* Jualan Page */
+.form-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
 .rekod-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     margin-bottom: 1rem;
-    gap: 1rem;
 }
 
 .filter-section {
@@ -303,10 +537,9 @@ body {
     gap: 1rem;
 }
 
-.filter-section select {
-    padding: 0.5rem;
+.filter-section select, .filter-section button {
+    padding: 0.5rem 1rem;
     border-radius: 8px;
-    border: 1px solid #cbd5e1;
 }
 
 .rekod-list {
@@ -314,105 +547,150 @@ body {
     border-radius: 16px;
     overflow: hidden;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .rekod-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     border-bottom: 1px solid #e2e8f0;
-    transition: background 0.2s;
 }
 
-.rekod-item:last-child {
-    border-bottom: none;
+.rekod-item.jualan {
+    border-left: 4px solid #16a34a;
 }
 
-.rekod-item:hover {
-    background: #f8fafc;
+.rekod-item.belanja {
+    border-left: 4px solid #dc2626;
 }
 
-.rekod-item.jualan { border-left: 5px solid #16a34a; }
-.rekod-item.belanja { border-left: 5px solid #dc2626; }
+.rekod-info {
+    flex: 1;
+}
 
-.rekod-info { flex: 1; }
-.rekod-tarikh { font-size: 0.8rem; color: #64748b; }
-.rekod-keterangan { font-weight: 500; }
+.rekod-tarikh {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.rekod-keterangan {
+    font-weight: 500;
+}
 
 .rekod-jumlah {
     font-weight: 700;
     font-size: 1.1rem;
 }
 
-.rekod-jumlah.jualan { color: #16a34a; }
-.rekod-jumlah.belanja { color: #dc2626; }
+.rekod-jumlah.jualan {
+    color: #16a34a;
+}
 
-/* --- SUMMARY SECTION --- */
+.rekod-jumlah.belanja {
+    color: #dc2626;
+}
+
+.rekod-delete {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #94a3b8;
+}
+
 .summary-card {
     background: white;
     padding: 1.5rem;
     border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1.5rem;
+    gap: 1rem;
     margin-top: 1rem;
 }
 
 .summary-item {
     text-align: center;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 12px;
 }
 
 .summary-item span {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #64748b;
-    margin-bottom: 0.5rem;
 }
 
 .summary-item strong {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: #1a5f7a;
 }
 
-/* --- FOOTER --- */
+/* Footer */
 footer {
     background: #1e293b;
     color: #94a3b8;
     text-align: center;
-    padding: 2.5rem 0;
+    padding: 2rem 0;
     margin-top: 3rem;
 }
 
-/* --- RESPONSIVE MOBILE --- */
+/* Responsive */
 @media (max-width: 768px) {
-    .nav-links { display: none; }
-    .mobile-menu-btn { display: block; }
+    .nav-links {
+        display: none;
+    }
     
-    .hero-content h1 { font-size: 1.8rem; }
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    
     .hero-stats {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .modul-tabs {
+        justify-content: center;
     }
     
     .rekod-header {
         flex-direction: column;
-        align-items: flex-start;
+        gap: 1rem;
     }
     
-    .filter-section {
-        width: 100%;
+    .form-row {
+        grid-template-columns: 1fr;
     }
-    
-    .filter-section select {
-        flex: 1;
-    }
+}
+
+/* Utility */
+.section-desc {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+/* Forgot password link */
+.forgot-password {
+    text-align: right;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+    color: #1a5f7a;
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
 }
