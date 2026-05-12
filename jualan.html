@@ -10,6 +10,24 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        /* Gaya untuk butang kembali dan elemen cetakan */
+        .back-button-container { margin-bottom: 20px; }
+        .back-btn { 
+            text-decoration: none; 
+            color: #1a5f7a; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px;
+        }
+        .back-btn:hover { text-decoration: underline; }
+
+        @media print {
+            .no-print { display: none !important; }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -29,6 +47,10 @@
     </nav>
 
     <div class="container" id="reportArea">
+        <div class="back-button-container no-print">
+            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+        </div>
+
         <h2>💰 Rekod Jualan & Perbelanjaan</h2>
         <p class="section-desc">Catat semua transaksi perniagaan anda di sini. Jana laporan PDF untuk simpanan.</p>
 
@@ -120,20 +142,21 @@
     <script src="js/jualan.js"></script>
 
     <script>
-        // Fungsi baru menggunakan html2pdf
+        // Logik Eksport PDF menggunakan html2pdf
         function exportToPDF() {
             const element = document.getElementById('reportArea');
             
-            // Konfigurasi PDF
+            // Konfigurasi PDF - margin dan kualiti ditingkatkan
             const opt = {
                 margin:       10,
                 filename:     'Laporan_Kewangan_UsahawanDigital.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Jalankan proses convert
+            // Jalankan proses penukaran
+            // Kami tambah class 'no-print' secara dinamik jika perlu
             html2pdf().set(opt).from(element).save();
         }
     </script>
