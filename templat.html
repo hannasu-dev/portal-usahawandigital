@@ -135,19 +135,47 @@
     <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
     <script>
-        function downloadTemplate(type) {
-            const templates = {
-                invois: 'Invois Mudah - UsahawanDigital.pdf',
-                quotation: 'Sebut Harga - UsahawanDigital.docx',
-                caption: 'Caption Media Sosial - UsahawanDigital.pdf',
-                stok: 'Template Rekod Stok - UsahawanDigital.xlsx',
-                perancang: 'Perancang Bulanan Bisnes - UsahawanDigital.pdf',
-                email: 'Template Email Promosi - UsahawanDigital.docx'
-            };
-            
-            // Logik simulasi muat turun
-            alert(`📥 Memulakan muat turun: "${templates[type]}"\n\n(Pastikan fail sebenar berada dalam folder projek anda)`);
+    function downloadTemplate(type) {
+        let fileUrl = '';
+        let fileName = '';
+        
+        switch(type) {
+            case 'invois':
+                fileUrl = 'uploads/templateinvoice.pdf';
+                fileName = 'Template_Invois_UsahawanDigital.pdf';
+                break;
+            case 'quotation':
+                fileUrl = 'uploads/templatequotation.pdf';
+                fileName = 'Template_Sebut_Harga_UsahawanDigital.pdf';
+                break;
+            case 'caption':
+                alert('📱 Demo: File caption media sosial akan tersedia tidak lama lagi.');
+                return;
+            case 'stok':
+                alert('📋 Demo: Template rekod stok akan tersedia tidak lama lagi.');
+                return;
+            case 'perancang':
+                alert('📅 Demo: Template perancang bulanan akan tersedia tidak lama lagi.');
+                return;
+            case 'email':
+                alert('📧 Demo: Template email promosi akan tersedia tidak lama lagi.');
+                return;
+            default:
+                alert('Template sedang dalam pembinaan.');
+                return;
         }
-    </script>
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Success message
+        alert(`✅ ${fileName} berjaya dimuat turun!`);
+    }
+</script>
 </body>
 </html>
