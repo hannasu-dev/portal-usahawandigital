@@ -6,6 +6,50 @@
     <title>Templat Percuma - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Konsistensi dengan modul.html */
+        .back-button-container { margin-bottom: 20px; }
+        .back-btn { 
+            text-decoration: none; 
+            color: #1a5f7a; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px;
+        }
+        .back-btn:hover { text-decoration: underline; }
+        
+        .templat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .templat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.2s;
+            text-align: center;
+        }
+        
+        .templat-card:hover { transform: translateY(-5px); }
+        
+        .templat-icon { font-size: 3rem; margin-bottom: 15px; }
+        .templat-card h3 { color: #1a5f7a; margin-bottom: 10px; }
+        .templat-card p { color: #64748b; font-size: 0.9rem; margin-bottom: 20px; }
+        
+        .templat-note {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-left: 4px solid #1a5f7a;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -24,8 +68,12 @@
     </nav>
 
     <div class="container">
+        <div class="back-button-container">
+            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+        </div>
+
         <h2>📄 Templat Perniagaan Percuma</h2>
-        <p class="section-desc">Muat turun dan guna terus untuk perniagaan anda. Format Word/Excel/PDF sedia guna.</p>
+        <p class="section-desc">Muat turun dan guna terus untuk perniagaan anda. Format Word, Excel, dan PDF sedia guna.</p>
 
         <div class="templat-grid">
             <div class="templat-card">
@@ -78,14 +126,14 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+            <p>&copy; 2026 Portal UsahawanDigital | Memperkasakan Peniaga Kecil Malaysia</p>
         </div>
     </footer>
 
-    <!-- 1. CDN (PALING ATAS) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
     <script>
         function downloadTemplate(type) {
             const templates = {
@@ -96,9 +144,10 @@
                 perancang: 'Perancang Bulanan Bisnes - UsahawanDigital.pdf',
                 email: 'Template Email Promosi - UsahawanDigital.docx'
             };
-            alert(`📥 Demo: Fail "${templates[type]}" akan dimuat turun. Untuk projek sebenar, sila gantikan dengan fail template sebenar dalam folder uploads/`);
+            
+            // Logik simulasi muat turun
+            alert(`📥 Memulakan muat turun: "${templates[type]}"\n\n(Pastikan fail sebenar berada dalam folder projek anda)`);
         }
     </script>
-        
 </body>
 </html>
