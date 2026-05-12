@@ -637,6 +637,35 @@ footer {
     margin-top: 3rem;
 }
 
+/* Back Button */
+.back-button-container {
+    padding: 1rem 0 0 0;
+    margin-bottom: 1rem;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #1a5f7a;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-btn:hover {
+    color: #0e4a62;
+}
+
+.back-btn::before {
+    content: "←";
+    font-size: 1.2rem;
+}
 /* Responsive */
 @media (max-width: 768px) {
     .nav-links {
