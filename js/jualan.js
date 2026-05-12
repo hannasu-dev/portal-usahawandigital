@@ -1,7 +1,9 @@
+// Global variables
 let currentRecords = [];
 let currentFilter = 'semua';
+let salesChart = null;
 
-// Load records on page load
+// 1. Load records apabila halaman dimuatkan
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthAndLoad();
 });
@@ -14,11 +16,14 @@ async function checkAuthAndLoad() {
         return;
     }
     
-    document.getElementById('userName').textContent = user.email;
+    // Pastikan ID userName wujud di HTML anda
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) userNameEl.textContent = user.email;
+    
     loadRecords();
 }
 
-// Handle form submission
+// 2. Kendalikan penghantaran borang (Form Submission)
 const jualanForm = document.getElementById('jualanForm');
 if (jualanForm) {
     jualanForm.addEventListener('submit', async (e) => {
@@ -59,11 +64,11 @@ if (jualanForm) {
             
             if (error) throw error;
             
-            // Clear form
-            document.getElementById('jualanForm').reset();
+            // Kosongkan borang
+            jualanForm.reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             
-            // Reload records
+            // Muat semula rekod & carta
             loadRecords();
             
         } catch (error) {
@@ -73,6 +78,7 @@ if (jualanForm) {
     });
 }
 
+// 3. Fungsi memuatkan data dari Supabase
 async function loadRecords() {
     const user = await checkAuth();
     if (!user) return;
@@ -94,7 +100,10 @@ async function loadRecords() {
         if (error) throw error;
         
         currentRecords = data || [];
+        
+        // Kemaskini paparan senarai, ringkasan, dan carta
         filterRecords();
+        prepareChartData(currentRecords);
         
     } catch (error) {
         console.error('Error loading records:', error);
@@ -102,6 +111,7 @@ async function loadRecords() {
     }
 }
 
+// 4. Penapisan Rekod (Filter)
 function filterRecords() {
     const filter = document.getElementById('filterJenis')?.value || 'semua';
     currentFilter = filter;
@@ -115,6 +125,7 @@ function filterRecords() {
     updateSummary(filtered);
 }
 
+// 5. Paparkan senarai rekod di HTML
 function displayRecords(records) {
     const rekodList = document.getElementById('rekodList');
     
@@ -148,6 +159,7 @@ function displayRecords(records) {
     rekodList.innerHTML = html;
 }
 
+// 6. Kemaskini Ringkasan (Summary)
 function updateSummary(records) {
     let totalJualan = 0;
     let totalBelanja = 0;
@@ -174,6 +186,7 @@ function updateSummary(records) {
     }
 }
 
+// 7. Padam Rekod
 async function deleteRecord(recordId) {
     if (!confirm('Padam rekod ini?')) return;
     
@@ -193,6 +206,100 @@ async function deleteRecord(recordId) {
     }
 }
 
+// ==========================================
+// LOGIK CARTA (CHART.JS)
+// ==========================================
+
+function updateChart(jualanData, belanjaData, bulanLabels) {
+    const canvas = document.getElementById('salesChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    if (salesChart) {
+        salesChart.destroy();
+    }
+    
+    salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: bulanLabels,
+            datasets: [
+                {
+                    label: 'Jualan (RM)',
+                    data: jualanData,
+                    backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                    borderColor: 'rgb(34, 197, 94)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Perbelanjaan (RM)',
+                    data: belanjaData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `RM ${context.raw.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Jumlah (RM)' }
+                }
+            }
+        }
+    });
+}
+
+function prepareChartData(records) {
+    const months = [];
+    const jualanByMonth = {};
+    const belanjaByMonth = {};
+    
+    const now = new Date();
+    // Ambil data 6 bulan terakhir
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = `${d.getFullYear()}-${d.getMonth() + 1}`;
+        const monthLabel = d.toLocaleDateString('ms-MY', { month: 'short', year: 'numeric' });
+        months.push({ key: monthKey, label: monthLabel });
+        jualanByMonth[monthKey] = 0;
+        belanjaByMonth[monthKey] = 0;
+    }
+    
+    records.forEach(record => {
+        const date = new Date(record.tarikh);
+        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        
+        if (jualanByMonth[monthKey] !== undefined) {
+            if (record.jenis === 'jualan') {
+                jualanByMonth[monthKey] += record.jumlah;
+            } else {
+                belanjaByMonth[monthKey] += record.jumlah;
+            }
+        }
+    });
+    
+    const labels = months.map(m => m.label);
+    const jualanData = months.map(m => jualanByMonth[m.key]);
+    const belanjaData = months.map(m => belanjaByMonth[m.key]);
+    
+    updateChart(jualanData, belanjaData, labels);
+}
+
+// 8. Jana Laporan HTML/PDF
 function generateReport() {
     if (currentRecords.length === 0) {
         alert('Tiada rekod untuk dijana laporan.');
@@ -222,31 +329,47 @@ function generateReport() {
         <head>
             <title>Laporan Jualan - UsahawanDigital</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 40px; }
-                h1 { color: #1a5f7a; }
-                .summary { margin: 20px 0; padding: 15px; background: #f0f7ff; border-radius: 8px; }
+                body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+                h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
+                .summary { margin: 20px 0; padding: 20px; background: #f0f7ff; border-radius: 8px; display: flex; justify-content: space-between; }
+                .summary-item { text-align: center; }
                 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
                 th { background: #1a5f7a; color: white; }
-                .total-jualan { color: green; font-weight: bold; }
-                .total-belanja { color: red; font-weight: bold; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .jualan-text { color: green; font-weight: bold; }
+                .belanja-text { color: red; font-weight: bold; }
             </style>
         </head>
         <body>
-            <h1>Laporan Jualan & Perbelanjaan</h1>
+            <h1>Laporan Kewangan UsahawanDigital</h1>
             <p>Tarikh laporan: ${new Date().toLocaleDateString('ms-MY')}</p>
             
             <div class="summary">
-                <p><strong>Ringkasan Kewangan</strong></p>
-                <p>Jumlah Jualan: RM ${totalJualan.toFixed(2)}</p>
-                <p>Jumlah Perbelanjaan: RM ${totalBelanja.toFixed(2)}</p>
-                <p>Untung Bersih: RM ${keuntungan.toFixed(2)}</p>
+                <div class="summary-item">
+                    <p>Jumlah Jualan</p>
+                    <p class="jualan-text">RM ${totalJualan.toFixed(2)}</p>
+                </div>
+                <div class="summary-item">
+                    <p>Jumlah Perbelanjaan</p>
+                    <p class="belanja-text">RM ${totalBelanja.toFixed(2)}</p>
+                </div>
+                <div class="summary-item">
+                    <p>Untung Bersih</p>
+                    <p style="font-weight:bold; color: ${keuntungan >= 0 ? 'green' : 'red'}">RM ${keuntungan.toFixed(2)}</p>
+                </div>
             </div>
             
-            <h3>Senarai Transaksi</h3>
+            <h3>Senarai Transaksi (${currentFilter.toUpperCase()})</h3>
             <table>
                 <thead>
-                    <tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Jumlah (RM)</th><th>Keterangan</th></tr>
+                    <tr>
+                        <th>Tarikh</th>
+                        <th>Jenis</th>
+                        <th>Kategori</th>
+                        <th>Keterangan</th>
+                        <th>Jumlah (RM)</th>
+                    </tr>
                 </thead>
                 <tbody>
     `;
@@ -254,11 +377,13 @@ function generateReport() {
     filtered.forEach(record => {
         reportHtml += `
             <tr>
-                <td>${record.tarikh}</td>
+                <td>${new Date(record.tarikh).toLocaleDateString('ms-MY')}</td>
                 <td>${record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan'}</td>
                 <td>${record.kategori}</td>
-                <td>${record.jumlah.toFixed(2)}</td>
                 <td>${record.keterangan || '-'}</td>
+                <td class="${record.jenis === 'jualan' ? 'jualan-text' : 'belanja-text'}">
+                    ${record.jenis === 'jualan' ? '+' : '-'} ${record.jumlah.toFixed(2)}
+                </td>
             </tr>
         `;
     });
@@ -266,7 +391,9 @@ function generateReport() {
     reportHtml += `
                 </tbody>
             </table>
-            <p>Dijana oleh Portal UsahawanDigital</p>
+            <footer style="margin-top: 40px; font-size: 0.8em; text-align: center; color: #777;">
+                Dijana secara automatik oleh Portal UsahawanDigital.
+            </footer>
         </body>
         </html>
     `;
@@ -275,7 +402,7 @@ function generateReport() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `laporan_jualan_${new Date().toISOString().split('T')[0]}.html`;
+    a.download = `Laporan_Kewangan_${new Date().toISOString().split('T')[0]}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
