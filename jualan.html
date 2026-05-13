@@ -6,28 +6,8 @@
     <title>Rekod Jualan - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <!-- Chart.js untuk visual -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <style>
-        /* Gaya untuk butang kembali dan elemen cetakan */
-        .back-button-container { margin-bottom: 20px; }
-        .back-btn { 
-            text-decoration: none; 
-            color: #1a5f7a; 
-            font-weight: 600; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 5px;
-        }
-        .back-btn:hover { text-decoration: underline; }
-
-        @media print {
-            .no-print { display: none !important; }
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -46,15 +26,16 @@
         </div>
     </nav>
 
-    <div class="container" id="reportArea">
-        <div class="back-button-container no-print">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+    <div class="container">
+        <div class="back-button-container">
+            <a href="dashboard.html" class="back-btn">Kembali ke Dashboard</a>
         </div>
-
+        
         <h2>💰 Rekod Jualan & Perbelanjaan</h2>
-        <p class="section-desc">Catat semua transaksi perniagaan anda di sini. Jana laporan PDF untuk simpanan.</p>
+        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item (contoh: Kek Coklat 3 biji, Air Sirap 2 gelas)</p>
 
-        <div class="form-card no-print">
+        <!-- Form Tambah Rekod - Itemized Version -->
+        <div class="form-card">
             <h3>Tambah Rekod Baru</h3>
             <form id="jualanForm">
                 <div class="form-row">
@@ -63,53 +44,60 @@
                         <input type="date" id="tarikh" required>
                     </div>
                     <div class="form-group">
-                        <label>Jenis</label>
+                        <label>Jenis Transaksi</label>
                         <select id="jenis" required>
                             <option value="jualan">💰 Jualan (Pendapatan)</option>
-                            <option value="belanja">📉 Perbelanjaan</option>
+                            <option value="belanja">📉 Perbelanjaan (Kos/Beli Stok)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Kategori</label>
+                        <label>Kategori Utama</label>
                         <select id="kategori" required>
-                            <option value="produk">Produk</option>
-                            <option value="perkhidmatan">Perkhidmatan</option>
-                            <option value="stok">Stok/Bahan Mentah</option>
-                            <option value="operasi">Operasi (Sewa, Elektrik)</option>
-                            <option value="lain">Lain-lain</option>
+                            <option value="makanan">🍔 Makanan</option>
+                            <option value="minuman">🥤 Minuman</option>
+                            <option value="produk">📦 Produk</option>
+                            <option value="perkhidmatan">⚙️ Perkhidmatan</option>
+                            <option value="stok">📦 Stok/Bahan Mentah</option>
+                            <option value="operasi">🏢 Operasi (Sewa, Elektrik)</option>
+                            <option value="lain">📝 Lain-lain</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Jumlah (RM)</label>
-                        <input type="number" id="jumlah" step="0.01" placeholder="0.00" required>
+
+                <!-- Item List Container -->
+                <div id="itemsContainer">
+                    <div class="items-header">
+                        <span>Senarai Item</span>
+                        <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
                     </div>
-                    <div class="form-group">
-                        <label>Keterangan (Optional)</label>
-                        <input type="text" id="keterangan" placeholder="contoh: Jualan kek coklat">
+                    <div id="itemsList">
+                        <!-- Item rows will be added here dynamically -->
                     </div>
                 </div>
-                <button type="submit" class="btn-primary">Simpan Rekod</button>
+
+                <!-- Total Ringkasan -->
+                <div class="items-total">
+                    <div class="total-row">
+                        <span>💰 Jumlah Keseluruhan:</span>
+                        <strong id="totalAmountDisplay">RM 0.00</strong>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">💾 Simpan Rekod</button>
             </form>
+            <div id="formMessage" class="message-box" style="display:none;"></div>
         </div>
 
-        <div class="chart-card">
-            <h3>📊 Ringkasan Bulanan</h3>
-            <div style="height: 300px; position: relative;">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
-
+        <!-- Senarai Rekod -->
         <div class="rekod-header">
-            <h3>Senarai Rekod Terkini</h3>
-            <div class="filter-section no-print">
+            <h3>📋 Senarai Rekod Terkini</h3>
+            <div class="filter-section">
                 <select id="filterJenis" onchange="filterRecords()">
                     <option value="semua">Semua</option>
                     <option value="jualan">Jualan Sahaja</option>
                     <option value="belanja">Perbelanjaan Sahaja</option>
                 </select>
-                <button id="generateReportBtn" class="btn-outline" onclick="exportToPDF()">📄 Jana Laporan PDF</button>
+                <button id="generateReportBtn" class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
             </div>
         </div>
 
@@ -117,48 +105,41 @@
             <p class="loading-text">Loading rekod...</p>
         </div>
 
+        <!-- Bar Chart -->
+        <div class="chart-card">
+            <h3>📊 Ringkasan Bulanan (Jualan vs Perbelanjaan)</h3>
+            <canvas id="salesChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Ringkasan Kewangan -->
         <div class="summary-card">
-            <h3>Ringkasan Keseluruhan</h3>
+            <h3>💰 Ringkasan Kewangan</h3>
             <div class="summary-grid">
                 <div class="summary-item">
                     <span>Jumlah Jualan</span>
-                    <strong id="totalJualan">RM0.00</strong>
+                    <strong id="totalJualan">RM 0.00</strong>
                 </div>
                 <div class="summary-item">
                     <span>Jumlah Perbelanjaan</span>
-                    <strong id="totalBelanja">RM0.00</strong>
+                    <strong id="totalBelanja">RM 0.00</strong>
                 </div>
                 <div class="summary-item">
                     <span>Untung Bersih</span>
-                    <strong id="keuntungan">RM0.00</strong>
+                    <strong id="keuntungan">RM 0.00</strong>
                 </div>
             </div>
         </div>
     </div>
 
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/jualan.js"></script>
-
-    <script>
-        // Logik Eksport PDF menggunakan html2pdf
-        function exportToPDF() {
-            const element = document.getElementById('reportArea');
-            
-            // Konfigurasi PDF - margin dan kualiti ditingkatkan
-            const opt = {
-                margin:       10,
-                filename:     'Laporan_Kewangan_UsahawanDigital.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Jalankan proses penukaran
-            // Kami tambah class 'no-print' secara dinamik jika perlu
-            html2pdf().set(opt).from(element).save();
-        }
-    </script>
 </body>
 </html>
