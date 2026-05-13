@@ -8,25 +8,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar dashboard-nav">
+    <nav class="navbar">
         <div class="container">
             <div class="logo">
                 <h1>🇲🇾 Usahawan<span>Digital</span></h1>
             </div>
-            <div class="nav-links">
-                <a href="dashboard.html">Dashboard</a>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Utama</a>
                 <a href="modul.html">Modul</a>
                 <a href="jualan.html">Rekod Jualan</a>
                 <a href="templat.html">Templat</a>
                 <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
     <div class="dashboard-container">
         <div class="container">
             <div class="welcome-card">
-                <h2>Selamat Datang, <span id="userName">Usahawan</span>!</h2>
+                <h2>👋 Selamat Datang, <span id="userName">Usahawan</span>!</h2>
                 <p>Teruskan pembelajaran dan urus perniagaan anda dengan lebih sistematik.</p>
             </div>
 
@@ -40,7 +41,7 @@
                 <a href="jualan.html" class="dashboard-card">
                     <div class="card-icon">💰</div>
                     <h3>Rekod Jualan</h3>
-                    <p>Catat jualan & perbelanjaan harian</p>
+                    <p>Catat jualan & perbelanjaan harian dengan detail item</p>
                 </a>
                 
                 <a href="templat.html" class="dashboard-card">
@@ -57,7 +58,7 @@
             </div>
 
             <div class="progress-section">
-                <h3>Kemajuan Anda</h3>
+                <h3>📈 Kemajuan Anda</h3>
                 <div class="progress-bar-container">
                     <div class="progress-label">Modul Pemasaran Digital</div>
                     <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
@@ -75,10 +76,15 @@
         </div>
     </div>
 
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/dashboard.js"></script>
-       
 </body>
 </html>
