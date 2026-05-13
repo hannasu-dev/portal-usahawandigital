@@ -2,28 +2,138 @@
 let currentRecords = [];
 let currentFilter = 'semua';
 let salesChart = null;
+let itemCounter = 0;
 
-// 1. Load records apabila halaman dimuatkan
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuthAndLoad();
-});
-
-async function checkAuthAndLoad() {
-    const user = await checkAuth();
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', async () => {
+    // Set default date
+    const tarikhInput = document.getElementById('tarikh');
+    if (tarikhInput) {
+        tarikhInput.valueAsDate = new Date();
+    }
     
+    // Check auth and load records
+    const user = await checkAuth();
     if (!user) {
         window.location.href = 'login.html';
         return;
     }
     
-    // Pastikan ID userName wujud di HTML anda
-    const userNameEl = document.getElementById('userName');
-    if (userNameEl) userNameEl.textContent = user.email;
+    // Add first empty item row
+    addItemRow();
     
-    loadRecords();
+    // Load records
+    await loadRecords();
+});
+
+// Function to add new item row
+function addItemRow() {
+    const itemsList = document.getElementById('itemsList');
+    const itemId = Date.now() + itemCounter++;
+    
+    const itemRow = document.createElement('div');
+    itemRow.className = 'item-row';
+    itemRow.id = `item-${itemId}`;
+    itemRow.innerHTML = `
+        <div class="item-col item-name-col">
+            <label>Nama Item</label>
+            <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap" required>
+        </div>
+        <div class="item-col item-qty-col">
+            <label>Kuantiti</label>
+            <input type="number" class="item-qty" value="1" min="1" step="1" required>
+        </div>
+        <div class="item-col item-price-col">
+            <label>Harga (RM)</label>
+            <input type="number" class="item-price" value="0" min="0" step="0.01" required>
+        </div>
+        <div class="item-col item-subtotal-col">
+            <label>Jumlah (RM)</label>
+            <span class="item-subtotal">RM 0.00</span>
+        </div>
+        <div class="item-col item-action-col">
+            <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
+        </div>
+    `;
+    
+    // Add event listeners for calculation
+    const qtyInput = itemRow.querySelector('.item-qty');
+    const priceInput = itemRow.querySelector('.item-price');
+    
+    qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
+    priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
+    
+    itemsList.appendChild(itemRow);
+    calculateTotalAmount();
 }
 
-// 2. Kendalikan penghantaran borang (Form Submission)
+// Function to remove item row
+function removeItemRow(itemId) {
+    const itemRow = document.getElementById(`item-${itemId}`);
+    if (itemRow) {
+        itemRow.remove();
+        calculateTotalAmount();
+    }
+}
+
+// Function to calculate subtotal for an item
+function calculateItemSubtotal(itemId) {
+    const itemRow = document.getElementById(`item-${itemId}`);
+    if (!itemRow) return;
+    
+    const qty = parseFloat(itemRow.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(itemRow.querySelector('.item-price').value) || 0;
+    const subtotal = qty * price;
+    
+    const subtotalSpan = itemRow.querySelector('.item-subtotal');
+    subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
+    
+    calculateTotalAmount();
+}
+
+// Function to calculate total amount from all items
+function calculateTotalAmount() {
+    const itemRows = document.querySelectorAll('.item-row');
+    let total = 0;
+    
+    itemRows.forEach(row => {
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        total += qty * price;
+    });
+    
+    const totalDisplay = document.getElementById('totalAmountDisplay');
+    if (totalDisplay) {
+        totalDisplay.textContent = `RM ${total.toFixed(2)}`;
+    }
+    
+    return total;
+}
+
+// Function to get items data from form
+function getItemsData() {
+    const itemRows = document.querySelectorAll('.item-row');
+    const items = [];
+    
+    itemRows.forEach(row => {
+        const name = row.querySelector('.item-name').value.trim();
+        const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        
+        if (name && quantity > 0 && price > 0) {
+            items.push({
+                name: name,
+                quantity: quantity,
+                price: price,
+                subtotal: quantity * price
+            });
+        }
+    });
+    
+    return items;
+}
+
+// Handle form submission
 const jualanForm = document.getElementById('jualanForm');
 if (jualanForm) {
     jualanForm.addEventListener('submit', async (e) => {
@@ -39,13 +149,27 @@ if (jualanForm) {
         const tarikh = document.getElementById('tarikh').value;
         const jenis = document.getElementById('jenis').value;
         const kategori = document.getElementById('kategori').value;
-        const jumlah = parseFloat(document.getElementById('jumlah').value);
-        const keterangan = document.getElementById('keterangan').value;
+        const items = getItemsData();
+        const total = calculateTotalAmount();
         
-        if (!tarikh || isNaN(jumlah) || jumlah <= 0) {
-            alert('Sila lengkapkan semua maklumat yang diperlukan');
+        if (!tarikh) {
+            alert('Sila pilih tarikh');
             return;
         }
+        
+        if (items.length === 0) {
+            alert('Sila tambah sekurang-kurangnya satu item');
+            return;
+        }
+        
+        if (total <= 0) {
+            alert('Jumlah mesti lebih dari RM0');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Menyimpan...';
         
         try {
             const { error } = await supabaseClient
@@ -56,29 +180,53 @@ if (jualanForm) {
                         tarikh: tarikh,
                         jenis: jenis,
                         kategori: kategori,
-                        jumlah: jumlah,
-                        keterangan: keterangan,
+                        jumlah: total,
+                        items: items,  // Save items as JSON
                         created_at: new Date().toISOString()
                     }
                 ]);
             
             if (error) throw error;
             
-            // Kosongkan borang
-            jualanForm.reset();
+            // Reset form
+            document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             
-            // Muat semula rekod & carta
-            loadRecords();
+            // Clear items and add one empty row
+            const itemsList = document.getElementById('itemsList');
+            itemsList.innerHTML = '';
+            itemCounter = 0;
+            addItemRow();
+            
+            // Show success message
+            const formMessage = document.getElementById('formMessage');
+            formMessage.style.display = 'block';
+            formMessage.className = 'message-box success';
+            formMessage.innerHTML = '✅ Rekod berjaya disimpan!';
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 3000);
+            
+            // Reload records
+            await loadRecords();
             
         } catch (error) {
             console.error('Error saving record:', error);
-            alert('Ralat menyimpan rekod: ' + error.message);
+            const formMessage = document.getElementById('formMessage');
+            formMessage.style.display = 'block';
+            formMessage.className = 'message-box error';
+            formMessage.innerHTML = `❌ Ralat: ${error.message}`;
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💾 Simpan Rekod';
         }
     });
 }
 
-// 3. Fungsi memuatkan data dari Supabase
+// Load records from database
 async function loadRecords() {
     const user = await checkAuth();
     if (!user) return;
@@ -86,7 +234,7 @@ async function loadRecords() {
     const rekodList = document.getElementById('rekodList');
     if (!rekodList) return;
     
-    rekodList.innerHTML = '<p>Loading rekod...</p>';
+    rekodList.innerHTML = '<p>📂 Loading rekod...</p>';
     
     try {
         let query = supabaseClient
@@ -99,22 +247,16 @@ async function loadRecords() {
         
         if (error) throw error;
         
-        // Simpan data ke dalam variable global
         currentRecords = data || [];
-        
-        // 1. Tapis dan papar senarai
         filterRecords();
-        
-        // 2. Sediakan dan kemaskini carta (Langkah 5)
-        prepareChartData(currentRecords);
         
     } catch (error) {
         console.error('Error loading records:', error);
-        rekodList.innerHTML = '<p>Ralat memuatkan rekod. Sila cuba lagi.</p>';
+        rekodList.innerHTML = '<p>❌ Ralat memuatkan rekod. Sila cuba lagi.</p>';
     }
 }
 
-// 4. Penapisan Rekod (Filter)
+// Filter and display records
 function filterRecords() {
     const filter = document.getElementById('filterJenis')?.value || 'semua';
     currentFilter = filter;
@@ -126,14 +268,15 @@ function filterRecords() {
     
     displayRecords(filtered);
     updateSummary(filtered);
+    prepareChartData(filtered);
 }
 
-// 5. Paparkan senarai rekod di HTML
+// Display records in list
 function displayRecords(records) {
     const rekodList = document.getElementById('rekodList');
     
     if (records.length === 0) {
-        rekodList.innerHTML = '<p class="no-records">Tiada rekod dijumpai. Tambah rekod baru di atas.</p>';
+        rekodList.innerHTML = '<p class="no-records">📭 Tiada rekod dijumpai. Tambah rekod baru di atas.</p>';
         return;
     }
     
@@ -144,15 +287,27 @@ function displayRecords(records) {
         const jenisIcon = record.jenis === 'jualan' ? '💰' : '📉';
         const jenisText = record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan';
         
+        // Display items detail
+        let itemsHtml = '';
+        if (record.items && Array.isArray(record.items)) {
+            itemsHtml = '<div class="rekod-items">';
+            record.items.forEach(item => {
+                itemsHtml += `<div class="rekod-item-detail">• ${item.name} (${item.quantity} x RM${item.price.toFixed(2)}) = RM${item.subtotal.toFixed(2)}</div>`;
+            });
+            itemsHtml += '</div>';
+        } else {
+            itemsHtml = `<div class="rekod-items"><div class="rekod-item-detail">• ${record.keterangan || 'Tiada keterangan'}</div></div>`;
+        }
+        
         html += `
-            <div class="rekod-item ${jenisClass}">
+            <div class="rekod-item ${jenisClass}" data-id="${record.id}">
                 <div class="rekod-info">
                     <div class="rekod-tarikh">${tanggal}</div>
                     <div class="rekod-keterangan">${jenisIcon} ${jenisText} - ${record.kategori}</div>
-                    ${record.keterangan ? `<div class="rekod-catatan">${record.keterangan}</div>` : ''}
+                    ${itemsHtml}
                 </div>
                 <div class="rekod-jumlah ${jenisClass}">
-                    RM ${record.jumlah.toFixed(2)}
+                    RM ${(record.jumlah || 0).toFixed(2)}
                 </div>
                 <button class="rekod-delete" onclick="deleteRecord('${record.id}')">🗑️</button>
             </div>
@@ -162,16 +317,16 @@ function displayRecords(records) {
     rekodList.innerHTML = html;
 }
 
-// 6. Kemaskini Ringkasan (Summary)
+// Update summary cards
 function updateSummary(records) {
     let totalJualan = 0;
     let totalBelanja = 0;
     
     records.forEach(record => {
         if (record.jenis === 'jualan') {
-            totalJualan += record.jumlah;
+            totalJualan += record.jumlah || 0;
         } else {
-            totalBelanja += record.jumlah;
+            totalBelanja += record.jumlah || 0;
         }
     });
     
@@ -189,34 +344,46 @@ function updateSummary(records) {
     }
 }
 
-// 7. Padam Rekod
-async function deleteRecord(recordId) {
-    if (!confirm('Padam rekod ini?')) return;
+// Prepare chart data
+function prepareChartData(records) {
+    const months = [];
+    const jualanByMonth = {};
+    const belanjaByMonth = {};
     
-    try {
-        const { error } = await supabaseClient
-            .from('jualan_records')
-            .delete()
-            .eq('id', recordId);
-        
-        if (error) throw error;
-        
-        loadRecords();
-        
-    } catch (error) {
-        console.error('Error deleting record:', error);
-        alert('Ralat memadam rekod: ' + error.message);
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = `${d.getFullYear()}-${d.getMonth() + 1}`;
+        const monthLabel = d.toLocaleDateString('ms-MY', { month: 'short', year: 'numeric' });
+        months.push({ key: monthKey, label: monthLabel });
+        jualanByMonth[monthKey] = 0;
+        belanjaByMonth[monthKey] = 0;
     }
+    
+    records.forEach(record => {
+        const date = new Date(record.tarikh);
+        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        
+        if (jualanByMonth[monthKey] !== undefined) {
+            if (record.jenis === 'jualan') {
+                jualanByMonth[monthKey] += record.jumlah || 0;
+            } else {
+                belanjaByMonth[monthKey] += record.jumlah || 0;
+            }
+        }
+    });
+    
+    const labels = months.map(m => m.label);
+    const jualanData = months.map(m => jualanByMonth[m.key]);
+    const belanjaData = months.map(m => belanjaByMonth[m.key]);
+    
+    updateChart(jualanData, belanjaData, labels);
 }
 
-// ==========================================
-// LOGIK CARTA (CHART.JS)
-// ==========================================
-
-function updateChart(jualanData, belanjaData, bulanLabels) {
-    const canvas = document.getElementById('salesChart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+// Update chart
+function updateChart(jualanData, belanjaData, labels) {
+    const ctx = document.getElementById('salesChart');
+    if (!ctx) return;
     
     if (salesChart) {
         salesChart.destroy();
@@ -225,7 +392,7 @@ function updateChart(jualanData, belanjaData, bulanLabels) {
     salesChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: bulanLabels,
+            labels: labels,
             datasets: [
                 {
                     label: 'Jualan (RM)',
@@ -245,7 +412,7 @@ function updateChart(jualanData, belanjaData, bulanLabels) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
             plugins: {
                 legend: { position: 'top' },
                 tooltip: {
@@ -260,52 +427,39 @@ function updateChart(jualanData, belanjaData, bulanLabels) {
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Jumlah (RM)' }
+                },
+                x: {
+                    title: { display: true, text: 'Bulan' }
                 }
             }
         }
     });
 }
 
-function prepareChartData(records) {
-    const months = [];
-    const jualanByMonth = {};
-    const belanjaByMonth = {};
+// Delete record
+async function deleteRecord(recordId) {
+    if (!confirm('⚠️ Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')) return;
     
-    const now = new Date();
-    // Ambil data 6 bulan terakhir
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthKey = `${d.getFullYear()}-${d.getMonth() + 1}`;
-        const monthLabel = d.toLocaleDateString('ms-MY', { month: 'short', year: 'numeric' });
-        months.push({ key: monthKey, label: monthLabel });
-        jualanByMonth[monthKey] = 0;
-        belanjaByMonth[monthKey] = 0;
-    }
-    
-    records.forEach(record => {
-        const date = new Date(record.tarikh);
-        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+    try {
+        const { error } = await supabaseClient
+            .from('jualan_records')
+            .delete()
+            .eq('id', recordId);
         
-        if (jualanByMonth[monthKey] !== undefined) {
-            if (record.jenis === 'jualan') {
-                jualanByMonth[monthKey] += record.jumlah;
-            } else {
-                belanjaByMonth[monthKey] += record.jumlah;
-            }
-        }
-    });
-    
-    const labels = months.map(m => m.label);
-    const jualanData = months.map(m => jualanByMonth[m.key]);
-    const belanjaData = months.map(m => belanjaByMonth[m.key]);
-    
-    updateChart(jualanData, belanjaData, labels);
+        if (error) throw error;
+        
+        await loadRecords();
+        
+    } catch (error) {
+        console.error('Error deleting record:', error);
+        alert('❌ Ralat memadam rekod: ' + error.message);
+    }
 }
 
-// 8. Jana Laporan HTML/PDF
-function generateReport() {
+// Generate Professional PDF Report (Only Summary + Details, Not Whole Page)
+async function generateReport() {
     if (currentRecords.length === 0) {
-        alert('Tiada rekod untuk dijana laporan.');
+        alert('📭 Tiada rekod untuk dijana laporan.');
         return;
     }
     
@@ -316,63 +470,210 @@ function generateReport() {
     
     let totalJualan = 0;
     let totalBelanja = 0;
+    let allItems = [];
     
     filtered.forEach(record => {
         if (record.jenis === 'jualan') {
-            totalJualan += record.jumlah;
+            totalJualan += record.jumlah || 0;
         } else {
-            totalBelanja += record.jumlah;
+            totalBelanja += record.jumlah || 0;
+        }
+        
+        // Collect items for detail
+        if (record.items && Array.isArray(record.items)) {
+            record.items.forEach(item => {
+                allItems.push({
+                    tarikh: record.tarikh,
+                    jenis: record.jenis,
+                    kategori: record.kategori,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    subtotal: item.subtotal
+                });
+            });
         }
     });
     
     const keuntungan = totalJualan - totalBelanja;
+    const reportDate = new Date().toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' });
     
-    // Create PDF using html2pdf library
-    // First, create a hidden div for PDF content
-    const pdfContent = document.createElement('div');
-    pdfContent.style.padding = '20px';
-    pdfContent.style.fontFamily = 'Arial, sans-serif';
-    
-    pdfContent.innerHTML = `
-        <h1 style="color: #1a5f7a;">Laporan Jualan & Perbelanjaan</h1>
-        <p>Tarikh laporan: ${new Date().toLocaleDateString('ms-MY')}</p>
-        
-        <div style="margin: 20px 0; padding: 15px; background: #f0f7ff; border-radius: 8px;">
-            <p><strong>Ringkasan Kewangan</strong></p>
-            <p>Jumlah Jualan: RM ${totalJualan.toFixed(2)}</p>
-            <p>Jumlah Perbelanjaan: RM ${totalBelanja.toFixed(2)}</p>
-            <p>Untung Bersih: RM ${keuntungan.toFixed(2)}</p>
-        </div>
-        
-        <h3>Senarai Transaksi</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: #1a5f7a; color: white;">
-                    <th style="padding: 8px; border: 1px solid #ddd;">Tarikh</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Jenis</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Kategori</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Jumlah (RM)</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${filtered.map(record => `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${record.tarikh}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan'}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${record.kategori}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${record.jumlah.toFixed(2)}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${record.keterangan || '-'}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        <p style="margin-top: 20px;">Dijana oleh Portal UsahawanDigital</p>
+    // Build HTML for report
+    const reportHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Laporan Kewangan - UsahawanDigital</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Arial', sans-serif;
+                    padding: 40px;
+                    background: white;
+                    color: #1e293b;
+                }
+                .report-container {
+                    max-width: 1000px;
+                    margin: 0 auto;
+                }
+                .report-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 3px solid #1a5f7a;
+                }
+                .report-header h1 {
+                    color: #1a5f7a;
+                    margin-bottom: 10px;
+                }
+                .report-header p {
+                    color: #64748b;
+                }
+                .summary-card {
+                    background: #f0f7ff;
+                    padding: 20px;
+                    border-radius: 12px;
+                    margin-bottom: 30px;
+                }
+                .summary-card h3 {
+                    color: #1a5f7a;
+                    margin-bottom: 15px;
+                }
+                .summary-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                    text-align: center;
+                }
+                .summary-item {
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                }
+                .summary-item span {
+                    display: block;
+                    font-size: 14px;
+                    color: #64748b;
+                    margin-bottom: 5px;
+                }
+                .summary-item strong {
+                    font-size: 24px;
+                    color: #1a5f7a;
+                }
+                .profit {
+                    color: #16a34a;
+                }
+                .loss {
+                    color: #dc2626;
+                }
+                .items-table, .records-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                .items-table th, .items-table td,
+                .records-table th, .records-table td {
+                    border: 1px solid #e2e8f0;
+                    padding: 10px;
+                    text-align: left;
+                }
+                .items-table th, .records-table th {
+                    background: #1a5f7a;
+                    color: white;
+                }
+                .section-title {
+                    font-size: 18px;
+                    margin: 25px 0 10px 0;
+                    padding-left: 10px;
+                    border-left: 4px solid #1a5f7a;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                    color: #94a3b8;
+                    font-size: 12px;
+                }
+                @media print {
+                    body { padding: 20px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="report-container">
+                <div class="report-header">
+                    <h1>📊 Laporan Jualan & Perbelanjaan</h1>
+                    <p>Portal UsahawanDigital | Dijana pada: ${reportDate}</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>💰 Ringkasan Kewangan</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span>Jumlah Jualan</span>
+                            <strong>RM ${totalJualan.toFixed(2)}</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Jumlah Perbelanjaan</span>
+                            <strong>RM ${totalBelanja.toFixed(2)}</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Untung Bersih</span>
+                            <strong class="${keuntungan >= 0 ? 'profit' : 'loss'}">RM ${keuntungan.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">📋 Senarai Transaksi</h3>
+                <table class="records-table">
+                    <thead>
+                        <tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Item</th><th>Kuantiti</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr>
+                    </thead>
+                    <tbody>
+                        ${filtered.map(record => {
+                            if (record.items && Array.isArray(record.items)) {
+                                return record.items.map(item => `
+                                    <tr>
+                                        <td>${record.tarikh}</td>
+                                        <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
+                                        <td>${record.kategori}</td>
+                                        <td>${item.name}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.price.toFixed(2)}</td>
+                                        <td>${item.subtotal.toFixed(2)}</td>
+                                    </tr>
+                                `).join('');
+                            } else {
+                                return `
+                                    <tr>
+                                        <td>${record.tarikh}</td>
+                                        <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
+                                        <td>${record.kategori}</td>
+                                        <td colspan="4">${record.keterangan || 'Tiada detail item'}</td>
+                                    </tr>
+                                `;
+                            }
+                        }).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="footer">
+                    <p>Dijana oleh Portal UsahawanDigital © ${new Date().getFullYear()}</p>
+                    <p>Portal literasi digital untuk usahawan mikro Malaysia</p>
+                </div>
+            </div>
+            <script>
+                window.onload = function() { window.print(); }
+            <\/script>
+        </body>
+        </html>
     `;
     
-    // Open print window (which can save as PDF)
+    // Open print window
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(pdfContent.innerHTML);
+    printWindow.document.write(reportHtml);
     printWindow.document.close();
-    printWindow.print();
 }
