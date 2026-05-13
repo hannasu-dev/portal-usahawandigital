@@ -1,4 +1,9 @@
-// Handle Registration
+/**
+ * UsahawanDigital - Authentication Logic
+ * Menguruskan Pendaftaran, Log Masuk, dan Kawalan Sesi
+ */
+
+// --- 1. HANDLE REGISTRATION ---
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
@@ -11,6 +16,7 @@ if (registerForm) {
         const registerBtn = document.getElementById('registerBtn');
         const messageDiv = document.getElementById('registerMessage');
         
+        // Validasi ringkas
         if (password.length < 6) {
             messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
             return;
@@ -21,7 +27,7 @@ if (registerForm) {
         messageDiv.innerHTML = '';
         
         try {
-            // Register with Supabase Auth
+            // A. Daftar dengan Supabase Auth
             const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -36,7 +42,7 @@ if (registerForm) {
             if (error) throw error;
             
             if (data.user) {
-                // Create profile in profiles table
+                // B. Simpan profil tambahan ke dalam table 'profiles'
                 const { error: profileError } = await supabaseClient
                     .from('profiles')
                     .insert([
@@ -49,9 +55,9 @@ if (registerForm) {
                         }
                     ]);
                 
-                if (profileError) console.error('Profile error:', profileError);
+                if (profileError) console.error('Ralat Profil:', profileError);
                 
-                messageDiv.innerHTML = '<div class="message-box success">Pendaftaran berjaya! Anda akan dihubungkan ke dashboard...</div>';
+                messageDiv.innerHTML = '<div class="message-box success">Pendaftaran berjaya! Anda akan dialihkan sebentar lagi...</div>';
                 
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
@@ -67,7 +73,7 @@ if (registerForm) {
     });
 }
 
-// Handle Login
+// --- 2. HANDLE LOGIN ---
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -107,7 +113,7 @@ if (loginForm) {
     });
 }
 
-// Handle Logout
+// --- 3. HANDLE LOGOUT ---
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
@@ -117,13 +123,17 @@ if (logoutBtn) {
         
         if (error) {
             console.error('Logout error:', error);
+            alert('Ralat ketika log keluar');
+        } else {
+            window.location.href = 'index.html';
         }
-        
-        window.location.href = 'index.html';
     });
 }
 
-// Update navbar based on auth status
+// --- 4. NAVBAR & SESSION MANAGEMENT ---
+/**
+ * Mengemaskini paparan navigasi berdasarkan status log masuk pengguna.
+ */
 async function updateNavbar() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     
@@ -131,6 +141,7 @@ async function updateNavbar() {
     const registerBtn = document.getElementById('registerNavBtn');
     const dashboardBtn = document.getElementById('dashboardNavBtn');
     
+    // Pastikan elemen wujud sebelum manipulasi style
     if (user) {
         if (loginBtn) loginBtn.style.display = 'none';
         if (registerBtn) registerBtn.style.display = 'none';
@@ -139,9 +150,15 @@ async function updateNavbar() {
         if (loginBtn) loginBtn.style.display = 'inline-block';
         if (registerBtn) registerBtn.style.display = 'inline-block';
         if (dashboardBtn) dashboardBtn.style.display = 'none';
+        
+        // Protect Dashboard: Jika pengguna tiada sesi dan berada di dashboard/jualan, tendang ke login
+        const protectedPages = ['dashboard.html', 'jualan.html'];
+        const currentPage = window.location.pathname.split('/').pop();
+        if (protectedPages.includes(currentPage)) {
+            window.location.href = 'login.html';
+        }
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateNavbar();
-});
+// Jalankan pemeriksaan status setiap kali halaman dimuatkan
+document.addEventListener('DOMContentLoaded', updateNavbar);
