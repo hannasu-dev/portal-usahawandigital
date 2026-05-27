@@ -580,33 +580,47 @@
         }
 
         // ==================== LOAD USER ITEMS ====================
-        async function loadUserItems() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('user_items')
-                    .select('*')
-                    .eq('user_id', currentUser.id);
-
-                if (error) throw error;
-                globalUserItems = data || [];
-
-                const selectEl = document.getElementById('jualanItemSelect');
-                if (!selectEl) return;
-
-                if (globalUserItems.length === 0) {
-                    selectEl.innerHTML = '<option value="">-- Tiada item didaftarkan --</option>';
-                    return;
-                }
-
-                let optionsHTML = '<option value="">-- Pilih Item --</option>';
-                globalUserItems.forEach(item => {
-                    optionsHTML += `<option value="${item.id}" data-price="${item.item_price}" data-category="${item.category || 'produk'}">${item.item_name} (RM ${parseFloat(item.item_price).toFixed(2)})</option>`;
-                });
-                selectEl.innerHTML = optionsHTML;
-            } catch (err) {
-                console.error('Error loading items:', err);
-            }
+async function loadUserItems() {
+    try {
+        // Get current user
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        console.log('Current user:', user?.email); // Debug: check user
+        
+        if (!user) {
+            console.error('No user logged in');
+            return;
         }
+        
+        const { data, error } = await supabaseClient
+            .from('user_items')
+            .select('*')
+            .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        console.log('Loaded items:', data); // Debug: check items
+        
+        globalUserItems = data || [];
+
+        const selectEl = document.getElementById('jualanItemSelect');
+        if (!selectEl) return;
+
+        if (globalUserItems.length === 0) {
+            selectEl.innerHTML = '<option value="">-- Tiada item didaftarkan --</option>';
+            return;
+        }
+
+        let optionsHTML = '<option value="">-- Pilih Item --</option>';
+        globalUserItems.forEach(item => {
+            optionsHTML += `<option value="${item.id}" data-price="${item.item_price}" data-category="${item.category || 'produk'}">${item.item_name} (RM ${parseFloat(item.item_price).toFixed(2)})</option>`;
+        });
+        selectEl.innerHTML = optionsHTML;
+        
+    } catch (err) {
+        console.error('Error loading items:', err);
+    }
+}
 
         // ==================== JUALAN PREVIEW ====================
         const kuantitiInput = document.getElementById('jualanKuantiti');
