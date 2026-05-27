@@ -3,6 +3,7 @@ let currentRecords = [];
 let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
+let userItemsList = [];
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -19,19 +20,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
+    // Load user items from database
+    await loadUserItems();
+    
     // Add first empty item row
-    addItemRow();
+    await addItemRow();
     
     // Load records
     await loadRecords();
 });
 
-// Function to add new item row
-function addItemRow() {
+// Load user items from database
+async function loadUserItems() {
+    const user = await checkAuth();
+    if (!user) return [];
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('user_items')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('item_name');
+        
+        if (error) throw error;
+        userItemsList = data || [];
+        return userItemsList;
+    } catch (error) {
+        console.error('Error loading items:', error);
+        return [];
+    }
+}
+
+// Function to add new item row with dropdown
+async function addItemRow() {
     const itemsList = document.getElementById('itemsList');
     if (!itemsList) return;
     
     const itemId = Date.now() + itemCounter++;
+    
+    // Build options for dropdown
+    let optionsHtml = '<option value="">-- Pilih Item (pilih atau taip baru) --</option>';
+    userItemsList.forEach(item => {
+        optionsHtml += `<option value="${item.item_name}" data-price="${item.item_price}" data-category="${item.category || ''}">${item.item_name} (RM${item.item_price.toFixed(2)})</option>`;
+    });
+    optionsHtml += '<option value="new">+ Tambah Item Baru (taip manual)</option>';
     
     const itemRow = document.createElement('div');
     itemRow.className = 'item-row';
@@ -39,7 +71,10 @@ function addItemRow() {
     itemRow.innerHTML = `
         <div class="item-col item-name-col">
             <label>Nama Item</label>
-            <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap" required>
+            <select class="item-select" onchange="onItemSelect(this, '${itemId}')">
+                ${optionsHtml}
+            </select>
+            <input type="text" class="item-name manual-name" placeholder="Taip nama item baru" style="display:none; margin-top:5px;">
         </div>
         <div class="item-col item-qty-col">
             <label>Kuantiti</label>
@@ -58,7 +93,7 @@ function addItemRow() {
         </div>
     `;
     
-    // Add event listeners for calculation
+    // Add event listeners
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
     
@@ -67,6 +102,65 @@ function addItemRow() {
     
     itemsList.appendChild(itemRow);
     calculateTotalAmount();
+}
+
+// Handle item select change
+function onItemSelect(select, itemId) {
+    const row = document.getElementById(`item-${itemId}`);
+    if (!row) return;
+    
+    const priceInput = row.querySelector('.item-price');
+    const manualNameInput = row.querySelector('.manual-name');
+    const selectedOption = select.options[select.selectedIndex];
+    const selectedValue = select.value;
+    
+    if (selectedValue === 'new') {
+        // Show manual input for new item
+        manualNameInput.style.display = 'block';
+        manualNameInput.required = true;
+        manualNameInput.focus();
+        priceInput.value = '';
+        priceInput.readOnly = false;
+        
+        // Clear select and mark that we're adding new item
+        select.style.border = '1px solid #ff9800';
+        
+        // Add event to manual name input
+        manualNameInput.oninput = function() {
+            if (this.value.trim()) {
+                select.style.border = '1px solid #cbd5e1';
+            }
+        };
+    } else if (selectedValue && selectedValue !== '') {
+        // Existing item selected
+        manualNameInput.style.display = 'none';
+        manualNameInput.required = false;
+        const price = selectedOption.getAttribute('data-price');
+        if (price) {
+            priceInput.value = parseFloat(price).toFixed(2);
+        }
+        priceInput.readOnly = false;
+        select.style.border = '1px solid #cbd5e1';
+    } else {
+        // No selection
+        manualNameInput.style.display = 'none';
+        priceInput.value = '';
+    }
+    
+    calculateItemSubtotal(itemId);
+}
+
+// Function to get item name from row
+function getItemNameFromRow(row) {
+    const select = row.querySelector('.item-select');
+    const manualName = row.querySelector('.manual-name');
+    
+    if (select.value === 'new' && manualName.value.trim()) {
+        return manualName.value.trim();
+    } else if (select.value && select.value !== '' && select.value !== 'new') {
+        return select.value;
+    }
+    return '';
 }
 
 // Function to remove item row
@@ -118,7 +212,7 @@ function getItemsData() {
     const items = [];
     
     itemRows.forEach(row => {
-        const name = row.querySelector('.item-name').value.trim();
+        const name = getItemNameFromRow(row);
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         
@@ -190,6 +284,25 @@ if (jualanForm) {
             
             if (error) throw error;
             
+            // Check if there are new items to save to user_items
+            for (const item of items) {
+                // Check if item already exists in user_items
+                const exists = userItemsList.some(ui => ui.item_name.toLowerCase() === item.name.toLowerCase());
+                if (!exists) {
+                    await supabaseClient
+                        .from('user_items')
+                        .insert([{
+                            user_id: user.id,
+                            item_name: item.name,
+                            item_price: item.price,
+                            category: kategori
+                        }]);
+                }
+            }
+            
+            // Reload user items
+            await loadUserItems();
+            
             // Reset form
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
@@ -200,7 +313,7 @@ if (jualanForm) {
                 itemsList.innerHTML = '';
             }
             itemCounter = 0;
-            addItemRow();
+            await addItemRow();
             
             // Show success message
             const formMessage = document.getElementById('formMessage');
@@ -558,11 +671,14 @@ async function generateReport() {
                     display: flex;
                     justify-content: space-around;
                     text-align: center;
+                    flex-wrap: wrap;
+                    gap: 1rem;
                 }
                 .summary-item {
                     background: white;
                     padding: 15px 25px;
                     border-radius: 10px;
+                    min-width: 150px;
                 }
                 .summary-item span {
                     display: block;
@@ -630,7 +746,15 @@ async function generateReport() {
                 <h3>📋 Senarai Transaksi</h3>
                 <table>
                     <thead>
-                        <tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Item</th><th>Kuantiti</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr>
+                        <tr>
+                            <th>Tarikh</th>
+                            <th>Jenis</th>
+                            <th>Kategori</th>
+                            <th>Item</th>
+                            <th>Kuantiti</th>
+                            <th>Harga (RM)</th>
+                            <th>Jumlah (RM)</th>
+                        </tr>
                     </thead>
                     <tbody>
                         ${tableRows}
@@ -639,6 +763,7 @@ async function generateReport() {
                 
                 <div class="footer">
                     <p>Dijana oleh Portal UsahawanDigital © ${new Date().getFullYear()}</p>
+                    <p>Portal literasi digital untuk usahawan mikro Malaysia</p>
                 </div>
             </div>
             <script>
