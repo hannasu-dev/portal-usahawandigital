@@ -45,10 +45,7 @@
                     
                     <div class="form-group">
                         <label>Kata Laluan</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="password" placeholder="Minimum 6 aksara" required>
-                            <button type="button" class="toggle-password" id="togglePasswordBtn">👁️</button>
-                        </div>
+                        <input type="password" id="password" placeholder="Minimum 6 aksara" required>
                     </div>
 
                     <div class="form-group">
@@ -72,9 +69,30 @@
 
                 <div class="form-section">
                     <h4>🛒 Senarai Produk/Item Perniagaan</h4>
-                    <p class="section-note">Masukkan item yang anda jual. Item ini akan muncul di halaman Rekod Jualan nanti.</p>
+                    <p class="section-note">Masukkan item awal yang anda jual. Item ini akan dipanggil secara automatik di halaman Rekod Jualan nanti supaya anda hanya perlu masukkan kuantiti sahaja.</p>
                     
-                    <div id="itemsListContainer"></div>
+                    <div id="itemsListContainer">
+                        <div class="item-row-register">
+                            <div class="item-col-reg">
+                                <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
+                            </div>
+                            <div class="item-col-reg">
+                                <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
+                            </div>
+                            <div class="item-col-reg">
+                                <select class="item-category-reg" required>
+                                    <option value="">Kategori Item</option>
+                                    <option value="makanan">🍔 Makanan</option>
+                                    <option value="minuman">🥤 Minuman</option>
+                                    <option value="produk">📦 Produk</option>
+                                    <option value="perkhidmatan">⚙️ Perkhidmatan</option>
+                                </select>
+                            </div>
+                            <div class="item-col-reg item-action">
+                                <button type="button" class="remove-item-btn" onclick="buangBarisItem(this)">🗑️ Buang</button>
+                            </div>
+                        </div>
+                    </div>
                     
                     <button type="button" class="btn-add-item-reg" id="addItemBtn">+ Tambah Item Lagi</button>
                 </div>
@@ -94,45 +112,24 @@
     <script src="js/auth.js"></script>
     
     <script>
-        // ==================== INITIALIZE ON PAGE LOAD ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // 1. FUNGSI LIHAT / SEMBUNYI KATA LALUAN (TOGGLE PASSWORD)
-            const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-            const passwordField = document.getElementById('password');
-            
-            if (togglePasswordBtn && passwordField) {
-                togglePasswordBtn.addEventListener('click', function(e) {
-                    e.preventDefault(); // Menghalang sebarang pencetusan submit form
-                    
-                    // Tukar jenis jenis input (text <=> password)
-                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordField.setAttribute('type', type);
-                    
-                    // Kemas kini ikon mata
-                    this.textContent = type === 'password' ? '👁️' : '🙈';
-                });
-            }
-
-            // 2. LOGIK PENGURUSAN BARIS ITEM DINAMIK
+        // ==================== GLOBAL FUNCTIONS (TAMBAH / BUANG ITEM) ====================
+        
+        // Fungsi tambah baris baru menggunakan kaedah String Template yang lebih stabil
+        document.getElementById('addItemBtn').addEventListener('click', function(e) {
+            e.preventDefault();
             const container = document.getElementById('itemsListContainer');
-            const addBtn = document.getElementById('addItemBtn');
-
-            // Fungsi untuk mencipta struktur baris item baru
-            function createItemRow(itemId) {
-                const row = document.createElement('div');
-                row.className = 'item-row-register';
-                row.setAttribute('data-item-id', itemId);
-                row.innerHTML = `
+            
+            const HTMLBarisBaru = `
+                <div class="item-row-register">
                     <div class="item-col-reg">
                         <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
                     </div>
                     <div class="item-col-reg">
-                        <input type="number" class="item-price-reg" placeholder="Harga seunit (RM)" step="0.01" required>
+                        <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
                     </div>
                     <div class="item-col-reg">
                         <select class="item-category-reg" required>
-                            <option value="">Kategori</option>
+                            <option value="">Kategori Item</option>
                             <option value="makanan">🍔 Makanan</option>
                             <option value="minuman">🥤 Minuman</option>
                             <option value="produk">📦 Produk</option>
@@ -140,66 +137,46 @@
                         </select>
                     </div>
                     <div class="item-col-reg item-action">
-                        <button type="button" class="remove-item-btn">🗑️ Buang</button>
+                        <button type="button" class="remove-item-btn" onclick="buangBarisItem(this)">🗑️ Buang</button>
                     </div>
-                `;
-                
-                // Daftarkan event klik terus pada butang buang di dalam baris baharu ini
-                const removeBtn = row.querySelector('.remove-item-btn');
-                if (removeBtn) {
-                    removeBtn.addEventListener('click', function() {
-                        const totalRows = container.querySelectorAll('.item-row-register').length;
-                        if (totalRows <= 1) {
-                            alert('Anda perlu mengekalkan sekurang-kurangnya satu item perniagaan.');
-                            return;
-                        }
-                        row.remove();
-                    });
-                }
-                
-                return row;
-            }
-
-            // Fungsi utama menambah baris ke dalam container pembungkus HTML
-            function addItemRow() {
-                if (!container) return;
-                const uniqueId = 'item_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-                const newRow = createItemRow(uniqueId);
-                container.appendChild(newRow);
-            }
-
-            // Membuka baris kosong pertama secara automatik apabila sistem dimuatkan
-            if (container && container.children.length === 0) {
-                addItemRow();
-            }
-
-            // Sambungkan logik klik pada butang "+ Tambah Item Lagi"
-            if (addBtn) {
-                addBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    addItemRow();
-                });
-            }
-
-            // 3. SKRIP UNTUK EKSTRAK SEMUA DATA ITEM YANG DIISI PENGGUNA
-            window.getItemsData = function() {
-                const items = [];
-                const rows = document.querySelectorAll('.item-row-register');
-                
-                rows.forEach(row => {
-                    const name = row.querySelector('.item-name-reg')?.value.trim();
-                    const price = parseFloat(row.querySelector('.item-price-reg')?.value);
-                    const category = row.querySelector('.item-category-reg')?.value;
-                    
-                    if (name && price >= 0) {
-                        items.push({ name, price, category });
-                    }
-                });
-                return items;
-            };
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', HTMLBarisBaru);
         });
 
-        // ==================== PROSES SUBMIT / PENDAFTARAN SUPABASE ====================
+        // Fungsi buang baris menggunakan fungsi inline onclick (anti-gagal)
+        function buangBarisItem(butang) {
+            const container = document.getElementById('itemsListContainer');
+            const bilanganBaris = container.querySelectorAll('.item-row-register').length;
+            
+            if (bilanganBaris <= 1) {
+                alert('Anda perlu memasukkan sekurang-kurangnya satu item perniagaan.');
+                return;
+            }
+            
+            // Buang elemen pembungkus terdekat (.item-row-register)
+            butang.closest('.item-row-register').remove();
+        }
+
+        // Fungsi ekstrak data daripada form sebelum dihantar ke database
+        function dapatkanSemuaItem() {
+            const susunanItem = [];
+            const semuaBaris = document.querySelectorAll('.item-row-register');
+            
+            semuaBaris.forEach(baris => {
+                const nama = baris.querySelector('.item-name-reg').value.trim();
+                const harga = parseFloat(baris.querySelector('.item-price-reg').value);
+                const kategori = baris.querySelector('.item-category-reg').value;
+                
+                if (nama && harga >= 0) {
+                    susunanItem.push({ name: nama, price: harga, category: kategori });
+                }
+            });
+            return susunanItem;
+        }
+
+        // ==================== PROSES REGISTER KE SUPABASE ====================
         const registerForm = document.getElementById('registerForm');
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
@@ -211,16 +188,8 @@
                 const businessName = document.getElementById('businessName').value;
                 const businessCategory = document.getElementById('businessCategory').value;
                 
-                // Mengambil senarai item yang diekstrak daripada fungsi tetingkap global (window)
-                const items = window.getItemsData();
-                
+                const items = dapatkanSemuaItem();
                 const messageDiv = document.getElementById('registerMessage');
-                
-                // Validasi asas data input
-                if (!fullName || !email || !password || !businessName || !businessCategory) {
-                    messageDiv.innerHTML = '<div class="message-box error">Sila lengkapkan semua maklumat asas</div>';
-                    return;
-                }
                 
                 if (password.length < 6) {
                     messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
@@ -238,7 +207,7 @@
                 messageDiv.innerHTML = '';
                 
                 try {
-                    // Langkah 1: Daftarkan pengguna ke modul Supabase Auth
+                    // 1. Daftar pengguna dalam Supabase Auth
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
@@ -254,7 +223,7 @@
                     if (error) throw error;
                     
                     if (data.user) {
-                        // Langkah 2: Masukkan rekod ke dalam jadual profil ('profiles')
+                        // 2. Simpan profil maklumat perniagaan ke table 'profiles'
                         const { error: profileError } = await supabaseClient
                             .from('profiles')
                             .insert([{
@@ -267,7 +236,7 @@
                         
                         if (profileError) throw profileError;
                         
-                        // Langkah 3: Tukar data item ke format pukal (Bulk Insert Object)
+                        // 3. Sediakan struktur objek jualan pukal (Bulk Object)
                         const itemsToInsert = items.map(item => ({
                             user_id: data.user.id,
                             item_name: item.name,
@@ -275,21 +244,21 @@
                             category: item.category
                         }));
 
-                        // Langkah 4: Simpan senarai item secara pukal dalam satu klik ke jadual 'user_items'
+                        // 4. Masukkan semua item awal ke jadual 'user_items'
                         const { error: itemsError } = await supabaseClient
                             .from('user_items')
                             .insert(itemsToInsert);
 
                         if (itemsError) throw itemsError;
                         
-                        messageDiv.innerHTML = '<div class="message-box success">✅ Pendaftaran berjaya! Anda akan dihubungkan ke dashboard...</div>';
+                        messageDiv.innerHTML = '<div class="message-box success">✅ Pendaftaran berjaya! Menghubungkan ke dashboard...</div>';
                         
                         setTimeout(() => {
                             window.location.href = 'dashboard.html';
                         }, 2000);
                     }
                 } catch (error) {
-                    console.error('Registration error:', error);
+                    console.error('Pendaftaran gagal:', error);
                     messageDiv.innerHTML = `<div class="message-box error">❌ Ralat: ${error.message}</div>`;
                 } finally {
                     registerBtn.disabled = false;
