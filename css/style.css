@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. BASE STYLES & RESET
-   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -20,9 +17,7 @@ body {
     padding: 0 20px;
 }
 
-/* ==========================================================================
-   2. NAVIGATION BAR
-   ========================================================================== */
+/* ==================== NAVBAR ==================== */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -72,9 +67,7 @@ body {
     cursor: pointer;
 }
 
-/* ==========================================================================
-   3. BUTTONS
-   ========================================================================== */
+/* ==================== BUTTONS ==================== */
 .btn-primary, .btn-outline {
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
@@ -118,9 +111,7 @@ body {
     text-align: center;
 }
 
-/* ==========================================================================
-   4. HERO SECTION (LANDING PAGE)
-   ========================================================================== */
+/* ==================== HERO SECTION ==================== */
 .hero {
     background: linear-gradient(135deg, #1a5f7a 0%, #2c7da0 100%);
     color: white;
@@ -177,9 +168,7 @@ body {
     opacity: 0.9;
 }
 
-/* ==========================================================================
-   5. FEATURES SECTION
-   ========================================================================== */
+/* ==================== FEATURES SECTION ==================== */
 .features {
     padding: 4rem 0;
 }
@@ -220,9 +209,7 @@ body {
     color: #1a5f7a;
 }
 
-/* ==========================================================================
-   6. AUTH PAGES (LOGIN & REGISTER)
-   ========================================================================== */
+/* ==================== AUTH PAGES (LOGIN/REGISTER) ==================== */
 .auth-container {
     min-height: calc(100vh - 200px);
     display: flex;
@@ -277,7 +264,55 @@ body {
     border-color: #1a5f7a;
 }
 
-/* Password Wrapper & Input Show/Hide */
+.message-box {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.message-box.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.message-box.success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #64748b;
+}
+
+.auth-footer a {
+    color: #1a5f7a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* ==================== FORM SECTIONS (REGISTER) ==================== */
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-section h4 {
+    color: #1a5f7a;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.section-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+}
+
+/* Password Wrapper */
 .password-wrapper {
     display: flex;
     gap: 0.5rem;
@@ -302,7 +337,7 @@ body {
     background: #e2e8f0;
 }
 
-/* Forgot Password Link */
+/* Forgot Password */
 .forgot-password {
     text-align: right;
     margin: 0.5rem 0 1.5rem 0;
@@ -312,32 +347,9 @@ body {
     color: #1a5f7a;
     text-decoration: none;
     font-size: 0.85rem;
-    font-weight: 500;
 }
 
-.forgot-password a:hover {
-    text-decoration: underline;
-}
-
-/* Register Form Sections & Items Setup */
-.form-section {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.form-section h4 {
-    color: #1a5f7a;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-}
-
-.section-note {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-bottom: 1rem;
-}
-
+/* Item Row for Register */
 .item-row-register {
     display: flex;
     gap: 0.8rem;
@@ -398,62 +410,7 @@ body {
     background: #bae6fd;
 }
 
-/* Messages */
-.message-box {
-    margin-top: 1rem;
-    padding: 0.8rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.message-box.error {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.message-box.success {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-.auth-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    color: #64748b;
-}
-
-.auth-footer a {
-    color: #1a5f7a;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.back-button-container {
-    margin-bottom: 1rem;
-}
-
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    color: #1a5f7a;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.back-btn:hover {
-    color: #0e4a62;
-}
-
-/* ==========================================================================
-   7. DASHBOARD SYSTEM
-   ========================================================================== */
+/* ==================== DASHBOARD ==================== */
 .dashboard-container {
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
@@ -560,9 +517,7 @@ body {
     text-align: center;
 }
 
-/* ==========================================================================
-   8. MODULES SECTION (LEARNING MODUL)
-   ========================================================================== */
+/* ==================== MODUL PAGE ==================== */
 .modul-container {
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
@@ -652,7 +607,7 @@ body {
     text-decoration: underline;
 }
 
-/* Modul Detail Page */
+/* ==================== MODUL DETAIL PAGE ==================== */
 .modul-detail-container {
     padding: 2rem 0;
 }
@@ -720,9 +675,7 @@ body {
     border-radius: 8px;
 }
 
-/* ==========================================================================
-   9. TEMPLATES PAGE
-   ========================================================================== */
+/* ==================== TEMPLAT PAGE ==================== */
 .templat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -755,14 +708,13 @@ body {
     margin: 1rem 0;
 }
 
-/* ==========================================================================
-   10. JUALAN & TRANSAKSI SYSTEM (AUTOMATED ITEMS)
-   ========================================================================== */
+/* ==================== JUALAN PAGE (REKOD JUALAN) ==================== */
 .form-card {
     background: white;
     padding: 1.5rem;
     border-radius: 16px;
     margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .form-row {
@@ -797,6 +749,7 @@ body {
     overflow-y: auto;
     margin-bottom: 1.5rem;
     max-height: 400px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .rekod-list::-webkit-scrollbar {
@@ -884,11 +837,13 @@ body {
     margin: 0.2rem 0;
 }
 
+/* Summary Card */
 .summary-card {
     background: white;
     padding: 1.5rem;
     border-radius: 16px;
     margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .summary-grid {
@@ -930,7 +885,7 @@ body {
     color: #1a5f7a;
 }
 
-/* Itemized Jualan Form Styles */
+/* Itemized Form Styles (Jualan Page) */
 .items-header {
     display: flex;
     justify-content: space-between;
@@ -974,6 +929,7 @@ body {
     background: #f8fafc;
     border-radius: 12px;
     margin-bottom: 0.8rem;
+    border: 1px solid #e2e8f0;
 }
 
 .item-col label {
@@ -1035,9 +991,31 @@ body {
     color: #1a5f7a;
 }
 
-/* ==========================================================================
-   11. UTILITIES & FOOTER
-   ========================================================================== */
+/* ==================== BACK BUTTON ==================== */
+.back-button-container {
+    margin-bottom: 1rem;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #1a5f7a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-btn:hover {
+    color: #0e4a62;
+}
+
+/* ==================== FOOTER ==================== */
 footer {
     background: #1e293b;
     color: #94a3b8;
@@ -1046,6 +1024,7 @@ footer {
     margin-top: 3rem;
 }
 
+/* ==================== UTILITY ==================== */
 .section-desc {
     text-align: center;
     color: #64748b;
@@ -1058,9 +1037,7 @@ footer {
     color: #64748b;
 }
 
-/* ==========================================================================
-   12. RESPONSIVE DESIGN (MEDIA QUERIES)
-   ========================================================================== */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 900px) {
     .modul-three-columns {
         grid-template-columns: 1fr;
@@ -1104,7 +1081,7 @@ footer {
         grid-template-columns: 1fr;
     }
     
-    /* Responsive input jualan automatik */
+    /* Item row responsive */
     .item-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -1125,7 +1102,7 @@ footer {
         align-items: flex-start;
     }
     
-    /* Responsive pendaftaran item baru */
+    /* Register item row responsive */
     .item-row-register {
         flex-direction: column;
     }
@@ -1140,5 +1117,10 @@ footer {
     
     .remove-item-btn {
         width: 100%;
+    }
+    
+    /* Auth card responsive */
+    .auth-card {
+        padding: 1.5rem;
     }
 }
