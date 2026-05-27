@@ -3,11 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekod Jualan - UsahawanDigital</title>
+    <title>Rekod Kewangan - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js untuk visual -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* CSS Tambahan Khusus untuk Sistem Tab Kewangan & Kad Ringkasan */
+        .financial-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .tab-btn.active.jualan-tab {
+            background: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+        .tab-btn.active.belanja-tab {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+        .form-toggle-section {
+            display: none;
+        }
+        .form-toggle-section.active {
+            display: block;
+        }
+        .live-preview-total {
+            background: #f0fdf4;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #16a34a;
+            border: 1px dashed #bbf7d0;
+        }
+        .text-danger {
+            color: #dc2626 !important;
+        }
+        .text-success {
+            color: #16a34a !important;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -15,131 +74,405 @@
             <div class="logo">
                 <h1>🇲🇾 Usahawan<span>Digital</span></h1>
             </div>
-            <div class="nav-links" id="navLinks">
-                <a href="index.html">Utama</a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="jualan.html" class="active">Rekod Kewangan</a>
                 <a href="modul.html">Modul</a>
-                <a href="jualan.html" class="active">Rekod Jualan</a>
-                <a href="templat.html">Templat</a>
-                <a href="login.html" id="loginNavBtn">Log Masuk</a>
-                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+                <a href="logout.html" id="logoutBtn">Log Keluar</a>
             </div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="back-button-container">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
-        </div>
-        
-        <h2>💰 Rekod Jualan & Perbelanjaan</h2>
-        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item (contoh: Kek Coklat 3 biji, Air Sirap 2 gelas)</p>
-
-        <!-- Form Tambah Rekod -->
-        <div class="form-card">
-            <h3>➕ Tambah Rekod Baru</h3>
-            <form id="jualanForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>📅 Tarikh</label>
-                        <input type="date" id="tarikh" required>
-                    </div>
-                    <div class="form-group">
-                        <label>💰 Jenis Transaksi</label>
-                        <select id="jenis" required>
-                            <option value="jualan">💰 Jualan (Pendapatan)</option>
-                            <option value="belanja">📉 Perbelanjaan (Kos/Beli Stok)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>📁 Kategori Utama</label>
-                        <select id="kategori" required>
-                            <option value="makanan">🍔 Makanan</option>
-                            <option value="minuman">🥤 Minuman</option>
-                            <option value="produk">📦 Produk</option>
-                            <option value="perkhidmatan">⚙️ Perkhidmatan</option>
-                            <option value="stok">📦 Stok/Bahan Mentah</option>
-                            <option value="operasi">🏢 Operasi</option>
-                            <option value="lain">📝 Lain-lain</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Item List Container -->
-                <div class="items-header">
-                    <span>🛒 Senarai Item</span>
-                    <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
-                </div>
+    <div class="container page-layout">
+        <div class="form-wrapper">
+            <div class="card">
+                <h3>📝 Kemasukan Urus Niaga</h3>
+                <p class="section-note" style="margin-bottom: 15px;">Pilih jenis transaksi untuk direkodkan ke dalam sistem.</p>
                 
-                <div id="itemsList"></div>
-
-                <!-- Total Ringkasan -->
-                <div class="items-total">
-                    <div class="total-row">
-                        <span>💰 Jumlah Keseluruhan:</span>
-                        <strong id="totalAmountDisplay">RM 0.00</strong>
-                    </div>
+                <div class="financial-tabs">
+                    <button type="button" class="tab-btn active jualan-tab" id="switchJualanBtn">🟢 Masukkan Jualan</button>
+                    <button type="button" class="tab-btn belanja-tab" id="switchBelanjaBtn">🔴 Masukkan Perbelanjaan</button>
                 </div>
 
-                <button type="submit" class="btn-primary" id="submitBtn">💾 Simpan Rekod</button>
-            </form>
-            <div id="formMessage" class="message-box" style="display:none;"></div>
-        </div>
+                <div id="jualanFormSection" class="form-toggle-section active">
+                    <form id="jualanForm">
+                        <div class="form-group">
+                            <label>Pilih Item / Produk</label>
+                            <select id="jualanItemSelect" required>
+                                <option value="">-- Memuatkan senarai produk... --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kuantiti Terjual</label>
+                            <input type="number" id="jualanKuantiti" min="1" placeholder="contoh: 2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tarikh Jualan</label>
+                            <input type="date" id="jualanTarikh" required>
+                        </div>
+                        <div id="jualanTotalPreview" class="live-preview-total">
+                            Jumlah Jualan: RM 0.00
+                        </div>
+                        <button type="submit" class="btn-primary btn-full" style="background: #16a34a; margin-top: 15px;">Simpan Jualan ✓</button>
+                    </form>
+                </div>
 
-        <!-- Senarai Rekod - Scrollable -->
-        <div class="rekod-header">
-            <h3>📋 Senarai Rekod Terkini</h3>
-            <div class="filter-section">
-                <select id="filterJenis" onchange="filterRecords()">
-                    <option value="semua">📌 Semua</option>
-                    <option value="jualan">💰 Jualan Sahaja</option>
-                    <option value="belanja">📉 Perbelanjaan Sahaja</option>
-                </select>
-                <button id="generateReportBtn" class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
+                <div id="belanjaFormSection" class="form-toggle-section">
+                    <form id="belanjaForm">
+                        <div class="form-group">
+                            <label>Keterangan Perbelanjaan</label>
+                            <input type="text" id="belanjaKeterangan" placeholder="contoh: Beli kain ela 20 meter / Bil Elektrik" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori Perbelanjaan</label>
+                            <select id="belanjaKategori" required>
+                                <option value="">-- Pilih Kategori Kos --</option>
+                                <option value="bahan_mentah">📦 Kos Bahan Mentah / Stok Jualan</option>
+                                <option value="operasi">🏢 Kos Operasi (Sewa, Bil, Gaji)</option>
+                                <option value="pemasaran">📣 Kos Pemasaran & Iklan</option>
+                                <option value="lain_lain">💸 Lain-lain Kos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Kos Keluar (RM)</label>
+                            <input type="number" id="belanjaJumlah" step="0.01" min="0.01" placeholder="contoh: 150.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tarikh Belanja</label>
+                            <input type="date" id="belanjaTarikh" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-full" style="background: #dc2626; margin-top: 15px;">Simpan Perbelanjaan ✓</button>
+                    </form>
+                </div>
+
+                <div id="transactionMessage" class="message-box" style="margin-top: 15px;"></div>
             </div>
         </div>
 
-        <div class="rekod-list-container">
-            <div id="rekodList" class="rekod-list">
-                <p class="loading-text">📂 Loading rekod...</p>
+        <div class="content-wrapper">
+            <div class="filter-container">
+                <select id="monthFilter" class="filter-select">
+                    </select>
             </div>
-        </div>
 
-        <!-- Bar Chart -->
-        <div class="chart-card">
-            <h3>📊 Ringkasan Bulanan (Jualan vs Perbelanjaan)</h3>
-            <canvas id="salesChart" width="400" height="200"></canvas>
-        </div>
-
-        <!-- Ringkasan Kewangan -->
-        <div class="summary-card">
-            <h3>💰 Ringkasan Kewangan</h3>
             <div class="summary-grid">
-                <div class="summary-item">
-                    <span>Jumlah Jualan</span>
-                    <strong id="totalJualan">RM 0.00</strong>
+                <div class="summary-card">
+                    <h4>Jumlah Jualan</h4>
+                    <p class="summary-value text-success" id="totalJualanCard">RM 0.00</p>
                 </div>
-                <div class="summary-item">
-                    <span>Jumlah Perbelanjaan</span>
-                    <strong id="totalBelanja">RM 0.00</strong>
+                <div class="summary-card">
+                    <h4>Jumlah Belanja</h4>
+                    <p class="summary-value text-danger" id="totalBelanjaCard">RM 0.00</p>
                 </div>
-                <div class="summary-item">
-                    <span>Untung Bersih</span>
-                    <strong id="keuntungan">RM 0.00</strong>
+                <div class="summary-card">
+                    <h4>Untung Kasar</h4>
+                    <p class="summary-value" id="untungKasarCard">RM 0.00</p>
+                </div>
+                <div class="summary-card">
+                    <h4>Untung Bersih</h4>
+                    <p class="summary-value" id="untungBersihCard">RM 0.00</p>
+                </div>
+            </div>
+
+            <div class="card style="margin-top: 20px;">
+                <h3>📊 Aliran Kewangan Kronologi</h3>
+                <div class="rekod-list" id="financialRecordsList">
+                    <p class="text-center" style="color: #64748b; padding: 20px;">Memuatkan rekod aliran kewangan...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/jualan.js"></script>
+
+    <script>
+        // Memaksa set tarikh hari ini ke dalam input kalendar secara automatik
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('jualanTarikh').value = todayStr;
+        document.getElementById('belanjaTarikh').value = todayStr;
+
+        let globalUserItems = []; // Menyimpan data produk dari database untuk rujukan harga
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Cek log masuk pengguna
+            const { data: { user }, error: authErr } = await supabaseClient.auth.getUser();
+            if (authErr || !user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 1. LOGIK SWIS TAB UI (JUALAN VS PERBELANJAAN)
+            const jualanTab = document.getElementById('switchJualanBtn');
+            const belanjaTab = document.getElementById('switchBelanjaBtn');
+            const jualanSection = document.getElementById('jualanFormSection');
+            const belanjaSection = document.getElementById('belanjaFormSection');
+
+            jualanTab.addEventListener('click', function() {
+                jualanTab.classList.add('active');
+                belanjaTab.classList.remove('active');
+                jualanSection.classList.add('active');
+                belanjaSection.classList.remove('active');
+            });
+
+            belanjaTab.addEventListener('click', function() {
+                belanjaTab.classList.add('active');
+                jualanTab.classList.remove('active');
+                belanjaSection.classList.add('active');
+                jualanSection.classList.remove('active');
+            });
+
+            // 2. INTEGRASI PENAPIS BULAN (MONTH FILTER GENERATOR)
+            const monthFilter = document.getElementById('monthFilter');
+            const namaBulan = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+            const semasa = new Date();
+            
+            // Jenerasikan senarai 6 bulan ke belakang
+            for (let i = 0; i < 6; i++) {
+                let d = new Date(semasa.getFullYear(), semasa.getMonth() - i, 1);
+                let val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                let teks = `${namaBulan[d.getMonth()]} ${d.getFullYear()}`;
+                let opt = new Array('<option value="', val, '">', teks, '</option>').join('');
+                monthFilter.insertAdjacentHTML('beforeend', opt);
+            }
+
+            monthFilter.addEventListener('change', muatSemulaDataKewangan);
+
+            // 3. AMBIL DATA PRODUK (USER_ITEMS) UNTUK DROPDOWN JUALAN
+            async function dapatkanProdukPendaftar() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('user_items')
+                        .select('*')
+                        .eq('user_id', user.id);
+
+                    if (error) throw error;
+                    globalUserItems = data;
+
+                    const selectEl = document.getElementById('jualanItemSelect');
+                    if (data.length === 0) {
+                        selectEl.innerHTML = '<option value="">-- Tiada item didaftarkan --</option>';
+                        return;
+                    }
+
+                    let optionsHTML = '<option value="">-- Pilih Item --</option>';
+                    data.forEach(item => {
+                        optionsHTML += `<option value="${item.id}" data-price="${item.item_price}" data-category="${item.category}">${item.item_name} (RM ${parseFloat(item.item_price).toFixed(2)})</option>`;
+                    });
+                    selectEl.innerHTML = optionsHTML;
+                } catch (err) {
+                    console.error('Gagal memuatkan produk:', err);
+                }
+            }
+
+            // 4. KIRA TOTAL SECARA REAL-TIME PADA BORANG JUALAN
+            const inputKuantiti = document.getElementById('jualanKuantiti');
+            const selectItem = document.getElementById('jualanItemSelect');
+            const previewTotal = document.getElementById('jualanTotalPreview');
+
+            function kiraPreviewJualan() {
+                const optTerpilih = selectItem.options[selectItem.selectedIndex];
+                const kuantiti = parseInt(inputKuantiti.value) || 0;
+                if (!optTerpilih || !optTerpilih.value || kuantiti <= 0) {
+                    previewTotal.textContent = "Jumlah Jualan: RM 0.00";
+                    return;
+                }
+                const harga = parseFloat(optTerpilih.getAttribute('data-price'));
+                previewTotal.textContent = `Jumlah Jualan: RM ${(harga * kuantiti).toFixed(2)}`;
+            }
+            inputKuantiti.addEventListener('input', kiraPreviewJualan);
+            selectItem.addEventListener('change', kiraPreviewJualan);
+
+            // 5. PROSES SIMPAN BORANG JUALAN (KEMASUKAN DATA)
+            document.getElementById('jualanForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const msgBox = document.getElementById('transactionMessage');
+                const optTerpilih = selectItem.options[selectItem.selectedIndex];
+                
+                const itemId = selectItem.value;
+                const namaItem = optTerpilih.text.split(' (RM')[0];
+                const hargaUnit = parseFloat(optTerpilih.getAttribute('data-price'));
+                const kuantiti = parseInt(inputKuantiti.value);
+                const tarikh = document.getElementById('jualanTarikh').value;
+                const totalJualan = hargaUnit * kuantiti;
+                const kategoriProduk = optTerpilih.getAttribute('data-category') || 'produk';
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .insert([{
+                            user_id: user.id,
+                            jenis: 'jualan',
+                            kategori: kategoriProduk,
+                            jumlah: totalJualan,
+                            keterangan: `${namaItem} x ${kuantiti}`,
+                            tarikh: tarikh
+                        }]);
+
+                    if (error) throw error;
+                    msgBox.innerHTML = '<div class="message-box success">✅ Rekod jualan berjaya disimpan!</div>';
+                    document.getElementById('jualanForm').reset();
+                    document.getElementById('jualanTarikh').value = todayStr;
+                    previewTotal.textContent = "Jumlah Jualan: RM 0.00";
+                    muatSemulaDataKewangan();
+                } catch (err) {
+                    msgBox.innerHTML = `<div class="message-box error">❌ Gagal simpan: ${err.message}</div>`;
+                }
+            });
+
+            // 6. PROSES SIMPAN BORANG PERBELANJAAN (KEMASUKAN DATA)
+            document.getElementById('belanjaForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const msgBox = document.getElementById('transactionMessage');
+                
+                const keterangan = document.getElementById('belanjaKeterangan').value.trim();
+                const kategori = document.getElementById('belanjaKategori').value;
+                const jumlah = parseFloat(document.getElementById('belanjaJumlah').value);
+                const tarikh = document.getElementById('belanjaTarikh').value;
+
+                try {
+                    const { error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .insert([{
+                            user_id: user.id,
+                            jenis: 'belanja',
+                            kategori: kategori,
+                            jumlah: jumlah,
+                            keterangan: keterangan,
+                            tarikh: tarikh
+                        }]);
+
+                    if (error) throw error;
+                    msgBox.innerHTML = '<div class="message-box success">✅ Rekod perbelanjaan berjaya disimpan!</div>';
+                    document.getElementById('belanjaForm').reset();
+                    document.getElementById('belanjaTarikh').value = todayStr;
+                    muatSemulaDataKewangan();
+                } catch (err) {
+                    msgBox.innerHTML = `<div class="message-box error">❌ Gagal simpan: ${err.message}</div>`;
+                }
+            });
+
+            // 7. AMBIL DATA, KIRA UNTUNG RUGI & PAPARAN SENARAI KRONOLOGI
+            async function muatSemulaDataKewangan() {
+                const listContainer = document.getElementById('financialRecordsList');
+                const bulanPilihan = monthFilter.value; // Format: "YYYY-MM"
+                
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .order('tarikh', { ascending: false });
+
+                    if (error) throw error;
+
+                    // Buat tapis (filter) data mengikut bulan di peringkat client-side
+                    const dataDitapis = data.filter(rekod => rekod.tarikh.startsWith(bulanPilihan));
+
+                    // Mengira pembolehubah perakaunan
+                    let jumlahJualan = 0;
+                    let jumlahBelanja = 0;
+                    let kosBahanMentah = 0;
+                    let kosOperasiPemasaranLain = 0;
+
+                    let listHTML = '';
+
+                    if (dataDitapis.length === 0) {
+                        listContainer.innerHTML = '<p class="text-center" style="color: #64748b; padding: 20px;">Tiada sebarang rekod transaksi untuk bulan ini.</p>';
+                    } else {
+                        dataDitapis.forEach(rekod => {
+                            const amaun = parseFloat(rekod.jumlah);
+                            const tarikhLokal = new Date(rekod.tarikh).toLocaleDateString('ms-MY', { day:'numeric', month:'short' });
+                            
+                            if (rekod.jenis === 'jualan') {
+                                jumlahJualan += amaun;
+                                listHTML += `
+                                    <div class="rekod-item jualan">
+                                        <div>
+                                            <strong style="color:#16a34a;">🟢 JUALAN</strong> - ${rekod.keterangan}
+                                            <div style="font-size:12px; color:#94a3b8;">Tarikh: ${tarikhLokal}</div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:15px;">
+                                            <span class="rekod-jumlah jualan">+ RM ${amaun.toFixed(2)}</span>
+                                            <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${rekod.id}')">🗑️</button>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                jumlahBelanja += amaun;
+                                if (rekod.kategori === 'bahan_mentah') {
+                                    kosBahanMentah += amaun;
+                                } else {
+                                    kosOperasiPemasaranLain += amaun;
+                                }
+
+                                // Map ID Kategori ke teks UI yang mesra pengguna
+                                const mapKategori = {
+                                    'bahan_mentah': 'Kos Bahan Mentah',
+                                    'operasi': 'Kos Operasi',
+                                    'pemasaran': 'Kos Pemasaran',
+                                    'lain_lain': 'Kos Lain-lain'
+                                };
+                                const namaKategoriSkrin = mapKategori[rekod.kategori] || 'Perbelanjaan';
+
+                                listHTML += `
+                                    <div class="rekod-item belanja">
+                                        <div>
+                                            <strong style="color:#dc2626;">🔴 BELANJA</strong> (${namaKategoriSkrin}) - ${rekod.keterangan}
+                                            <div style="font-size:12px; color:#94a3b8;">Tarikh: ${tarikhLokal}</div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:15px;">
+                                            <span class="rekod-jumlah belanja">- RM ${amaun.toFixed(2)}</span>
+                                            <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${rekod.id}')">🗑️</button>
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                        listContainer.innerHTML = listHTML;
+                    }
+
+                    // Pengiraan Formula Akaun Standard
+                    const untungKasar = jumlahJualan - kosBahanMentah;
+                    const untungBersih = untungKasar - kosOperasiPemasaranLain;
+
+                    // Kemas kini paparan kad ringkasan di skrin
+                    document.getElementById('totalJualanCard').textContent = `RM ${jumlahJualan.toFixed(2)}`;
+                    document.getElementById('totalBelanjaCard').textContent = `RM ${jumlahBelanja.toFixed(2)}`;
+                    
+                    // Kad Untung Kasar (Beri warna merah jika negatif)
+                    const kadUntungKasar = document.getElementById('untungKasarCard');
+                    kadUntungKasar.textContent = `RM ${untungKasar.toFixed(2)}`;
+                    kadUntungKasar.className = untungKasar >= 0 ? "summary-value text-success" : "summary-value text-danger";
+
+                    // Kad Untung Bersih (Beri warna merah jika negatif)
+                    const kadUntungBersih = document.getElementById('untungBersihCard');
+                    kadUntungBersih.textContent = `RM ${untungBersih.toFixed(2)}`;
+                    kadUntungBersih.className = untungBersih >= 0 ? "summary-value text-success" : "summary-value text-danger";
+
+                } catch (err) {
+                    console.error('Ralat memuatkan aliran kewangan:', err);
+                }
+            }
+
+            // Fungsi global untuk padam transaksi (diperlukan oleh onclick HTML dinamik)
+            window.padamRekodTransaksi = async function(idMerekod) {
+                if (!confirm('Adakah anda pasti mahu memadamkan rekod transaksi kewangan ini?')) return;
+                try {
+                    const { error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .delete()
+                        .eq('id', idMerekod);
+
+                    if (error) throw error;
+                    muatSemulaDataKewangan();
+                } catch (err) {
+                    alert(`Gagal memadam rekod: ${err.message}`);
+                }
+            };
+
+            // Panggilan sistem pada fasa permulaan dimuatkan
+            await dapatkanProdukPendaftar();
+            await muatSemulaDataKewangan();
+        });
+    </script>
 </body>
 </html>
