@@ -1,49 +1,7 @@
-// Pada awal file jualan.js, sebelum KATEGORI_PERNIAGAAN, tambah:
-
-// Get business type from localStorage (set by dashboard)
-function getActiveBusinessType() {
-    return localStorage.getItem('userBusinessType') || 'fnb';
-}
-
-// Kemudian update function getUserBusinessType():
-
-async function getUserBusinessType() {
-    // First try to get from localStorage (faster)
-    const localType = getActiveBusinessType();
-    if (localType && KATEGORI_PERNIAGAAN[localType]) {
-        return localType;
-    }
-    
-    // Fallback to database
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return DEFAULT_KATEGORI;
-    
-    try {
-        const { data: profile, error } = await supabaseClient
-            .from('profiles')
-            .select('business_type, jenis_perniagaan')
-            .eq('id', user.id)
-            .single();
-        
-        if (error) throw error;
-        
-        let businessType = profile?.business_type || profile?.jenis_perniagaan || DEFAULT_KATEGORI;
-        if (!KATEGORI_PERNIAGAAN[businessType]) businessType = DEFAULT_KATEGORI;
-        
-        // Update localStorage
-        localStorage.setItem('userBusinessType', businessType);
-        
-        return businessType;
-    } catch (err) {
-        console.error('Error in getUserBusinessType:', err);
-        return DEFAULT_KATEGORI;
-    }
-}
 // =========================================
 // 1. STRUKTUR DATA KATEGORI (MAPPING OBJECT)
 // =========================================
 const KATEGORI_PERNIAGAAN = {
-    // A. F&B (Makanan & Minuman)
     fnb: {
         jualan: [
             { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
@@ -61,8 +19,6 @@ const KATEGORI_PERNIAGAAN = {
             { value: "Penyelenggaraan Mesin", label: "🛠️ Penyelenggaraan Mesin" }
         ]
     },
-    
-    // B. RETAIL/BUTIK
     retail: {
         jualan: [
             { value: "Pakaian Wanita", label: "👗 Pakaian Wanita" },
@@ -80,8 +36,6 @@ const KATEGORI_PERNIAGAAN = {
             { value: "Pemasaran", label: "📣 Pemasaran" }
         ]
     },
-    
-    // C. PERKHIDMATAN/SERVIS
     servis: {
         jualan: [
             { value: "Servis Utama", label: "✂️ Servis Utama" },
@@ -99,7 +53,6 @@ const KATEGORI_PERNIAGAAN = {
     }
 };
 
-// Default kategori (F&B) jika tiada padanan
 const DEFAULT_KATEGORI = 'fnb';
 
 // Global variables
@@ -107,13 +60,12 @@ let currentRecords = [];
 let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
-let currentUserBusinessType = 'fnb'; // Default
+let currentUserBusinessType = 'fnb';
 
 // =========================================
 // 2. FUNGSI RENDER DROPDOWN KATEGORI DINAMIK
 // =========================================
 function renderDynamicCategories(jenisPerniagaan) {
-    // Validasi - jika jenis perniagaan tidak wujud dalam mapping, guna default
     let businessData = KATEGORI_PERNIAGAAN[jenisPerniagaan];
     if (!businessData) {
         console.warn(`Jenis perniagaan "${jenisPerniagaan}" tidak dijumpai. Menggunakan default (fnb).`);
@@ -122,26 +74,13 @@ function renderDynamicCategories(jenisPerniagaan) {
     }
     
     currentUserBusinessType = jenisPerniagaan;
-    
-    // Dapatkan dropdown kategori
     const kategoriSelect = document.getElementById('kategori');
     if (!kategoriSelect) return;
     
-    // Dapatkan jenis transaksi yang dipilih (jualan/belanja)
     const jenisTransaksi = document.getElementById('jenis').value;
+    let kategoriList = jenisTransaksi === 'jualan' ? businessData.jualan : businessData.belanja;
     
-    // Pilih mapping berdasarkan jenis transaksi
-    let kategoriList = [];
-    if (jenisTransaksi === 'jualan') {
-        kategoriList = businessData.jualan;
-    } else {
-        kategoriList = businessData.belanja;
-    }
-    
-    // Kosongkan dropdown
     kategoriSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-    
-    // Masukkan kategori baru
     kategoriList.forEach(kategori => {
         const option = document.createElement('option');
         option.value = kategori.value;
@@ -149,49 +88,47 @@ function renderDynamicCategories(jenisPerniagaan) {
         kategoriSelect.appendChild(option);
     });
     
-    // Optional: set default ke kategori pertama
-    if (kategoriList.length > 0) {
+    if (kategoriList.length > 0 && kategoriSelect.options.length > 1) {
         kategoriSelect.value = kategoriList[0].value;
     }
 }
 
 // =========================================
-// 3. DAPATKAN JENIS PERNIAGAAN DARI PROFILES
+// 3. DAPATKAN JENIS PERNIAGAAN DARI STORAGE/PROFILE
 // =========================================
+function getActiveBusinessType() {
+    return localStorage.getItem('userBusinessType') || 'fnb';
+}
+
 async function getUserBusinessType() {
+    const localType = getActiveBusinessType();
+    if (localType && KATEGORI_PERNIAGAAN[localType]) {
+        return localType;
+    }
+    
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return DEFAULT_KATEGORI;
     
     try {
         const { data: profile, error } = await supabaseClient
             .from('profiles')
-            .select('jenis_perniagaan')
+            .select('business_type, jenis_perniagaan')
             .eq('id', user.id)
             .single();
         
-        if (error) {
-            console.warn('Error fetching profile:', error);
-            return DEFAULT_KATEGORI;
-        }
+        if (error) throw error;
         
-        // Jika profile ada dan jenis_perniagaan valid
-        if (profile && profile.jenis_perniagaan) {
-            const businessType = profile.jenis_perniagaan;
-            // Validasi sama ada jenis_perniagaan wujud dalam mapping
-            if (KATEGORI_PERNIAGAAN[businessType]) {
-                return businessType;
-            }
-        }
-        return DEFAULT_KATEGORI;
+        let businessType = profile?.business_type || profile?.jenis_perniagaan || DEFAULT_KATEGORI;
+        if (!KATEGORI_PERNIAGAAN[businessType]) businessType = DEFAULT_KATEGORI;
+        
+        localStorage.setItem('userBusinessType', businessType);
+        return businessType;
     } catch (err) {
         console.error('Error in getUserBusinessType:', err);
         return DEFAULT_KATEGORI;
     }
 }
 
-// =========================================
-// 4. EVENT LISTENER UNTUK JENIS TRANSAKSI
-// =========================================
 function setupJenisTransaksiListener() {
     const jenisSelect = document.getElementById('jenis');
     if (jenisSelect) {
@@ -202,38 +139,7 @@ function setupJenisTransaksiListener() {
 }
 
 // =========================================
-// 5. INITIALIZATION (PAGE LOAD)
-// =========================================
-document.addEventListener('DOMContentLoaded', async () => {
-    // Set default date
-    const tarikhInput = document.getElementById('tarikh');
-    if (tarikhInput) {
-        tarikhInput.valueAsDate = new Date();
-    }
-    
-    // Check auth
-    const user = await checkAuth();
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    // Add first empty item row
-    addItemRow();
-    
-    // Get user's business type and render categories
-    currentUserBusinessType = await getUserBusinessType();
-    renderDynamicCategories(currentUserBusinessType);
-    
-    // Setup event listener for jenis transaksi change
-    setupJenisTransaksiListener();
-    
-    // Load records
-    await loadRecords();
-});
-
-// =========================================
-// 6. ITEM MANAGEMENT FUNCTIONS
+// 4. ITEM MANAGEMENT FUNCTIONS (IMPROVED LAYOUT)
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
@@ -246,19 +152,19 @@ function addItemRow() {
     itemRow.id = `item-${itemId}`;
     itemRow.innerHTML = `
         <div class="item-col item-name-col">
-            <label>Nama Item</label>
+            <label>📝 Nama Item</label>
             <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap" required>
         </div>
         <div class="item-col item-qty-col">
-            <label>Kuantiti</label>
+            <label>🔢 Kuantiti</label>
             <input type="number" class="item-qty" value="1" min="1" step="1" required>
         </div>
         <div class="item-col item-price-col">
-            <label>Harga (RM)</label>
+            <label>💰 Harga (RM)</label>
             <input type="number" class="item-price" value="0" min="0" step="0.01" required>
         </div>
         <div class="item-col item-subtotal-col">
-            <label>Jumlah (RM)</label>
+            <label>💵 Jumlah</label>
             <span class="item-subtotal">RM 0.00</span>
         </div>
         <div class="item-col item-action-col">
@@ -266,10 +172,8 @@ function addItemRow() {
         </div>
     `;
     
-    // Add event listeners for calculation
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
-    
     qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     
@@ -310,10 +214,7 @@ function calculateTotalAmount() {
     });
     
     const totalDisplay = document.getElementById('totalAmountDisplay');
-    if (totalDisplay) {
-        totalDisplay.textContent = `RM ${total.toFixed(2)}`;
-    }
-    
+    if (totalDisplay) totalDisplay.textContent = `RM ${total.toFixed(2)}`;
     return total;
 }
 
@@ -325,22 +226,35 @@ function getItemsData() {
         const name = row.querySelector('.item-name').value.trim();
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        
         if (name && quantity > 0 && price > 0) {
-            items.push({
-                name: name,
-                quantity: quantity,
-                price: price,
-                subtotal: quantity * price
-            });
+            items.push({ name, quantity, price, subtotal: quantity * price });
         }
     });
-    
     return items;
 }
 
 // =========================================
-// 7. FORM SUBMISSION
+// 5. INITIALIZATION
+// =========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    const tarikhInput = document.getElementById('tarikh');
+    if (tarikhInput) tarikhInput.valueAsDate = new Date();
+    
+    const user = await checkAuth();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    addItemRow();
+    currentUserBusinessType = await getUserBusinessType();
+    renderDynamicCategories(currentUserBusinessType);
+    setupJenisTransaksiListener();
+    await loadRecords();
+});
+
+// =========================================
+// 6. FORM SUBMISSION
 // =========================================
 const jualanForm = document.getElementById('jualanForm');
 if (jualanForm) {
@@ -360,25 +274,10 @@ if (jualanForm) {
         const items = getItemsData();
         const total = calculateTotalAmount();
         
-        if (!tarikh) {
-            alert('Sila pilih tarikh');
-            return;
-        }
-        
-        if (!kategori) {
-            alert('Sila pilih kategori');
-            return;
-        }
-        
-        if (items.length === 0) {
-            alert('Sila tambah sekurang-kurangnya satu item');
-            return;
-        }
-        
-        if (total <= 0) {
-            alert('Jumlah mesti lebih dari RM0');
-            return;
-        }
+        if (!tarikh) { alert('Sila pilih tarikh'); return; }
+        if (!kategori) { alert('Sila pilih kategori'); return; }
+        if (items.length === 0) { alert('Sila tambah sekurang-kurangnya satu item'); return; }
+        if (total <= 0) { alert('Jumlah mesti lebih dari RM0'); return; }
         
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
@@ -387,56 +286,38 @@ if (jualanForm) {
         try {
             const { error } = await supabaseClient
                 .from('jualan_records')
-                .insert([
-                    {
-                        user_id: user.id,
-                        tarikh: tarikh,
-                        jenis: jenis,
-                        kategori: kategori,
-                        jumlah: total,
-                        items: items,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+                .insert([{
+                    user_id: user.id,
+                    tarikh: tarikh,
+                    jenis: jenis,
+                    kategori: kategori,
+                    jumlah: total,
+                    items: items,
+                    created_at: new Date().toISOString()
+                }]);
             
             if (error) throw error;
             
-            // Reset form
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
-            
-            // Reset items list
-            const itemsList = document.getElementById('itemsList');
-            if (itemsList) {
-                itemsList.innerHTML = '';
-            }
+            document.getElementById('itemsList').innerHTML = '';
             itemCounter = 0;
             addItemRow();
-            
-            // Re-render categories (to ensure dropdown is fresh)
             renderDynamicCategories(currentUserBusinessType);
             
-            // Show success message
             const formMessage = document.getElementById('formMessage');
             formMessage.style.display = 'block';
             formMessage.className = 'message-box success';
             formMessage.innerHTML = '✅ Rekod berjaya disimpan!';
-            setTimeout(() => {
-                formMessage.style.display = 'none';
-            }, 3000);
+            setTimeout(() => { formMessage.style.display = 'none'; }, 3000);
             
-            // Reload records
             await loadRecords();
-            
         } catch (error) {
-            console.error('Error saving record:', error);
             const formMessage = document.getElementById('formMessage');
             formMessage.style.display = 'block';
             formMessage.className = 'message-box error';
             formMessage.innerHTML = `❌ Ralat: ${error.message}`;
-            setTimeout(() => {
-                formMessage.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { formMessage.style.display = 'none'; }, 5000);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = '💾 Simpan Rekod';
@@ -445,33 +326,26 @@ if (jualanForm) {
 }
 
 // =========================================
-// 8. LOAD, FILTER, DISPLAY RECORDS
+// 7. LOAD, FILTER, DISPLAY RECORDS
 // =========================================
 async function loadRecords() {
     const user = await checkAuth();
     if (!user) return;
     
     const rekodList = document.getElementById('rekodList');
-    if (!rekodList) return;
-    
     rekodList.innerHTML = '<p class="loading-text">📂 Loading rekod...</p>';
     
     try {
-        let query = supabaseClient
+        const { data, error } = await supabaseClient
             .from('jualan_records')
             .select('*')
             .eq('user_id', user.id)
             .order('tarikh', { ascending: false });
         
-        const { data, error } = await query;
-        
         if (error) throw error;
-        
         currentRecords = data || [];
         filterRecords();
-        
     } catch (error) {
-        console.error('Error loading records:', error);
         rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod. Sila cuba lagi.</p>';
     }
 }
@@ -479,11 +353,8 @@ async function loadRecords() {
 function filterRecords() {
     const filter = document.getElementById('filterJenis')?.value || 'semua';
     currentFilter = filter;
-    
     let filtered = currentRecords;
-    if (filter !== 'semua') {
-        filtered = currentRecords.filter(record => record.jenis === filter);
-    }
+    if (filter !== 'semua') filtered = currentRecords.filter(record => record.jenis === filter);
     
     displayRecords(filtered);
     updateSummary(filtered);
@@ -492,7 +363,6 @@ function filterRecords() {
 
 function displayRecords(records) {
     const rekodList = document.getElementById('rekodList');
-    
     if (records.length === 0) {
         rekodList.innerHTML = '<p class="no-records">📭 Tiada rekod dijumpai. Tambah rekod baru di atas.</p>';
         return;
@@ -505,10 +375,6 @@ function displayRecords(records) {
         const jenisIcon = record.jenis === 'jualan' ? '💰' : '📉';
         const jenisText = record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan';
         
-        // Format kategori dengan emoji jika ada
-        let kategoriDisplay = record.kategori || 'Tiada kategori';
-        
-        // Display items detail
         let itemsHtml = '';
         if (record.items && Array.isArray(record.items) && record.items.length > 0) {
             itemsHtml = '<div class="rekod-items">';
@@ -516,63 +382,46 @@ function displayRecords(records) {
                 itemsHtml += `<div class="rekod-item-detail">• ${item.name} (${item.quantity} x RM${item.price.toFixed(2)}) = RM${item.subtotal.toFixed(2)}</div>`;
             });
             itemsHtml += '</div>';
-        } else if (record.keterangan) {
-            itemsHtml = `<div class="rekod-items"><div class="rekod-item-detail">• ${record.keterangan}</div></div>`;
         }
         
         html += `
             <div class="rekod-item ${jenisClass}" data-id="${record.id}">
                 <div class="rekod-info">
                     <div class="rekod-tarikh">${tanggal}</div>
-                    <div class="rekod-keterangan">${jenisIcon} ${jenisText} - ${kategoriDisplay}</div>
+                    <div class="rekod-keterangan">${jenisIcon} ${jenisText} - ${record.kategori || 'Tiada kategori'}</div>
                     ${itemsHtml}
                 </div>
-                <div class="rekod-jumlah ${jenisClass}">
-                    RM ${(record.jumlah || 0).toFixed(2)}
-                </div>
+                <div class="rekod-jumlah ${jenisClass}">RM ${(record.jumlah || 0).toFixed(2)}</div>
                 <button class="rekod-delete" onclick="deleteRecord('${record.id}')">🗑️</button>
             </div>
         `;
     });
-    
     rekodList.innerHTML = html;
 }
 
 function updateSummary(records) {
-    let totalJualan = 0;
-    let totalBelanja = 0;
-    
+    let totalJualan = 0, totalBelanja = 0;
     records.forEach(record => {
-        if (record.jenis === 'jualan') {
-            totalJualan += record.jumlah || 0;
-        } else {
-            totalBelanja += record.jumlah || 0;
-        }
+        if (record.jenis === 'jualan') totalJualan += record.jumlah || 0;
+        else totalBelanja += record.jumlah || 0;
     });
-    
     const keuntungan = totalJualan - totalBelanja;
     
-    const totalJualanEl = document.getElementById('totalJualan');
-    const totalBelanjaEl = document.getElementById('totalBelanja');
+    document.getElementById('totalJualan').textContent = `RM ${totalJualan.toFixed(2)}`;
+    document.getElementById('totalBelanja').textContent = `RM ${totalBelanja.toFixed(2)}`;
     const keuntunganEl = document.getElementById('keuntungan');
-    
-    if (totalJualanEl) totalJualanEl.textContent = `RM ${totalJualan.toFixed(2)}`;
-    if (totalBelanjaEl) totalBelanjaEl.textContent = `RM ${totalBelanja.toFixed(2)}`;
-    if (keuntunganEl) {
-        keuntunganEl.textContent = `RM ${keuntungan.toFixed(2)}`;
-        keuntunganEl.style.color = keuntungan >= 0 ? '#16a34a' : '#dc2626';
-    }
+    keuntunganEl.textContent = `RM ${keuntungan.toFixed(2)}`;
+    keuntunganEl.style.color = keuntungan >= 0 ? '#16a34a' : '#dc2626';
 }
 
 // =========================================
-// 9. CHART FUNCTIONS
+// 8. CHART FUNCTIONS
 // =========================================
 function prepareChartData(records) {
     const months = [];
-    const jualanByMonth = {};
-    const belanjaByMonth = {};
-    
+    const jualanByMonth = {}, belanjaByMonth = {};
     const now = new Date();
+    
     for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const monthKey = `${d.getFullYear()}-${d.getMonth() + 1}`;
@@ -586,289 +435,75 @@ function prepareChartData(records) {
         if (!record.tarikh) return;
         const date = new Date(record.tarikh);
         const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-        
         if (jualanByMonth[monthKey] !== undefined) {
-            if (record.jenis === 'jualan') {
-                jualanByMonth[monthKey] += record.jumlah || 0;
-            } else {
-                belanjaByMonth[monthKey] += record.jumlah || 0;
-            }
+            if (record.jenis === 'jualan') jualanByMonth[monthKey] += record.jumlah || 0;
+            else belanjaByMonth[monthKey] += record.jumlah || 0;
         }
     });
     
-    const labels = months.map(m => m.label);
-    const jualanData = months.map(m => jualanByMonth[m.key]);
-    const belanjaData = months.map(m => belanjaByMonth[m.key]);
-    
-    updateChart(jualanData, belanjaData, labels);
+    updateChart(months.map(m => jualanByMonth[m.key]), months.map(m => belanjaByMonth[m.key]), months.map(m => m.label));
 }
 
 function updateChart(jualanData, belanjaData, labels) {
     const ctx = document.getElementById('salesChart');
     if (!ctx) return;
-    
-    if (salesChart) {
-        salesChart.destroy();
-    }
+    if (salesChart) salesChart.destroy();
     
     salesChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
-                {
-                    label: 'Jualan (RM)',
-                    data: jualanData,
-                    backgroundColor: 'rgba(34, 197, 94, 0.6)',
-                    borderColor: 'rgb(34, 197, 94)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Perbelanjaan (RM)',
-                    data: belanjaData,
-                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                    borderColor: 'rgb(239, 68, 68)',
-                    borderWidth: 1
-                }
+                { label: 'Jualan (RM)', data: jualanData, backgroundColor: 'rgba(34, 197, 94, 0.6)', borderColor: 'rgb(34, 197, 94)', borderWidth: 1 },
+                { label: 'Perbelanjaan (RM)', data: belanjaData, backgroundColor: 'rgba(239, 68, 68, 0.6)', borderColor: 'rgb(239, 68, 68)', borderWidth: 1 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
-            plugins: {
-                legend: { position: 'top' },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `RM ${context.raw.toFixed(2)}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Jumlah (RM)' }
-                },
-                x: {
-                    title: { display: true, text: 'Bulan' }
-                }
-            }
+            plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (ctx) => `RM ${ctx.raw.toFixed(2)}` } } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'Jumlah (RM)' } }, x: { title: { display: true, text: 'Bulan' } } }
         }
     });
 }
 
-// =========================================
-// 10. DELETE RECORD
-// =========================================
 async function deleteRecord(recordId) {
     if (!confirm('⚠️ Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')) return;
-    
     try {
-        const { error } = await supabaseClient
-            .from('jualan_records')
-            .delete()
-            .eq('id', recordId);
-        
+        const { error } = await supabaseClient.from('jualan_records').delete().eq('id', recordId);
         if (error) throw error;
-        
         await loadRecords();
-        
     } catch (error) {
-        console.error('Error deleting record:', error);
         alert('❌ Ralat memadam rekod: ' + error.message);
     }
 }
 
-// =========================================
-// 11. GENERATE PDF REPORT
-// =========================================
 async function generateReport() {
-    if (currentRecords.length === 0) {
-        alert('📭 Tiada rekod untuk dijana laporan.');
-        return;
-    }
+    if (currentRecords.length === 0) { alert('📭 Tiada rekod untuk dijana laporan.'); return; }
     
     let filtered = currentRecords;
-    if (currentFilter !== 'semua') {
-        filtered = currentRecords.filter(record => record.jenis === currentFilter);
-    }
+    if (currentFilter !== 'semua') filtered = currentRecords.filter(record => record.jenis === currentFilter);
     
-    let totalJualan = 0;
-    let totalBelanja = 0;
-    
+    let totalJualan = 0, totalBelanja = 0;
     filtered.forEach(record => {
-        if (record.jenis === 'jualan') {
-            totalJualan += record.jumlah || 0;
-        } else {
-            totalBelanja += record.jumlah || 0;
-        }
+        if (record.jenis === 'jualan') totalJualan += record.jumlah || 0;
+        else totalBelanja += record.jumlah || 0;
     });
-    
     const keuntungan = totalJualan - totalBelanja;
     const reportDate = new Date().toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' });
     
-    // Build HTML for report
     let tableRows = '';
     filtered.forEach(record => {
-        const kategoriDisplay = record.kategori || 'Tiada kategori';
         if (record.items && Array.isArray(record.items) && record.items.length > 0) {
             record.items.forEach(item => {
-                tableRows += `
-                    <tr>
-                        <td>${record.tarikh}</td>
-                        <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
-                        <td>${kategoriDisplay}</td>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.price.toFixed(2)}</td>
-                        <td>${item.subtotal.toFixed(2)}</td>
-                    </tr>
-                `;
+                tableRows += `<tr><td>${record.tarikh}</td><td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td><td>${record.kategori || '-'}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price.toFixed(2)}</td><td>${item.subtotal.toFixed(2)}</td></tr>`;
             });
         } else {
-            tableRows += `
-                <tr>
-                    <td>${record.tarikh}</td>
-                    <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
-                    <td>${kategoriDisplay}</td>
-                    <td colspan="4">${record.keterangan || 'Tiada detail item'}</td>
-                </tr>
-            `;
+            tableRows += `<tr><td>${record.tarikh}</td><td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td><td>${record.kategori || '-'}</td><td colspan="4">${record.keterangan || 'Tiada detail item'}</td></tr>`;
         }
     });
     
-    const reportHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Kewangan - UsahawanDigital</title>
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body {
-                    font-family: 'Arial', sans-serif;
-                    padding: 40px;
-                    background: white;
-                    color: #1e293b;
-                }
-                .report-container {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }
-                .report-header {
-                    text-align: center;
-                    margin-bottom: 30px;
-                    padding-bottom: 20px;
-                    border-bottom: 3px solid #1a5f7a;
-                }
-                .report-header h1 {
-                    color: #1a5f7a;
-                    margin-bottom: 10px;
-                }
-                .summary-card {
-                    background: #f0f7ff;
-                    padding: 20px;
-                    border-radius: 12px;
-                    margin-bottom: 30px;
-                }
-                .summary-card h3 {
-                    color: #1a5f7a;
-                    margin-bottom: 15px;
-                }
-                .summary-grid {
-                    display: flex;
-                    justify-content: space-around;
-                    text-align: center;
-                }
-                .summary-item {
-                    background: white;
-                    padding: 15px 25px;
-                    border-radius: 10px;
-                }
-                .summary-item span {
-                    display: block;
-                    font-size: 14px;
-                    color: #64748b;
-                }
-                .summary-item strong {
-                    font-size: 24px;
-                    color: #1a5f7a;
-                }
-                .profit { color: #16a34a; }
-                .loss { color: #dc2626; }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                }
-                th, td {
-                    border: 1px solid #e2e8f0;
-                    padding: 10px;
-                    text-align: left;
-                }
-                th {
-                    background: #1a5f7a;
-                    color: white;
-                }
-                .footer {
-                    text-align: center;
-                    margin-top: 40px;
-                    padding-top: 20px;
-                    border-top: 1px solid #e2e8f0;
-                    color: #94a3b8;
-                    font-size: 12px;
-                }
-                @media print {
-                    body { padding: 20px; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="report-container">
-                <div class="report-header">
-                    <h1>📊 Laporan Jualan & Perbelanjaan</h1>
-                    <p>Portal UsahawanDigital | Dijana pada: ${reportDate}</p>
-                </div>
-                
-                <div class="summary-card">
-                    <h3>💰 Ringkasan Kewangan</h3>
-                    <div class="summary-grid">
-                        <div class="summary-item">
-                            <span>Jumlah Jualan</span>
-                            <strong>RM ${totalJualan.toFixed(2)}</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Jumlah Perbelanjaan</span>
-                            <strong>RM ${totalBelanja.toFixed(2)}</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Untung Bersih</span>
-                            <strong class="${keuntungan >= 0 ? 'profit' : 'loss'}">RM ${keuntungan.toFixed(2)}</strong>
-                        </div>
-                    </div>
-                </div>
-                
-                <h3>📋 Senarai Transaksi</h3>
-                <table>
-                    <thead>
-                        <tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Item</th><th>Kuantiti</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-                
-                <div class="footer">
-                    <p>Dijana oleh Portal UsahawanDigital © ${new Date().getFullYear()}</p>
-                </div>
-            </div>
-            <script>
-                window.onload = function() { window.print(); };
-            <\/script>
-        </body>
-        </html>
-    `;
+    const reportHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laporan Kewangan - UsahawanDigital</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,sans-serif;padding:40px;background:white;}.report-container{max-width:1200px;margin:0 auto;}.report-header{text-align:center;margin-bottom:30px;padding-bottom:20px;border-bottom:3px solid #1a5f7a;}.report-header h1{color:#1a5f7a;}.summary-card{background:#f0f7ff;padding:20px;border-radius:12px;margin-bottom:30px;}.summary-grid{display:flex;justify-content:space-around;text-align:center;}.summary-item{background:white;padding:15px 25px;border-radius:10px;}.summary-item strong{font-size:24px;color:#1a5f7a;}.profit{color:#16a34a;}.loss{color:#dc2626;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #e2e8f0;padding:10px;text-align:left;}th{background:#1a5f7a;color:white;}.footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:12px;}</style></head><body><div class="report-container"><div class="report-header"><h1>📊 Laporan Jualan & Perbelanjaan</h1><p>Portal UsahawanDigital | Dijana pada: ${reportDate}</p></div><div class="summary-card"><h3>💰 Ringkasan Kewangan</h3><div class="summary-grid"><div class="summary-item"><span>Jumlah Jualan</span><strong>RM ${totalJualan.toFixed(2)}</strong></div><div class="summary-item"><span>Jumlah Perbelanjaan</span><strong>RM ${totalBelanja.toFixed(2)}</strong></div><div class="summary-item"><span>Untung Bersih</span><strong class="${keuntungan >= 0 ? 'profit' : 'loss'}">RM ${keuntungan.toFixed(2)}</strong></div></div></div><h3>📋 Senarai Transaksi</h3><table><thead><tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Item</th><th>Kuantiti</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr></thead><tbody>${tableRows}</tbody></table><div class="footer"><p>Dijana oleh Portal UsahawanDigital © ${new Date().getFullYear()}</p></div></div><script>window.onload=function(){window.print();};<\/script></body></html>`;
     
     const printWindow = window.open('', '_blank');
     printWindow.document.write(reportHtml);
