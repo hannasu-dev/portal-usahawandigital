@@ -1047,15 +1047,7 @@ async function loadUserItems() {
             }
         };
 
-        // ==================== LOGOUT ====================
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await supabaseClient.auth.signOut();
-                window.location.href = 'index.html';
-            });
-        }
+        
 
         // ==================== TAB SWITCHING ====================
         function setupTabs() {
