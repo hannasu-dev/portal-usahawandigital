@@ -6,6 +6,171 @@
     <title>Rekod Kewangan - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Tambahan Khusus untuk Sistem Tab Kewangan & Kad Ringkasan */
+        .financial-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .tab-btn.active.jualan-tab {
+            background: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+        .tab-btn.active.belanja-tab {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+        .form-toggle-section {
+            display: none;
+        }
+        .form-toggle-section.active {
+            display: block;
+        }
+        .live-preview-total {
+            background: #f0fdf4;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #16a34a;
+            border: 1px dashed #bbf7d0;
+        }
+        .text-danger {
+            color: #dc2626 !important;
+        }
+        .text-success {
+            color: #16a34a !important;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .summary-card h4 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .page-layout {
+            padding: 20px 0;
+        }
+        .form-wrapper, .content-wrapper {
+            margin-bottom: 20px;
+        }
+        .rekod-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .rekod-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .rekod-item.jualan {
+            border-left: 4px solid #16a34a;
+            background: #f0fdf4;
+        }
+        .rekod-item.belanja {
+            border-left: 4px solid #dc2626;
+            background: #fef2f2;
+        }
+        .rekod-jumlah.jualan {
+            color: #16a34a;
+            font-weight: 700;
+        }
+        .rekod-jumlah.belanja {
+            color: #dc2626;
+            font-weight: 700;
+        }
+        .rekod-delete {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            color: #94a3b8;
+        }
+        .rekod-delete:hover {
+            color: #dc2626;
+        }
+        .btn-full {
+            width: 100%;
+        }
+        .section-note {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .message-box {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .message-box.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .message-box.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .text-center {
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .financial-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -13,140 +178,123 @@
             <div class="logo">
                 <h1>🇲🇾 Usahawan<span>Digital</span></h1>
             </div>
-            <div class="nav-links" id="navLinks">
-                <a href="index.html">Utama</a>
-                <a href="modul.html">Modul</a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
                 <a href="jualan.html" class="active">Rekod Kewangan</a>
-                <a href="templat.html">Templat</a>
-                <a href="login.html" id="loginNavBtn">Log Masuk</a>
-                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+                <a href="modul.html">Modul</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="back-button-container">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
-        </div>
-        
-        <h2>💰 Rekod Kewangan (Aliran Tunai)</h2>
-        <p class="section-desc">Rekod jualan & perbelanjaan perniagaan anda dengan mudah</p>
+    <div class="container page-layout">
+        <div class="form-wrapper">
+            <div class="card">
+                <h3>📝 Kemasukan Urus Niaga</h3>
+                <p class="section-note" style="margin-bottom: 15px;">Pilih jenis transaksi untuk direkodkan ke dalam sistem.</p>
+                
+                <div class="financial-tabs">
+                    <button type="button" class="tab-btn active jualan-tab" id="switchJualanBtn">🟢 Masukkan Jualan</button>
+                    <button type="button" class="tab-btn belanja-tab" id="switchBelanjaBtn">🔴 Masukkan Perbelanjaan</button>
+                </div>
 
-        <!-- Dropdown Penapis Bulanan -->
-        <div class="filter-month-container">
-            <label>📅 Penapis Bulanan:</label>
-            <select id="monthFilter" class="month-filter-select"></select>
+                <div id="jualanFormSection" class="form-toggle-section active">
+                    <form id="jualanForm">
+                        <div class="form-group">
+                            <label>📁 Kategori Jualan</label>
+                            <select id="jualanKategori" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="makanan">🍔 Makanan</option>
+                                <option value="minuman">🥤 Minuman</option>
+                                <option value="produk">📦 Produk</option>
+                                <option value="perkhidmatan">⚙️ Perkhidmatan</option>
+                                <option value="lain_lain">📝 Lain-lain</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🛒 Pilih Item / Produk</label>
+                            <select id="jualanItemSelect" required>
+                                <option value="">-- Memuatkan senarai produk... --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>🔢 Kuantiti Terjual</label>
+                            <input type="number" id="jualanKuantiti" min="1" value="1" placeholder="contoh: 2" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Tarikh Jualan</label>
+                            <input type="date" id="jualanTarikh" required>
+                        </div>
+                        <div id="jualanTotalPreview" class="live-preview-total">
+                            Jumlah Jualan: RM 0.00
+                        </div>
+                        <button type="submit" class="btn-primary btn-full" style="background: #16a34a; margin-top: 15px;">💾 Simpan Jualan ✓</button>
+                    </form>
+                </div>
+
+                <div id="belanjaFormSection" class="form-toggle-section">
+                    <form id="belanjaForm">
+                        <div class="form-group">
+                            <label>📝 Keterangan Perbelanjaan</label>
+                            <input type="text" id="belanjaKeterangan" placeholder="contoh: Beli kain ela 20 meter / Bil Elektrik" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📁 Kategori Perbelanjaan</label>
+                            <select id="belanjaKategori" required>
+                                <option value="">-- Pilih Kategori Kos --</option>
+                                <option value="bahan_mentah">📦 Kos Bahan Mentah / Stok Jualan</option>
+                                <option value="operasi">🏢 Kos Operasi (Sewa, Bil, Gaji)</option>
+                                <option value="pemasaran">📣 Kos Pemasaran & Iklan</option>
+                                <option value="lain_lain">💸 Lain-lain Kos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>💰 Jumlah Kos Keluar (RM)</label>
+                            <input type="number" id="belanjaJumlah" step="0.01" min="0.01" placeholder="contoh: 150.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📅 Tarikh Belanja</label>
+                            <input type="date" id="belanjaTarikh" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-full" style="background: #dc2626; margin-top: 15px;">💾 Simpan Perbelanjaan ✓</button>
+                    </form>
+                </div>
+
+                <div id="transactionMessage" class="message-box" style="margin-top: 15px; display: none;"></div>
+            </div>
         </div>
 
-        <!-- Blok Ringkasan Kewangan -->
-        <div class="summary-cards-container">
-            <div class="summary-card-v2">
-                <div class="summary-icon">💰</div>
-                <div class="summary-info">
-                    <span>Jumlah Jualan</span>
-                    <strong id="totalJualan">RM 0.00</strong>
+        <div class="content-wrapper">
+            <div class="filter-container">
+                <select id="monthFilter" class="filter-select">
+                </select>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>💰 Jumlah Jualan</h4>
+                    <p class="summary-value text-success" id="totalJualanCard">RM 0.00</p>
+                </div>
+                <div class="summary-card">
+                    <h4>📉 Jumlah Belanja</h4>
+                    <p class="summary-value text-danger" id="totalBelanjaCard">RM 0.00</p>
+                </div>
+                <div class="summary-card">
+                    <h4>📦 Untung Kasar</h4>
+                    <p class="summary-value" id="untungKasarCard">RM 0.00</p>
+                </div>
+                <div class="summary-card">
+                    <h4>🏆 Untung Bersih</h4>
+                    <p class="summary-value" id="untungBersihCard">RM 0.00</p>
                 </div>
             </div>
-            <div class="summary-card-v2">
-                <div class="summary-icon">📉</div>
-                <div class="summary-info">
-                    <span>Jumlah Perbelanjaan</span>
-                    <strong id="totalBelanja">RM 0.00</strong>
+
+            <div class="card">
+                <h3>📊 Aliran Kewangan Kronologi</h3>
+                <div class="rekod-list" id="financialRecordsList">
+                    <p class="text-center" style="color: #64748b; padding: 20px;">📂 Memuatkan rekod aliran kewangan...</p>
                 </div>
             </div>
-            <div class="summary-card-v2">
-                <div class="summary-icon">📦</div>
-                <div class="summary-info">
-                    <span>Untung Kasar</span>
-                    <strong id="untungKasar" class="profit-neutral">RM 0.00</strong>
-                </div>
-                <small class="summary-note">Jualan - Kos Bahan Mentah</small>
-            </div>
-            <div class="summary-card-v2">
-                <div class="summary-icon">🏆</div>
-                <div class="summary-info">
-                    <span>Untung Bersih</span>
-                    <strong id="untungBersih" class="profit-neutral">RM 0.00</strong>
-                </div>
-                <small class="summary-note">Untung Kasar - Kos Operasi & Lain-lain</small>
-            </div>
-        </div>
-
-        <!-- Tab Butang -->
-        <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="jualan">🟢 Masukkan Jualan</button>
-            <button class="tab-btn" data-tab="belanja">🔴 Masukkan Perbelanjaan</button>
-        </div>
-
-        <!-- ==================== BORANG JUALAN ==================== -->
-        <div id="formJualan" class="form-tab active">
-            <div class="form-card">
-                <h3>➕ Tambah Rekod Jualan</h3>
-                <form id="jualanForm">
-                    <div class="form-group">
-                        <label>📅 Tarikh</label>
-                        <input type="date" id="tarikhJualan" required>
-                    </div>
-                    <div class="form-group">
-                        <label>🛒 Pilih Item</label>
-                        <select id="itemSelect" required>
-                            <option value="">-- Pilih Item --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>🔢 Kuantiti</label>
-                        <input type="number" id="kuantitiJualan" min="1" value="1" step="1" required>
-                    </div>
-                    <div class="form-group preview-amount">
-                        <label>💰 Jumlah Jualan (Previu)</label>
-                        <div class="preview-box" id="previewJualan">RM 0.00</div>
-                    </div>
-                    <button type="submit" class="btn-primary" id="submitJualanBtn">💾 Simpan Jualan</button>
-                </form>
-                <div id="jualanMessage" class="message-box" style="display:none;"></div>
-            </div>
-        </div>
-
-        <!-- ==================== BORANG PERBELANJAAN ==================== -->
-        <div id="formBelanja" class="form-tab">
-            <div class="form-card">
-                <h3>➕ Tambah Rekod Perbelanjaan</h3>
-                <form id="belanjaForm">
-                    <div class="form-group">
-                        <label>📅 Tarikh</label>
-                        <input type="date" id="tarikhBelanja" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📝 Keterangan Perbelanjaan</label>
-                        <input type="text" id="keteranganBelanja" placeholder="Contoh: Beli stok baju kurung 20 helai" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📁 Kategori Perbelanjaan</label>
-                        <select id="kategoriBelanja" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <option value="bahan_mentah">📦 Kos Bahan Mentah / Stok Jualan</option>
-                            <option value="operasi">🏢 Kos Operasi (Sewa, Bil, Gaji)</option>
-                            <option value="pemasaran">📣 Kos Pemasaran & Iklan</option>
-                            <option value="lain_lain">💸 Lain-lain Kos</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>💰 Jumlah Kos (RM)</label>
-                        <input type="number" id="jumlahBelanja" min="0.01" step="0.01" placeholder="0.00" required>
-                    </div>
-                    <button type="submit" class="btn-primary" id="submitBelanjaBtn">💾 Simpan Perbelanjaan</button>
-                </form>
-                <div id="belanjaMessage" class="message-box" style="display:none;"></div>
-            </div>
-        </div>
-
-        <!-- Senarai Rekod Kewangan -->
-        <div class="rekod-header">
-            <h3>📋 Senarai Aliran Kewangan</h3>
-        </div>
-        <div id="rekodList" class="rekod-list">
-            <p class="loading-text">📂 Loading rekod...</p>
         </div>
     </div>
 
@@ -159,454 +307,385 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
-    
+
     <script>
-        // ==================== GLOBAL VARIABLES ====================
+        // Global variables
+        let globalUserItems = [];
         let currentUser = null;
-        let userItems = [];
-        let currentRecords = [];
-        let selectedMonth = '';
-        
-        // ==================== TAB SWITCHING ====================
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const formJualan = document.getElementById('formJualan');
-        const formBelanja = document.getElementById('formBelanja');
-        
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active class from all tabs and forms
-                tabBtns.forEach(b => b.classList.remove('active'));
-                formJualan.classList.remove('active');
-                formBelanja.classList.remove('active');
-                
-                // Add active class to clicked tab
-                btn.classList.add('active');
-                
-                // Show corresponding form
-                const tabId = btn.getAttribute('data-tab');
-                if (tabId === 'jualan') {
-                    formJualan.classList.add('active');
-                } else {
-                    formBelanja.classList.add('active');
-                }
-            });
-        });
-        
-        // ==================== HELPER FUNCTIONS ====================
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ms-MY');
-        }
-        
+
+        // Helper functions
         function formatCurrency(amount) {
             return `RM ${amount.toFixed(2)}`;
         }
-        
-        function updateProfitColors() {
-            const kasarEl = document.getElementById('untungKasar');
-            const bersihEl = document.getElementById('untungBersih');
-            
-            const kasarValue = parseFloat(kasarEl.textContent.replace('RM', '').trim());
-            const bersihValue = parseFloat(bersihEl.textContent.replace('RM', '').trim());
-            
-            if (kasarValue >= 0) {
-                kasarEl.classList.remove('profit-neutral', 'loss');
-                kasarEl.classList.add('profit');
-            } else {
-                kasarEl.classList.remove('profit-neutral', 'profit');
-                kasarEl.classList.add('loss');
-            }
-            
-            if (bersihValue >= 0) {
-                bersihEl.classList.remove('profit-neutral', 'loss');
-                bersihEl.classList.add('profit');
-            } else {
-                bersihEl.classList.remove('profit-neutral', 'profit');
-                bersihEl.classList.add('loss');
-            }
+
+        function showMessage(element, message, type) {
+            element.innerHTML = `<div class="message-box ${type}">${message}</div>`;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
         }
+
+        // Set default dates to today
+        const todayStr = new Date().toISOString().split('T')[0];
         
-        // ==================== MONTH FILTER ====================
-        function generateMonthOptions() {
-            const months = [];
-            const today = new Date();
-            
-            for (let i = 5; i >= 0; i--) {
-                const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-                const monthStr = month.toString().padStart(2, '0');
-                const value = `${year}-${monthStr}`;
-                const label = date.toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' });
-                months.push({ value, label });
-            }
-            
-            const select = document.getElementById('monthFilter');
-            select.innerHTML = '';
-            months.forEach(month => {
-                const option = document.createElement('option');
-                option.value = month.value;
-                option.textContent = month.label;
-                select.appendChild(option);
-            });
-            
-            // Set current month as default
-            const currentYear = today.getFullYear();
-            const currentMonth = (today.getMonth() + 1).toString().padStart(2, '0');
-            select.value = `${currentYear}-${currentMonth}`;
-            selectedMonth = select.value;
-            
-            select.addEventListener('change', () => {
-                selectedMonth = select.value;
-                loadRecords();
-            });
-        }
-        
-        // ==================== LOAD USER ITEMS FROM SUPABASE ====================
-        async function loadUserItems() {
-            if (!currentUser) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('user_items')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('item_name');
-                
-                if (error) throw error;
-                userItems = data || [];
-                
-                const itemSelect = document.getElementById('itemSelect');
-                itemSelect.innerHTML = '<option value="">-- Pilih Item --</option>';
-                
-                userItems.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.item_name;
-                    option.textContent = `${item.item_name} - (RM ${item.item_price.toFixed(2)})`;
-                    option.setAttribute('data-price', item.item_price);
-                    option.setAttribute('data-category', item.category || 'produk');
-                    itemSelect.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error loading items:', error);
-            }
-        }
-        
-        // ==================== PREVIEW CALCULATION FOR JUALAN ====================
-        const itemSelect = document.getElementById('itemSelect');
-        const kuantitiJualan = document.getElementById('kuantitiJualan');
-        const previewJualan = document.getElementById('previewJualan');
-        
-        function updatePreview() {
-            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-            const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) : 0;
-            const qty = parseInt(kuantitiJualan.value) || 0;
-            const total = price * qty;
-            previewJualan.textContent = formatCurrency(total);
-        }
-        
-        if (itemSelect) itemSelect.addEventListener('change', updatePreview);
-        if (kuantitiJualan) kuantitiJualan.addEventListener('input', updatePreview);
-        
-        // ==================== LOAD RECORDS FROM SUPABASE ====================
-        async function loadRecords() {
-            if (!currentUser) return;
-            
-            const rekodList = document.getElementById('rekodList');
-            rekodList.innerHTML = '<p class="loading-text">📂 Loading rekod...</p>';
-            
-            try {
-                // Filter by selected month
-                const [year, month] = selectedMonth.split('-');
-                const startDate = `${year}-${month}-01`;
-                const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0];
-                
-                const { data, error } = await supabaseClient
-                    .from('rekod_kewangan')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .gte('tarikh', startDate)
-                    .lte('tarikh', endDate)
-                    .order('tarikh', { ascending: false });
-                
-                if (error) throw error;
-                
-                currentRecords = data || [];
-                displayRecords(currentRecords);
-                updateSummaryCards(currentRecords);
-                
-            } catch (error) {
-                console.error('Error loading records:', error);
-                rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod. Sila cuba lagi.</p>';
-            }
-        }
-        
-        // ==================== DISPLAY RECORDS ====================
-        function displayRecords(records) {
-            const rekodList = document.getElementById('rekodList');
-            
-            if (records.length === 0) {
-                rekodList.innerHTML = '<p class="no-records">📭 Tiada rekod untuk bulan ini.</p>';
-                return;
-            }
-            
-            let html = '';
-            records.forEach(record => {
-                const tanggal = formatDate(record.tarikh);
-                const jenisClass = record.jenis === 'jualan' ? 'jualan' : 'belanja';
-                const jenisIcon = record.jenis === 'jualan' ? '💰' : '📉';
-                
-                if (record.jenis === 'jualan') {
-                    html += `
-                        <div class="rekod-item ${jenisClass}" data-id="${record.id}">
-                            <div class="rekod-info">
-                                <div class="rekod-tarikh">${tanggal}</div>
-                                <div class="rekod-keterangan">${jenisIcon} ${record.keterangan}</div>
-                            </div>
-                            <div class="rekod-jumlah ${jenisClass}">
-                                ${formatCurrency(record.jumlah)}
-                            </div>
-                            <button class="rekod-delete" onclick="deleteRecord('${record.id}')">🗑️</button>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="rekod-item ${jenisClass}" data-id="${record.id}">
-                            <div class="rekod-info">
-                                <div class="rekod-tarikh">${tanggal}</div>
-                                <div class="rekod-keterangan">${jenisIcon} ${record.keterangan} (${record.kategori})</div>
-                            </div>
-                            <div class="rekod-jumlah ${jenisClass}">
-                                ${formatCurrency(record.jumlah)}
-                            </div>
-                            <button class="rekod-delete" onclick="deleteRecord('${record.id}')">🗑️</button>
-                        </div>
-                    `;
-                }
-            });
-            
-            rekodList.innerHTML = html;
-        }
-        
-        // ==================== UPDATE SUMMARY CARDS ====================
-        function updateSummaryCards(records) {
-            let totalJualan = 0;
-            let totalBelanja = 0;
-            let kosBahanMentah = 0;
-            let kosOperasi = 0;
-            let kosPemasaran = 0;
-            let kosLain = 0;
-            
-            records.forEach(record => {
-                if (record.jenis === 'jualan') {
-                    totalJualan += record.jumlah || 0;
-                } else {
-                    totalBelanja += record.jumlah || 0;
-                    
-                    // Kategorikan kos perbelanjaan
-                    switch (record.kategori) {
-                        case 'bahan_mentah':
-                            kosBahanMentah += record.jumlah || 0;
-                            break;
-                        case 'operasi':
-                            kosOperasi += record.jumlah || 0;
-                            break;
-                        case 'pemasaran':
-                            kosPemasaran += record.jumlah || 0;
-                            break;
-                        default:
-                            kosLain += record.jumlah || 0;
-                            break;
-                    }
-                }
-            });
-            
-            const untungKasar = totalJualan - kosBahanMentah;
-            const untungBersih = untungKasar - (kosOperasi + kosPemasaran + kosLain);
-            
-            document.getElementById('totalJualan').textContent = formatCurrency(totalJualan);
-            document.getElementById('totalBelanja').textContent = formatCurrency(totalBelanja);
-            document.getElementById('untungKasar').textContent = formatCurrency(untungKasar);
-            document.getElementById('untungBersih').textContent = formatCurrency(untungBersih);
-            
-            updateProfitColors();
-        }
-        
-        // ==================== DELETE RECORD ====================
-        window.deleteRecord = async function(recordId) {
-            if (!confirm('⚠️ Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('rekod_kewangan')
-                    .delete()
-                    .eq('id', recordId);
-                
-                if (error) throw error;
-                
-                await loadRecords();
-                
-            } catch (error) {
-                console.error('Error deleting record:', error);
-                alert('❌ Ralat memadam rekod: ' + error.message);
-            }
-        };
-        
-        // ==================== SUBMIT JUALAN FORM ====================
-        const jualanForm = document.getElementById('jualanForm');
-        if (jualanForm) {
-            jualanForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const tarikh = document.getElementById('tarikhJualan').value;
-                const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-                const itemName = selectedOption.value;
-                const price = parseFloat(selectedOption.getAttribute('data-price'));
-                const category = selectedOption.getAttribute('data-category');
-                const qty = parseInt(kuantitiJualan.value);
-                const total = price * qty;
-                
-                if (!tarikh || !itemName) {
-                    alert('Sila lengkapkan semua maklumat');
-                    return;
-                }
-                
-                const submitBtn = document.getElementById('submitJualanBtn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Menyimpan...';
-                
-                try {
-                    const { error } = await supabaseClient
-                        .from('rekod_kewangan')
-                        .insert([{
-                            user_id: currentUser.id,
-                            jenis: 'jualan',
-                            kategori: category,
-                            jumlah: total,
-                            keterangan: `${itemName} x ${qty}`,
-                            tarikh: tarikh,
-                            created_at: new Date().toISOString()
-                        }]);
-                    
-                    if (error) throw error;
-                    
-                    // Reset form
-                    document.getElementById('tarikhJualan').valueAsDate = new Date();
-                    itemSelect.selectedIndex = 0;
-                    kuantitiJualan.value = 1;
-                    previewJualan.textContent = formatCurrency(0);
-                    
-                    const msgDiv = document.getElementById('jualanMessage');
-                    msgDiv.style.display = 'block';
-                    msgDiv.className = 'message-box success';
-                    msgDiv.innerHTML = '✅ Rekod jualan berjaya disimpan!';
-                    setTimeout(() => msgDiv.style.display = 'none', 3000);
-                    
-                    await loadRecords();
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    const msgDiv = document.getElementById('jualanMessage');
-                    msgDiv.style.display = 'block';
-                    msgDiv.className = 'message-box error';
-                    msgDiv.innerHTML = `❌ Ralat: ${error.message}`;
-                    setTimeout(() => msgDiv.style.display = 'none', 5000);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💾 Simpan Jualan';
-                }
-            });
-        }
-        
-        // ==================== SUBMIT BELANJA FORM ====================
-        const belanjaForm = document.getElementById('belanjaForm');
-        if (belanjaForm) {
-            belanjaForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const tarikh = document.getElementById('tarikhBelanja').value;
-                const keterangan = document.getElementById('keteranganBelanja').value;
-                const kategori = document.getElementById('kategoriBelanja').value;
-                const jumlah = parseFloat(document.getElementById('jumlahBelanja').value);
-                
-                if (!tarikh || !keterangan || !kategori || isNaN(jumlah) || jumlah <= 0) {
-                    alert('Sila lengkapkan semua maklumat dengan betul');
-                    return;
-                }
-                
-                const submitBtn = document.getElementById('submitBelanjaBtn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Menyimpan...';
-                
-                try {
-                    const { error } = await supabaseClient
-                        .from('rekod_kewangan')
-                        .insert([{
-                            user_id: currentUser.id,
-                            jenis: 'belanja',
-                            kategori: kategori,
-                            jumlah: jumlah,
-                            keterangan: keterangan,
-                            tarikh: tarikh,
-                            created_at: new Date().toISOString()
-                        }]);
-                    
-                    if (error) throw error;
-                    
-                    // Reset form
-                    document.getElementById('tarikhBelanja').valueAsDate = new Date();
-                    document.getElementById('keteranganBelanja').value = '';
-                    document.getElementById('kategoriBelanja').selectedIndex = 0;
-                    document.getElementById('jumlahBelanja').value = '';
-                    
-                    const msgDiv = document.getElementById('belanjaMessage');
-                    msgDiv.style.display = 'block';
-                    msgDiv.className = 'message-box success';
-                    msgDiv.innerHTML = '✅ Rekod perbelanjaan berjaya disimpan!';
-                    setTimeout(() => msgDiv.style.display = 'none', 3000);
-                    
-                    await loadRecords();
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    const msgDiv = document.getElementById('belanjaMessage');
-                    msgDiv.style.display = 'block';
-                    msgDiv.className = 'message-box error';
-                    msgDiv.innerHTML = `❌ Ralat: ${error.message}`;
-                    setTimeout(() => msgDiv.style.display = 'none', 5000);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💾 Simpan Perbelanjaan';
-                }
-            });
-        }
-        
-        // ==================== INITIALIZATION ====================
-        async function init() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Check authentication
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) {
+            const { data: { user }, error: authErr } = await supabaseClient.auth.getUser();
+            if (authErr || !user) {
                 window.location.href = 'login.html';
                 return;
             }
             currentUser = user;
-            
+
             // Set default dates
-            document.getElementById('tarikhJualan').valueAsDate = new Date();
-            document.getElementById('tarikhBelanja').valueAsDate = new Date();
+            const jualanTarikh = document.getElementById('jualanTarikh');
+            const belanjaTarikh = document.getElementById('belanjaTarikh');
+            if (jualanTarikh) jualanTarikh.value = todayStr;
+            if (belanjaTarikh) belanjaTarikh.value = todayStr;
+
+            // ==================== TAB SWITCHING ====================
+            const jualanTab = document.getElementById('switchJualanBtn');
+            const belanjaTab = document.getElementById('switchBelanjaBtn');
+            const jualanSection = document.getElementById('jualanFormSection');
+            const belanjaSection = document.getElementById('belanjaFormSection');
+
+            if (jualanTab && belanjaTab) {
+                jualanTab.addEventListener('click', function() {
+                    jualanTab.classList.add('active');
+                    belanjaTab.classList.remove('active');
+                    jualanSection.classList.add('active');
+                    belanjaSection.classList.remove('active');
+                });
+
+                belanjaTab.addEventListener('click', function() {
+                    belanjaTab.classList.add('active');
+                    jualanTab.classList.remove('active');
+                    belanjaSection.classList.add('active');
+                    jualanSection.classList.remove('active');
+                });
+            }
+
+            // ==================== MONTH FILTER GENERATOR ====================
+            const monthFilter = document.getElementById('monthFilter');
+            const bulanNames = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+            const currentDate = new Date();
             
-            // Generate month filter
-            generateMonthOptions();
+            // Generate 6 months backwards
+            for (let i = 0; i < 6; i++) {
+                let d = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+                let val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                let text = `${bulanNames[d.getMonth()]} ${d.getFullYear()}`;
+                let option = document.createElement('option');
+                option.value = val;
+                option.textContent = text;
+                monthFilter.appendChild(option);
+            }
+
+            monthFilter.addEventListener('change', loadFinancialData);
+
+            // ==================== LOAD USER ITEMS ====================
+            async function loadUserItems() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('user_items')
+                        .select('*')
+                        .eq('user_id', currentUser.id);
+
+                    if (error) throw error;
+                    globalUserItems = data || [];
+
+                    const selectEl = document.getElementById('jualanItemSelect');
+                    if (!selectEl) return;
+
+                    if (globalUserItems.length === 0) {
+                        selectEl.innerHTML = '<option value="">-- Tiada item didaftarkan --</option>';
+                        return;
+                    }
+
+                    let optionsHTML = '<option value="">-- Pilih Item --</option>';
+                    globalUserItems.forEach(item => {
+                        optionsHTML += `<option value="${item.id}" data-price="${item.item_price}" data-category="${item.category || 'produk'}">${item.item_name} (RM ${parseFloat(item.item_price).toFixed(2)})</option>`;
+                    });
+                    selectEl.innerHTML = optionsHTML;
+                } catch (err) {
+                    console.error('Error loading items:', err);
+                }
+            }
+
+            // ==================== JUALAN PREVIEW ====================
+            const kuantitiInput = document.getElementById('jualanKuantiti');
+            const itemSelect = document.getElementById('jualanItemSelect');
+            const previewTotal = document.getElementById('jualanTotalPreview');
+
+            function updateJualanPreview() {
+                const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+                const qty = parseInt(kuantitiInput.value) || 0;
+                
+                if (!selectedOption || !selectedOption.value || qty <= 0) {
+                    previewTotal.textContent = "Jumlah Jualan: RM 0.00";
+                    return;
+                }
+                
+                const price = parseFloat(selectedOption.getAttribute('data-price'));
+                const total = price * qty;
+                previewTotal.textContent = `Jumlah Jualan: RM ${total.toFixed(2)}`;
+            }
+
+            if (kuantitiInput) kuantitiInput.addEventListener('input', updateJualanPreview);
+            if (itemSelect) itemSelect.addEventListener('change', updateJualanPreview);
+
+            // ==================== SUBMIT JUALAN ====================
+            const jualanForm = document.getElementById('jualanForm');
+            const transactionMessage = document.getElementById('transactionMessage');
+
+            if (jualanForm) {
+                jualanForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const kategoriJualan = document.getElementById('jualanKategori').value;
+                    const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+                    const itemId = itemSelect.value;
+                    const itemName = selectedOption ? selectedOption.text.split(' (RM')[0] : '';
+                    const price = parseFloat(selectedOption.getAttribute('data-price'));
+                    const qty = parseInt(kuantitiInput.value);
+                    const tarikh = document.getElementById('jualanTarikh').value;
+                    const total = price * qty;
+
+                    if (!kategoriJualan || !itemId || !qty || !tarikh) {
+                        showMessage(transactionMessage, 'Sila lengkapkan semua maklumat', 'error');
+                        return;
+                    }
+
+                    try {
+                        const { error } = await supabaseClient
+                            .from('rekod_kewangan')
+                            .insert([{
+                                user_id: currentUser.id,
+                                jenis: 'jualan',
+                                kategori: kategoriJualan,
+                                jumlah: total,
+                                keterangan: `${itemName} x ${qty}`,
+                                tarikh: tarikh,
+                                created_at: new Date().toISOString()
+                            }]);
+
+                        if (error) throw error;
+
+                        showMessage(transactionMessage, '✅ Rekod jualan berjaya disimpan!', 'success');
+                        
+                        // Reset form
+                        document.getElementById('jualanKategori').value = '';
+                        itemSelect.selectedIndex = 0;
+                        kuantitiInput.value = 1;
+                        document.getElementById('jualanTarikh').value = todayStr;
+                        previewTotal.textContent = "Jumlah Jualan: RM 0.00";
+                        
+                        // Reload data
+                        await loadFinancialData();
+                        
+                    } catch (err) {
+                        console.error('Error:', err);
+                        showMessage(transactionMessage, `❌ Gagal simpan: ${err.message}`, 'error');
+                    }
+                });
+            }
+
+            // ==================== SUBMIT BELANJA ====================
+            const belanjaForm = document.getElementById('belanjaForm');
             
-            // Load user items
+            if (belanjaForm) {
+                belanjaForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const keterangan = document.getElementById('belanjaKeterangan').value.trim();
+                    const kategori = document.getElementById('belanjaKategori').value;
+                    const jumlah = parseFloat(document.getElementById('belanjaJumlah').value);
+                    const tarikh = document.getElementById('belanjaTarikh').value;
+
+                    if (!keterangan || !kategori || !jumlah || !tarikh) {
+                        showMessage(transactionMessage, 'Sila lengkapkan semua maklumat', 'error');
+                        return;
+                    }
+
+                    try {
+                        const { error } = await supabaseClient
+                            .from('rekod_kewangan')
+                            .insert([{
+                                user_id: currentUser.id,
+                                jenis: 'belanja',
+                                kategori: kategori,
+                                jumlah: jumlah,
+                                keterangan: keterangan,
+                                tarikh: tarikh,
+                                created_at: new Date().toISOString()
+                            }]);
+
+                        if (error) throw error;
+
+                        showMessage(transactionMessage, '✅ Rekod perbelanjaan berjaya disimpan!', 'success');
+                        
+                        // Reset form
+                        document.getElementById('belanjaKeterangan').value = '';
+                        document.getElementById('belanjaKategori').value = '';
+                        document.getElementById('belanjaJumlah').value = '';
+                        document.getElementById('belanjaTarikh').value = todayStr;
+                        
+                        // Reload data
+                        await loadFinancialData();
+                        
+                    } catch (err) {
+                        console.error('Error:', err);
+                        showMessage(transactionMessage, `❌ Gagal simpan: ${err.message}`, 'error');
+                    }
+                });
+            }
+
+            // ==================== LOAD FINANCIAL DATA ====================
+            async function loadFinancialData() {
+                const listContainer = document.getElementById('financialRecordsList');
+                const selectedMonth = monthFilter.value;
+                
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .order('tarikh', { ascending: false });
+
+                    if (error) throw error;
+
+                    // Filter by selected month
+                    const filteredData = data.filter(record => record.tarikh.startsWith(selectedMonth));
+
+                    // Calculate accounting variables
+                    let totalJualan = 0;
+                    let totalBelanja = 0;
+                    let kosBahanMentah = 0;
+                    let kosLain = 0;
+
+                    let listHTML = '';
+
+                    if (filteredData.length === 0) {
+                        listContainer.innerHTML = '<p class="text-center" style="color: #64748b; padding: 20px;">📭 Tiada rekod transaksi untuk bulan ini.</p>';
+                    } else {
+                        filteredData.forEach(record => {
+                            const amount = parseFloat(record.jumlah);
+                            const dateLocal = new Date(record.tarikh).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+                            
+                            if (record.jenis === 'jualan') {
+                                totalJualan += amount;
+                                
+                                // Map kategori jualan to emoji
+                                const kategoriMap = {
+                                    'makanan': '🍔',
+                                    'minuman': '🥤',
+                                    'produk': '📦',
+                                    'perkhidmatan': '⚙️',
+                                    'lain_lain': '📝'
+                                };
+                                const kategoriEmoji = kategoriMap[record.kategori] || '💰';
+                                
+                                listHTML += `
+                                    <div class="rekod-item jualan">
+                                        <div>
+                                            <strong style="color:#16a34a;">🟢 JUALAN</strong> ${kategoriEmoji} - ${record.keterangan}
+                                            <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:15px;">
+                                            <span class="rekod-jumlah jualan">+ RM ${amount.toFixed(2)}</span>
+                                            <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                totalBelanja += amount;
+                                
+                                if (record.kategori === 'bahan_mentah') {
+                                    kosBahanMentah += amount;
+                                } else {
+                                    kosLain += amount;
+                                }
+
+                                // Map kategori belanja to display text
+                                const kategoriMap = {
+                                    'bahan_mentah': '📦 Kos Bahan Mentah',
+                                    'operasi': '🏢 Kos Operasi',
+                                    'pemasaran': '📣 Kos Pemasaran',
+                                    'lain_lain': '💸 Kos Lain-lain'
+                                };
+                                const kategoriDisplay = kategoriMap[record.kategori] || 'Belanja';
+
+                                listHTML += `
+                                    <div class="rekod-item belanja">
+                                        <div>
+                                            <strong style="color:#dc2626;">🔴 BELANJA</strong> (${kategoriDisplay}) - ${record.keterangan}
+                                            <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:15px;">
+                                            <span class="rekod-jumlah belanja">- RM ${amount.toFixed(2)}</span>
+                                            <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                        listContainer.innerHTML = listHTML;
+                    }
+
+                    // Calculate profits
+                    const untungKasar = totalJualan - kosBahanMentah;
+                    const untungBersih = untungKasar - kosLain;
+
+                    // Update summary cards
+                    document.getElementById('totalJualanCard').textContent = `RM ${totalJualan.toFixed(2)}`;
+                    document.getElementById('totalBelanjaCard').textContent = `RM ${totalBelanja.toFixed(2)}`;
+                    
+                    const kasarCard = document.getElementById('untungKasarCard');
+                    kasarCard.textContent = `RM ${untungKasar.toFixed(2)}`;
+                    kasarCard.className = untungKasar >= 0 ? "summary-value text-success" : "summary-value text-danger";
+                    
+                    const bersihCard = document.getElementById('untungBersihCard');
+                    bersihCard.textContent = `RM ${untungBersih.toFixed(2)}`;
+                    bersihCard.className = untungBersih >= 0 ? "summary-value text-success" : "summary-value text-danger";
+
+                } catch (err) {
+                    console.error('Error loading financial data:', err);
+                    listContainer.innerHTML = '<p class="text-center" style="color: #dc2626; padding: 20px;">❌ Ralat memuatkan data. Sila cuba lagi.</p>';
+                }
+            }
+
+            // ==================== DELETE RECORD ====================
+            window.padamRekodTransaksi = async function(recordId) {
+                if (!confirm('⚠️ Adakah anda pasti mahu memadamkan rekod transaksi kewangan ini?')) return;
+                
+                try {
+                    const { error } = await supabaseClient
+                        .from('rekod_kewangan')
+                        .delete()
+                        .eq('id', recordId);
+
+                    if (error) throw error;
+                    
+                    await loadFinancialData();
+                    
+                } catch (err) {
+                    alert(`❌ Gagal memadam rekod: ${err.message}`);
+                }
+            };
+
+            // ==================== LOGOUT ====================
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Initial load
             await loadUserItems();
-            
-            // Load records
-            await loadRecords();
-        }
-        
-        // Run initialization
-        init();
+            await loadFinancialData();
+        });
     </script>
 </body>
 </html>
