@@ -14,7 +14,7 @@
                 <h1>🇲🇾 Usahawan<span>Digital</span></h1>
             </div>
             <div class="nav-links" id="navLinks">
-                <a href="index.html">Utama</a>
+                <a href="dashboard.html">Dashboard</a>
                 <a href="modul.html">Modul</a>
                 <a href="jualan.html">Rekod Jualan</a>
                 <a href="templat.html">Templat</a>
@@ -26,11 +26,20 @@
 
     <div class="dashboard-container">
         <div class="container">
-            <div class="welcome-card">
-                <h2>👋 Selamat Datang, <span id="userName">Usahawan</span>!</h2>
-                <p>Teruskan pembelajaran dan urus perniagaan anda dengan lebih sistematik.</p>
+            <!-- Profile Card dengan Edit Button -->
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-details">
+                        <h2>Selamat Datang, <span id="userName">Usahawan</span>!</h2>
+                        <p id="businessNameDisplay">🏪 Perniagaan: -</p>
+                        <p id="businessTypeDisplay">📋 Jenis Bisnes: 🍔 Makanan & Minuman</p>
+                    </div>
+                    <button class="btn-edit-profile" id="editProfileBtn">⚙️ Tetapan Profil</button>
+                </div>
             </div>
 
+            <!-- Dashboard Grid Menu -->
             <div class="dashboard-grid">
                 <a href="modul.html" class="dashboard-card">
                     <div class="card-icon">📚</div>
@@ -57,6 +66,7 @@
                 </div>
             </div>
 
+            <!-- Progress Section -->
             <div class="progress-section">
                 <h3>📈 Kemajuan Anda</h3>
                 <div class="progress-bar-container">
@@ -73,6 +83,31 @@
                 </div>
                 <p class="progress-note">✨ Selepas login, anda boleh tandakan modul yang sudah selesai (akan datang)</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Edit Profil -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+            <h3>⚙️ Kemas Kini Profil Perniagaan</h3>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>🏪 Nama Perniagaan</label>
+                    <input type="text" id="editBusinessName" placeholder="Nama perniagaan anda">
+                </div>
+                <div class="form-group">
+                    <label>📋 Jenis Perniagaan</label>
+                    <select id="editBusinessType" required>
+                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                        <option value="retail">👗 Retail / Butik</option>
+                        <option value="servis">✂️ Perkhidmatan / Servis</option>
+                    </select>
+                    <small class="form-note">Jenis perniagaan ini akan menentukan kategori jualan & perbelanjaan di halaman Rekod Jualan.</small>
+                </div>
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
+            </form>
+            <div id="profileMessage" class="message-box" style="display:none;"></div>
         </div>
     </div>
 
