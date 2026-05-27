@@ -29,7 +29,7 @@
             </div>
             <h2>Daftar Akaun Baru</h2>
             <p class="auth-subtitle">Percuma selama-lamanya untuk usahawan mikro</p>
-            
+             
             <form id="registerForm">
                 <div class="form-section">
                     <h4>📋 Maklumat Asas</h4>
@@ -37,12 +37,12 @@
                         <label>Nama Penuh</label>
                         <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
                     </div>
-                    
+                     
                     <div class="form-group">
                         <label>Emel</label>
                         <input type="email" id="email" placeholder="email@contoh.com" required>
                     </div>
-                    
+                     
                     <div class="form-group">
                         <label>Kata Laluan</label>
                         <div class="password-wrapper">
@@ -68,20 +68,29 @@
                             <option value="other">📝 Lain-lain</option>
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label>🏪 Jenis Perniagaan (Untuk Sistem Dinamik)</label>
+                        <select id="jenisPerniagaan" required>
+                            <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                            <option value="retail">👗 Retail / Butik</option>
+                            <option value="servis">✂️ Perkhidmatan / Servis</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-section">
                     <h4>🛒 Senarai Produk/Item Perniagaan</h4>
                     <p class="section-note">Masukkan item awal yang anda jual. Item ini akan dipanggil secara automatik di halaman Rekod Jualan nanti supaya anda hanya perlu masukkan kuantiti sahaja.</p>
-                    
+                     
                     <div id="itemsListContainer"></div>
-                    
+                     
                     <button type="button" class="btn-add-item-reg" id="addItemBtn">+ Tambah Item Lagi</button>
                 </div>
-                
+                 
                 <button type="submit" class="btn-primary btn-full" id="registerBtn">Daftar Sekarang →</button>
             </form>
-            
+             
             <p class="auth-footer">
                 Sudah ada akaun? <a href="login.html">Log Masuk di sini</a>
             </p>
@@ -91,7 +100,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
-    
+     
     <script>
         // ==================== TOGGLE PASSWORD ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -105,10 +114,10 @@
                     this.textContent = type === 'password' ? '👁️' : '🙈';
                 });
             }
-            
+             
             // Initialize items list
             initItemsList();
-            
+             
             // Add item button
             const addBtn = document.getElementById('addItemBtn');
             if (addBtn) {
@@ -117,7 +126,7 @@
                 });
             }
         });
-        
+         
         // Fungsi untuk mencipta baris item baru
         function createItemRow() {
             const div = document.createElement('div');
@@ -142,36 +151,36 @@
                     <button type="button" class="remove-item-btn">🗑️ Buang</button>
                 </div>
             `;
-            
+             
             // Add event listener untuk button buang
             const removeBtn = div.querySelector('.remove-item-btn');
             removeBtn.addEventListener('click', function() {
                 removeItemRow(this);
             });
-            
+             
             return div;
         }
-        
+         
         // Fungsi untuk tambah baris item baru
         function addNewItemRow() {
             const container = document.getElementById('itemsListContainer');
             const newRow = createItemRow();
             container.appendChild(newRow);
         }
-        
+         
         // Fungsi untuk buang baris item
         function removeItemRow(button) {
             const container = document.getElementById('itemsListContainer');
             const rows = container.querySelectorAll('.item-row-register');
-            
+             
             if (rows.length <= 1) {
                 alert('Anda perlu memasukkan sekurang-kurangnya satu item perniagaan.');
                 return;
             }
-            
+             
             button.closest('.item-row-register').remove();
         }
-        
+         
         // Fungsi untuk initialize dengan satu baris item
         function initItemsList() {
             const container = document.getElementById('itemsListContainer');
@@ -180,17 +189,17 @@
                 container.appendChild(firstRow);
             }
         }
-        
+         
         // Fungsi untuk dapatkan semua item
         function dapatkanSemuaItem() {
             const items = [];
             const rows = document.querySelectorAll('.item-row-register');
-            
+             
             rows.forEach(row => {
                 const name = row.querySelector('.item-name-reg').value.trim();
                 const price = parseFloat(row.querySelector('.item-price-reg').value);
                 const category = row.querySelector('.item-category-reg').value;
-                
+                 
                 if (name && !isNaN(price) && price > 0) {
                     items.push({ name: name, price: price, category: category });
                 }
@@ -203,38 +212,41 @@
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+                 
                 const fullName = document.getElementById('fullName').value;
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const businessName = document.getElementById('businessName').value;
                 const businessCategory = document.getElementById('businessCategory').value;
                 
+                // TAMBAHAN BARU: Ambil nilai jenis perniagaan yang dipilih
+                const jenisPerniagaan = document.getElementById('jenisPerniagaan').value;
+                 
                 const items = dapatkanSemuaItem();
                 const messageDiv = document.getElementById('registerMessage');
-                
-                if (!fullName || !email || !password || !businessName || !businessCategory) {
+                 
+                if (!fullName || !email || !password || !businessName || !businessCategory || !jenisPerniagaan) {
                     messageDiv.innerHTML = '<div class="message-box error">Sila lengkapkan semua maklumat asas</div>';
                     return;
                 }
-                
+                 
                 if (password.length < 6) {
                     messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
                     return;
                 }
-                
+                 
                 if (items.length === 0) {
                     messageDiv.innerHTML = '<div class="message-box error">Sila masukkan sekurang-kurangnya satu item perniagaan yang sah</div>';
                     return;
                 }
-                
+                 
                 const registerBtn = document.getElementById('registerBtn');
                 registerBtn.disabled = true;
                 registerBtn.textContent = 'Mendaftar...';
                 messageDiv.innerHTML = '';
-                
+                 
                 try {
-                    // 1. Daftar pengguna
+                    // 1. Daftar pengguna (Sertakan business_type di dalam user metadata)
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
@@ -242,15 +254,16 @@
                             data: {
                                 full_name: fullName,
                                 business_name: businessName,
-                                business_category: businessCategory
+                                business_category: businessCategory,
+                                business_type: jenisPerniagaan
                             }
                         }
                     });
-                    
+                     
                     if (error) throw error;
-                    
+                     
                     if (data.user) {
-                        // 2. Simpan profil
+                        // 2. Simpan profil ke dalam jadual 'profiles' beserta business_type
                         await supabaseClient
                             .from('profiles')
                             .insert([{
@@ -258,23 +271,24 @@
                                 full_name: fullName,
                                 email: email,
                                 business_name: businessName,
-                                business_category: businessCategory
+                                business_category: businessCategory,
+                                business_type: jenisPerniagaan
                             }]);
-                        
-                        // 3. Simpan item-item
+                         
+                        // 3. Simpan item-item produk awal
                         const itemsToInsert = items.map(item => ({
                             user_id: data.user.id,
                             item_name: item.name,
                             item_price: item.price,
                             category: item.category
                         }));
-                        
+                         
                         await supabaseClient
                             .from('user_items')
                             .insert(itemsToInsert);
-                        
+                         
                         messageDiv.innerHTML = '<div class="message-box success">✅ Pendaftaran berjaya! Menghubungkan ke dashboard...</div>';
-                        
+                         
                         setTimeout(() => {
                             window.location.href = 'dashboard.html';
                         }, 2000);
