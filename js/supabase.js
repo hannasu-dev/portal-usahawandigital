@@ -1,10 +1,6 @@
 // Supabase Configuration
-// IMPORTANT: Gantikan dengan URL dan anon key dari Supabase project anda
-// Daftar percuma di https://supabase.com
-
 const SUPABASE_URL = 'https://zholdqlkyrbeiaavsveb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpob2xkcWxreXJiZWlhYXZzdmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjkxNjYsImV4cCI6MjA5MzkwNTE2Nn0.JvzdRzkbdUp26iBSGOvV1maE2ryVAmsQrm4QHAElmdI';
-
 
 // Initialize Supabase client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -18,13 +14,6 @@ async function checkAuth() {
     
     if (user) {
         window.currentUser = user;
-        
-        // Get user profile from custom table
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
         
         // Update UI for logged in user
         const loginNavBtn = document.getElementById('loginNavBtn');
