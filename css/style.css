@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. BASE STYLES & RESET
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -17,7 +20,9 @@ body {
     padding: 0 20px;
 }
 
-/* Navbar */
+/* ==========================================================================
+   2. NAVIGATION BAR
+   ========================================================================== */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -67,7 +72,9 @@ body {
     cursor: pointer;
 }
 
-/* Buttons */
+/* ==========================================================================
+   3. BUTTONS
+   ========================================================================== */
 .btn-primary, .btn-outline {
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
@@ -111,7 +118,9 @@ body {
     text-align: center;
 }
 
-/* Hero Section */
+/* ==========================================================================
+   4. HERO SECTION (LANDING PAGE)
+   ========================================================================== */
 .hero {
     background: linear-gradient(135deg, #1a5f7a 0%, #2c7da0 100%);
     color: white;
@@ -168,7 +177,9 @@ body {
     opacity: 0.9;
 }
 
-/* Features Section */
+/* ==========================================================================
+   5. FEATURES SECTION
+   ========================================================================== */
 .features {
     padding: 4rem 0;
 }
@@ -209,7 +220,9 @@ body {
     color: #1a5f7a;
 }
 
-/* Auth Pages */
+/* ==========================================================================
+   6. AUTH PAGES (LOGIN & REGISTER)
+   ========================================================================== */
 .auth-container {
     min-height: calc(100vh - 200px);
     display: flex;
@@ -264,6 +277,128 @@ body {
     border-color: #1a5f7a;
 }
 
+/* Password Wrapper & Input Show/Hide */
+.password-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.password-wrapper input {
+    flex: 1;
+}
+
+.toggle-password {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.toggle-password:hover {
+    background: #e2e8f0;
+}
+
+/* Forgot Password Link */
+.forgot-password {
+    text-align: right;
+    margin: 0.5rem 0 1.5rem 0;
+}
+
+.forgot-password a {
+    color: #1a5f7a;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* Register Form Sections & Items Setup */
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-section h4 {
+    color: #1a5f7a;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.section-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+}
+
+.item-row-register {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0.8rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.item-col-reg {
+    flex: 1;
+    min-width: 120px;
+}
+
+.item-col-reg input, .item-col-reg select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.item-action {
+    flex: 0 0 auto;
+}
+
+.remove-item-btn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.3s;
+}
+
+.remove-item-btn:hover {
+    background: #fecaca;
+}
+
+.btn-add-item-reg {
+    background: #e0f2fe;
+    color: #1a5f7a;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    transition: background 0.3s;
+}
+
+.btn-add-item-reg:hover {
+    background: #bae6fd;
+}
+
+/* Messages */
 .message-box {
     margin-top: 1rem;
     padding: 0.8rem;
@@ -293,7 +428,32 @@ body {
     font-weight: 500;
 }
 
-/* Dashboard */
+.back-button-container {
+    margin-bottom: 1rem;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #1a5f7a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-btn:hover {
+    color: #0e4a62;
+}
+
+/* ==========================================================================
+   7. DASHBOARD SYSTEM
+   ========================================================================== */
 .dashboard-container {
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
@@ -400,7 +560,9 @@ body {
     text-align: center;
 }
 
-/* Modul Page */
+/* ==========================================================================
+   8. MODULES SECTION (LEARNING MODUL)
+   ========================================================================== */
 .modul-container {
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
@@ -558,7 +720,9 @@ body {
     border-radius: 8px;
 }
 
-/* Templat Page */
+/* ==========================================================================
+   9. TEMPLATES PAGE
+   ========================================================================== */
 .templat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -591,7 +755,9 @@ body {
     margin: 1rem 0;
 }
 
-/* Jualan Page */
+/* ==========================================================================
+   10. JUALAN & TRANSAKSI SYSTEM (AUTOMATED ITEMS)
+   ========================================================================== */
 .form-card {
     background: white;
     padding: 1.5rem;
@@ -764,7 +930,7 @@ body {
     color: #1a5f7a;
 }
 
-/* Itemized Form Styles */
+/* Itemized Jualan Form Styles */
 .items-header {
     display: flex;
     justify-content: space-between;
@@ -869,127 +1035,9 @@ body {
     color: #1a5f7a;
 }
 
-/* Register Page - Form Sections */
-.form-section {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.form-section h4 {
-    color: #1a5f7a;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-}
-
-.section-note {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-bottom: 1rem;
-}
-
-/* Item Row for Register */
-.item-row-register {
-    display: flex;
-    gap: 0.8rem;
-    margin-bottom: 0.8rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.item-col-reg {
-    flex: 1;
-    min-width: 120px;
-}
-
-.item-col-reg input, .item-col-reg select {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 0.85rem;
-}
-
-.item-action {
-    flex: 0 0 auto;
-}
-
-.remove-item-btn {
-    background: #fee2e2;
-    color: #dc2626;
-    border: none;
-    padding: 0.5rem 0.8rem;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.btn-add-item-reg {
-    background: #e0f2fe;
-    color: #1a5f7a;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-}
-
-/* Password Wrapper */
-.password-wrapper {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.password-wrapper input {
-    flex: 1;
-}
-
-.toggle-password {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-}
-
-/* Forgot Password */
-.forgot-password {
-    text-align: right;
-    margin: 0.5rem 0 1.5rem 0;
-}
-
-.forgot-password a {
-    color: #1a5f7a;
-    text-decoration: none;
-    font-size: 0.85rem;
-}
-
-/* Back Button */
-.back-button-container {
-    margin-bottom: 1rem;
-}
-
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    color: #1a5f7a;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.back-btn:hover {
-    color: #0e4a62;
-}
-
-/* Footer */
+/* ==========================================================================
+   11. UTILITIES & FOOTER
+   ========================================================================== */
 footer {
     background: #1e293b;
     color: #94a3b8;
@@ -998,7 +1046,6 @@ footer {
     margin-top: 3rem;
 }
 
-/* Utility */
 .section-desc {
     text-align: center;
     color: #64748b;
@@ -1011,7 +1058,9 @@ footer {
     color: #64748b;
 }
 
-/* Responsive */
+/* ==========================================================================
+   12. RESPONSIVE DESIGN (MEDIA QUERIES)
+   ========================================================================== */
 @media (max-width: 900px) {
     .modul-three-columns {
         grid-template-columns: 1fr;
@@ -1055,6 +1104,7 @@ footer {
         grid-template-columns: 1fr;
     }
     
+    /* Responsive input jualan automatik */
     .item-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -1075,11 +1125,20 @@ footer {
         align-items: flex-start;
     }
     
+    /* Responsive pendaftaran item baru */
     .item-row-register {
         flex-direction: column;
     }
     
     .item-col-reg {
+        width: 100%;
+    }
+    
+    .item-action {
+        width: 100%;
+    }
+    
+    .remove-item-btn {
         width: 100%;
     }
 }
