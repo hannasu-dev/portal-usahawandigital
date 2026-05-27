@@ -45,7 +45,10 @@
                     
                     <div class="form-group">
                         <label>Kata Laluan</label>
-                        <input type="password" id="password" placeholder="Minimum 6 aksara" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" placeholder="Minimum 6 aksara" required>
+                            <button type="button" class="toggle-password" id="togglePasswordBtn">👁️</button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -71,28 +74,7 @@
                     <h4>🛒 Senarai Produk/Item Perniagaan</h4>
                     <p class="section-note">Masukkan item awal yang anda jual. Item ini akan dipanggil secara automatik di halaman Rekod Jualan nanti supaya anda hanya perlu masukkan kuantiti sahaja.</p>
                     
-                    <div id="itemsListContainer">
-                        <div class="item-row-register">
-                            <div class="item-col-reg">
-                                <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
-                            </div>
-                            <div class="item-col-reg">
-                                <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
-                            </div>
-                            <div class="item-col-reg">
-                                <select class="item-category-reg" required>
-                                    <option value="">Kategori Item</option>
-                                    <option value="makanan">🍔 Makanan</option>
-                                    <option value="minuman">🥤 Minuman</option>
-                                    <option value="produk">📦 Produk</option>
-                                    <option value="perkhidmatan">⚙️ Perkhidmatan</option>
-                                </select>
-                            </div>
-                            <div class="item-col-reg item-action">
-                                <button type="button" class="remove-item-btn" onclick="buangBarisItem(this)">🗑️ Buang</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="itemsListContainer"></div>
                     
                     <button type="button" class="btn-add-item-reg" id="addItemBtn">+ Tambah Item Lagi</button>
                 </div>
@@ -112,53 +94,83 @@
     <script src="js/auth.js"></script>
     
     <script>
-        // ==================== GLOBAL FUNCTIONS (TAMBAH / BUANG ITEM) ====================
+        // ==================== TOGGLE PASSWORD ====================
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const passwordField = document.getElementById('password');
         
-        // Fungsi tambah baris baru menggunakan kaedah String Template yang lebih stabil
-        document.getElementById('addItemBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const container = document.getElementById('itemsListContainer');
-            
-            const HTMLBarisBaru = `
-                <div class="item-row-register">
-                    <div class="item-col-reg">
-                        <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
-                    </div>
-                    <div class="item-col-reg">
-                        <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
-                    </div>
-                    <div class="item-col-reg">
-                        <select class="item-category-reg" required>
-                            <option value="">Kategori Item</option>
-                            <option value="makanan">🍔 Makanan</option>
-                            <option value="minuman">🥤 Minuman</option>
-                            <option value="produk">📦 Produk</option>
-                            <option value="perkhidmatan">⚙️ Perkhidmatan</option>
-                        </select>
-                    </div>
-                    <div class="item-col-reg item-action">
-                        <button type="button" class="remove-item-btn" onclick="buangBarisItem(this)">🗑️ Buang</button>
-                    </div>
+        if (togglePasswordBtn && passwordField) {
+            togglePasswordBtn.addEventListener('click', function() {
+                const type = passwordField.type === 'password' ? 'text' : 'password';
+                passwordField.type = type;
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+        }
+        
+        // ==================== FUNGSI TAMBAH ITEM ====================
+        function createItemRow() {
+            const row = document.createElement('div');
+            row.className = 'item-row-register';
+            row.innerHTML = `
+                <div class="item-col-reg">
+                    <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
+                </div>
+                <div class="item-col-reg">
+                    <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
+                </div>
+                <div class="item-col-reg">
+                    <select class="item-category-reg" required>
+                        <option value="">Kategori Item</option>
+                        <option value="makanan">🍔 Makanan</option>
+                        <option value="minuman">🥤 Minuman</option>
+                        <option value="produk">📦 Produk</option>
+                        <option value="perkhidmatan">⚙️ Perkhidmatan</option>
+                    </select>
+                </div>
+                <div class="item-col-reg item-action">
+                    <button type="button" class="remove-item-btn">🗑️ Buang</button>
                 </div>
             `;
             
-            container.insertAdjacentHTML('beforeend', HTMLBarisBaru);
-        });
-
-        // Fungsi buang baris menggunakan fungsi inline onclick (anti-gagal)
-        function buangBarisItem(butang) {
-            const container = document.getElementById('itemsListContainer');
-            const bilanganBaris = container.querySelectorAll('.item-row-register').length;
+            // Add event listener untuk button buang
+            const removeBtn = row.querySelector('.remove-item-btn');
+            removeBtn.addEventListener('click', function() {
+                removeItemRow(this);
+            });
             
-            if (bilanganBaris <= 1) {
+            return row;
+        }
+        
+        function removeItemRow(button) {
+            const container = document.getElementById('itemsListContainer');
+            const rows = container.querySelectorAll('.item-row-register');
+            
+            if (rows.length <= 1) {
                 alert('Anda perlu memasukkan sekurang-kurangnya satu item perniagaan.');
                 return;
             }
             
-            // Buang elemen pembungkus terdekat (.item-row-register)
-            butang.closest('.item-row-register').remove();
+            button.closest('.item-row-register').remove();
         }
-
+        
+        // Event listener untuk button tambah item
+        const addItemBtn = document.getElementById('addItemBtn');
+        if (addItemBtn) {
+            addItemBtn.addEventListener('click', function() {
+                const container = document.getElementById('itemsListContainer');
+                const newRow = createItemRow();
+                container.appendChild(newRow);
+            });
+        }
+        
+        // Initialize dengan satu item row
+        function initItemsList() {
+            const container = document.getElementById('itemsListContainer');
+            if (container && container.children.length === 0) {
+                const firstRow = createItemRow();
+                container.appendChild(firstRow);
+            }
+        }
+        
         // Fungsi ekstrak data daripada form sebelum dihantar ke database
         function dapatkanSemuaItem() {
             const susunanItem = [];
@@ -169,7 +181,7 @@
                 const harga = parseFloat(baris.querySelector('.item-price-reg').value);
                 const kategori = baris.querySelector('.item-category-reg').value;
                 
-                if (nama && harga >= 0) {
+                if (nama && !isNaN(harga) && harga > 0) {
                     susunanItem.push({ name: nama, price: harga, category: kategori });
                 }
             });
@@ -190,6 +202,11 @@
                 
                 const items = dapatkanSemuaItem();
                 const messageDiv = document.getElementById('registerMessage');
+                
+                if (!fullName || !email || !password || !businessName || !businessCategory) {
+                    messageDiv.innerHTML = '<div class="message-box error">Sila lengkapkan semua maklumat asas</div>';
+                    return;
+                }
                 
                 if (password.length < 6) {
                     messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
@@ -234,9 +251,9 @@
                                 business_category: businessCategory
                             }]);
                         
-                        if (profileError) throw profileError;
+                        if (profileError) console.error('Profile error:', profileError);
                         
-                        // 3. Sediakan struktur objek jualan pukal (Bulk Object)
+                        // 3. Sediakan struktur objek jualan pukal
                         const itemsToInsert = items.map(item => ({
                             user_id: data.user.id,
                             item_name: item.name,
@@ -266,6 +283,11 @@
                 }
             });
         }
+        
+        // Initialize items list on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initItemsList();
+        });
     </script>
 </body>
 </html>
