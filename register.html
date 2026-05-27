@@ -91,26 +91,38 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
-    <script src="js/auth.js"></script>
     
     <script>
         // ==================== TOGGLE PASSWORD ====================
-        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-        const passwordField = document.getElementById('password');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const pwdField = document.getElementById('password');
+            if (toggleBtn && pwdField) {
+                toggleBtn.addEventListener('click', function() {
+                    const type = pwdField.type === 'password' ? 'text' : 'password';
+                    pwdField.type = type;
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
+            }
+            
+            // Initialize items list
+            initItemsList();
+            
+            // Add item button
+            const addBtn = document.getElementById('addItemBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    addNewItemRow();
+                });
+            }
+        });
         
-        if (togglePasswordBtn && passwordField) {
-            togglePasswordBtn.addEventListener('click', function() {
-                const type = passwordField.type === 'password' ? 'text' : 'password';
-                passwordField.type = type;
-                this.textContent = type === 'password' ? '👁️' : '🙈';
-            });
-        }
-        
-        // ==================== FUNGSI TAMBAH ITEM ====================
+        // Fungsi untuk mencipta baris item baru
         function createItemRow() {
-            const row = document.createElement('div');
-            row.className = 'item-row-register';
-            row.innerHTML = `
+            const div = document.createElement('div');
+            div.className = 'item-row-register';
+            div.innerHTML = `
                 <div class="item-col-reg">
                     <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
                 </div>
@@ -132,14 +144,22 @@
             `;
             
             // Add event listener untuk button buang
-            const removeBtn = row.querySelector('.remove-item-btn');
+            const removeBtn = div.querySelector('.remove-item-btn');
             removeBtn.addEventListener('click', function() {
                 removeItemRow(this);
             });
             
-            return row;
+            return div;
         }
         
+        // Fungsi untuk tambah baris item baru
+        function addNewItemRow() {
+            const container = document.getElementById('itemsListContainer');
+            const newRow = createItemRow();
+            container.appendChild(newRow);
+        }
+        
+        // Fungsi untuk buang baris item
         function removeItemRow(button) {
             const container = document.getElementById('itemsListContainer');
             const rows = container.querySelectorAll('.item-row-register');
@@ -152,17 +172,7 @@
             button.closest('.item-row-register').remove();
         }
         
-        // Event listener untuk button tambah item
-        const addItemBtn = document.getElementById('addItemBtn');
-        if (addItemBtn) {
-            addItemBtn.addEventListener('click', function() {
-                const container = document.getElementById('itemsListContainer');
-                const newRow = createItemRow();
-                container.appendChild(newRow);
-            });
-        }
-        
-        // Initialize dengan satu item row
+        // Fungsi untuk initialize dengan satu baris item
         function initItemsList() {
             const container = document.getElementById('itemsListContainer');
             if (container && container.children.length === 0) {
@@ -171,21 +181,21 @@
             }
         }
         
-        // Fungsi ekstrak data daripada form sebelum dihantar ke database
+        // Fungsi untuk dapatkan semua item
         function dapatkanSemuaItem() {
-            const susunanItem = [];
-            const semuaBaris = document.querySelectorAll('.item-row-register');
+            const items = [];
+            const rows = document.querySelectorAll('.item-row-register');
             
-            semuaBaris.forEach(baris => {
-                const nama = baris.querySelector('.item-name-reg').value.trim();
-                const harga = parseFloat(baris.querySelector('.item-price-reg').value);
-                const kategori = baris.querySelector('.item-category-reg').value;
+            rows.forEach(row => {
+                const name = row.querySelector('.item-name-reg').value.trim();
+                const price = parseFloat(row.querySelector('.item-price-reg').value);
+                const category = row.querySelector('.item-category-reg').value;
                 
-                if (nama && !isNaN(harga) && harga > 0) {
-                    susunanItem.push({ name: nama, price: harga, category: kategori });
+                if (name && !isNaN(price) && price > 0) {
+                    items.push({ name: name, price: price, category: category });
                 }
             });
-            return susunanItem;
+            return items;
         }
 
         // ==================== PROSES REGISTER KE SUPABASE ====================
@@ -224,7 +234,7 @@
                 messageDiv.innerHTML = '';
                 
                 try {
-                    // 1. Daftar pengguna dalam Supabase Auth
+                    // 1. Daftar pengguna
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
@@ -240,8 +250,8 @@
                     if (error) throw error;
                     
                     if (data.user) {
-                        // 2. Simpan profil maklumat perniagaan ke table 'profiles'
-                        const { error: profileError } = await supabaseClient
+                        // 2. Simpan profil
+                        await supabaseClient
                             .from('profiles')
                             .insert([{
                                 id: data.user.id,
@@ -251,22 +261,17 @@
                                 business_category: businessCategory
                             }]);
                         
-                        if (profileError) console.error('Profile error:', profileError);
-                        
-                        // 3. Sediakan struktur objek jualan pukal
+                        // 3. Simpan item-item
                         const itemsToInsert = items.map(item => ({
                             user_id: data.user.id,
                             item_name: item.name,
                             item_price: item.price,
                             category: item.category
                         }));
-
-                        // 4. Masukkan semua item awal ke jadual 'user_items'
-                        const { error: itemsError } = await supabaseClient
+                        
+                        await supabaseClient
                             .from('user_items')
                             .insert(itemsToInsert);
-
-                        if (itemsError) throw itemsError;
                         
                         messageDiv.innerHTML = '<div class="message-box success">✅ Pendaftaran berjaya! Menghubungkan ke dashboard...</div>';
                         
@@ -283,11 +288,6 @@
                 }
             });
         }
-        
-        // Initialize items list on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initItemsList();
-        });
     </script>
 </body>
 </html>
