@@ -25,30 +25,81 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="back-button-container">
-            <a href="index.html" class="back-btn">Kembali ke Utama</a>
+                <a href="index.html" class="back-btn">← Kembali ke Utama</a>
             </div>
             <h2>Daftar Akaun Baru</h2>
             <p class="auth-subtitle">Percuma selama-lamanya untuk usahawan mikro</p>
             
             <form id="registerForm">
-                <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Emel</label>
-                    <input type="email" id="email" placeholder="email@contoh.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Kata Laluan (minimum 6 aksara)</label>
-                    <input type="password" id="password" placeholder="********" required>
+                <!-- Maklumat Asas -->
+                <div class="form-section">
+                    <h4>📋 Maklumat Asas</h4>
+                    <div class="form-group">
+                        <label>Nama Penuh</label>
+                        <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Emel</label>
+                        <input type="email" id="email" placeholder="email@contoh.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kata Laluan</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" placeholder="Minimum 6 aksara" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Perniagaan</label>
+                        <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📁 Kategori Perniagaan</label>
+                        <select id="businessCategory" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="fnb">🍔 Makanan & Minuman (F&B)</option>
+                            <option value="retail">🛍️ Retail / Kedai Runcit</option>
+                            <option value="service">⚙️ Perkhidmatan (Service)</option>
+                            <option value="fashion">👗 Fesyen & Pakaian</option>
+                            <option value="craft">🎨 Kraf Tangan / Homemade</option>
+                            <option value="other">📝 Lain-lain</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Nama Perniagaan (optional)</label>
-                    <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade">
+                <!-- Senarai Produk/Item -->
+                <div class="form-section">
+                    <h4>🛒 Senarai Produk/Item Perniagaan</h4>
+                    <p class="section-note">Masukkan item yang anda jual. Item ini akan muncul di halaman Rekod Jualan nanti.</p>
+                    
+                    <div id="itemsList">
+                        <div class="item-row-register" id="item-template">
+                            <div class="item-col-reg">
+                                <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)">
+                            </div>
+                            <div class="item-col-reg">
+                                <input type="number" class="item-price-reg" placeholder="Harga seunit (RM)" step="0.01">
+                            </div>
+                            <div class="item-col-reg">
+                                <select class="item-category-reg">
+                                    <option value="">Kategori</option>
+                                    <option value="makanan">🍔 Makanan</option>
+                                    <option value="minuman">🥤 Minuman</option>
+                                    <option value="produk">📦 Produk</option>
+                                    <option value="perkhidmatan">⚙️ Perkhidmatan</option>
+                                </select>
+                            </div>
+                            <div class="item-col-reg item-action">
+                                <button type="button" class="remove-item-btn" onclick="removeItemRow(this)">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-add-item-reg" onclick="addItemRowRegister()">+ Tambah Item Lagi</button>
                 </div>
                 
                 <button type="submit" class="btn-primary btn-full" id="registerBtn">Daftar Sekarang →</button>
@@ -61,9 +112,140 @@
         </div>
     </div>
 
-    <!-- Supabase Library CDN - MUST BE FIRST -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+        let itemCount = 1;
+
+        function addItemRowRegister() {
+            const itemsList = document.getElementById('itemsList');
+            const template = document.getElementById('item-template');
+            const newRow = template.cloneNode(true);
+            newRow.id = `item-row-${Date.now()}`;
+            newRow.style.display = 'flex';
+            
+            // Clear input values
+            newRow.querySelector('.item-name-reg').value = '';
+            newRow.querySelector('.item-price-reg').value = '';
+            newRow.querySelector('.item-category-reg').value = '';
+            
+            itemsList.appendChild(newRow);
+            itemCount++;
+        }
+
+        function removeItemRow(btn) {
+            const row = btn.closest('.item-row-register');
+            if (document.querySelectorAll('.item-row-register').length > 1) {
+                row.remove();
+            } else {
+                alert('Anda perlu ada sekurang-kurangnya satu item');
+            }
+        }
+
+        function getItemsData() {
+            const items = [];
+            const rows = document.querySelectorAll('.item-row-register');
+            rows.forEach(row => {
+                const name = row.querySelector('.item-name-reg').value.trim();
+                const price = parseFloat(row.querySelector('.item-price-reg').value);
+                const category = row.querySelector('.item-category-reg').value;
+                
+                if (name && price > 0) {
+                    items.push({ name, price, category });
+                }
+            });
+            return items;
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const type = field.type === 'password' ? 'text' : 'password';
+            field.type = type;
+        }
+
+        // Handle Registration
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const businessName = document.getElementById('businessName').value;
+                const businessCategory = document.getElementById('businessCategory').value;
+                const items = getItemsData();
+                
+                if (password.length < 6) {
+                    document.getElementById('registerMessage').innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
+                    return;
+                }
+                
+                if (items.length === 0) {
+                    document.getElementById('registerMessage').innerHTML = '<div class="message-box error">Sila masukkan sekurang-kurangnya satu item perniagaan</div>';
+                    return;
+                }
+                
+                const registerBtn = document.getElementById('registerBtn');
+                registerBtn.disabled = true;
+                registerBtn.textContent = 'Mendaftar...';
+                
+                try {
+                    // Register with Supabase Auth
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                full_name: fullName,
+                                business_name: businessName,
+                                business_category: businessCategory
+                            }
+                        }
+                    });
+                    
+                    if (error) throw error;
+                    
+                    if (data.user) {
+                        // Create profile
+                        await supabaseClient
+                            .from('profiles')
+                            .insert([{
+                                id: data.user.id,
+                                full_name: fullName,
+                                email: email,
+                                business_name: businessName,
+                                business_category: businessCategory
+                            }]);
+                        
+                        // Save items to user_items table
+                        for (const item of items) {
+                            await supabaseClient
+                                .from('user_items')
+                                .insert([{
+                                    user_id: data.user.id,
+                                    item_name: item.name,
+                                    item_price: item.price,
+                                    category: item.category
+                                }]);
+                        }
+                        
+                        document.getElementById('registerMessage').innerHTML = '<div class="message-box success">Pendaftaran berjaya! Anda akan dihubungkan ke dashboard...</div>';
+                        
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    document.getElementById('registerMessage').innerHTML = `<div class="message-box error">Ralat: ${error.message}</div>`;
+                } finally {
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Daftar Sekarang →';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
