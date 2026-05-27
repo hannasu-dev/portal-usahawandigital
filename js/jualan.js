@@ -1,11 +1,168 @@
+// =========================================
+// 1. STRUKTUR DATA KATEGORI (MAPPING OBJECT)
+// =========================================
+const KATEGORI_PERNIAGAAN = {
+    // A. F&B (Makanan & Minuman)
+    fnb: {
+        jualan: [
+            { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
+            { value: "Minuman Premium", label: "☕ Minuman Premium" },
+            { value: "Minuman Biasa", label: "🥤 Minuman Biasa" },
+            { value: "Makanan Utama", label: "🍝 Makanan Utama" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Bahan Mentah", label: "🥛 Bahan Mentah" },
+            { value: "Pembungkusan", label: "📦 Pembungkusan" },
+            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
+            { value: "Utiliti", label: "⚡ Utiliti" },
+            { value: "Pemasaran", label: "📣 Pemasaran" },
+            { value: "Penyelenggaraan Mesin", label: "🛠️ Penyelenggaraan Mesin" }
+        ]
+    },
+    
+    // B. RETAIL/BUTIK
+    retail: {
+        jualan: [
+            { value: "Pakaian Wanita", label: "👗 Pakaian Wanita" },
+            { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" },
+            { value: "Pakaian Kanak-Kanak", label: "👶 Pakaian Kanak-Kanak" },
+            { value: "Hijab & Aksesori", label: "🧕 Hijab & Aksesori" },
+            { value: "Kasut & Beg", label: "👜 Kasut & Beg" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Belian Stok Borong", label: "📦 Belian Stok Borong" },
+            { value: "Logistik/Shipping", label: "🚚 Logistik/Shipping" },
+            { value: "Pembungkusan/Beg", label: "🛍️ Pembungkusan/Beg" },
+            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
+            { value: "Pemasaran", label: "📣 Pemasaran" }
+        ]
+    },
+    
+    // C. PERKHIDMATAN/SERVIS
+    servis: {
+        jualan: [
+            { value: "Servis Utama", label: "✂️ Servis Utama" },
+            { value: "Rawatan/Treatment", label: "💆 Rawatan/Treatment" },
+            { value: "Jualan Produk Tambahan", label: "🧴 Jualan Produk Tambahan" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Produk/Alatan Servis", label: "🧴 Produk/Alatan Servis" },
+            { value: "Kos Operasi/Sewa", label: "🏢 Kos Operasi/Sewa" },
+            { value: "Utiliti", label: "⚡ Utiliti" },
+            { value: "Pemasaran", label: "📣 Pemasaran" },
+            { value: "Lesen/Perisian", label: "💻 Lesen/Perisian" }
+        ]
+    }
+};
+
+// Default kategori (F&B) jika tiada padanan
+const DEFAULT_KATEGORI = 'fnb';
+
 // Global variables
 let currentRecords = [];
 let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
-let userItemsList = [];
+let currentUserBusinessType = 'fnb'; // Default
 
-// Initialize on page load
+// =========================================
+// 2. FUNGSI RENDER DROPDOWN KATEGORI DINAMIK
+// =========================================
+function renderDynamicCategories(jenisPerniagaan) {
+    // Validasi - jika jenis perniagaan tidak wujud dalam mapping, guna default
+    let businessData = KATEGORI_PERNIAGAAN[jenisPerniagaan];
+    if (!businessData) {
+        console.warn(`Jenis perniagaan "${jenisPerniagaan}" tidak dijumpai. Menggunakan default (fnb).`);
+        businessData = KATEGORI_PERNIAGAAN[DEFAULT_KATEGORI];
+        jenisPerniagaan = DEFAULT_KATEGORI;
+    }
+    
+    currentUserBusinessType = jenisPerniagaan;
+    
+    // Dapatkan dropdown kategori
+    const kategoriSelect = document.getElementById('kategori');
+    if (!kategoriSelect) return;
+    
+    // Dapatkan jenis transaksi yang dipilih (jualan/belanja)
+    const jenisTransaksi = document.getElementById('jenis').value;
+    
+    // Pilih mapping berdasarkan jenis transaksi
+    let kategoriList = [];
+    if (jenisTransaksi === 'jualan') {
+        kategoriList = businessData.jualan;
+    } else {
+        kategoriList = businessData.belanja;
+    }
+    
+    // Kosongkan dropdown
+    kategoriSelect.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+    
+    // Masukkan kategori baru
+    kategoriList.forEach(kategori => {
+        const option = document.createElement('option');
+        option.value = kategori.value;
+        option.textContent = kategori.label;
+        kategoriSelect.appendChild(option);
+    });
+    
+    // Optional: set default ke kategori pertama
+    if (kategoriList.length > 0) {
+        kategoriSelect.value = kategoriList[0].value;
+    }
+}
+
+// =========================================
+// 3. DAPATKAN JENIS PERNIAGAAN DARI PROFILES
+// =========================================
+async function getUserBusinessType() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return DEFAULT_KATEGORI;
+    
+    try {
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('jenis_perniagaan')
+            .eq('id', user.id)
+            .single();
+        
+        if (error) {
+            console.warn('Error fetching profile:', error);
+            return DEFAULT_KATEGORI;
+        }
+        
+        // Jika profile ada dan jenis_perniagaan valid
+        if (profile && profile.jenis_perniagaan) {
+            const businessType = profile.jenis_perniagaan;
+            // Validasi sama ada jenis_perniagaan wujud dalam mapping
+            if (KATEGORI_PERNIAGAAN[businessType]) {
+                return businessType;
+            }
+        }
+        return DEFAULT_KATEGORI;
+    } catch (err) {
+        console.error('Error in getUserBusinessType:', err);
+        return DEFAULT_KATEGORI;
+    }
+}
+
+// =========================================
+// 4. EVENT LISTENER UNTUK JENIS TRANSAKSI
+// =========================================
+function setupJenisTransaksiListener() {
+    const jenisSelect = document.getElementById('jenis');
+    if (jenisSelect) {
+        jenisSelect.addEventListener('change', () => {
+            renderDynamicCategories(currentUserBusinessType);
+        });
+    }
+}
+
+// =========================================
+// 5. INITIALIZATION (PAGE LOAD)
+// =========================================
 document.addEventListener('DOMContentLoaded', async () => {
     // Set default date
     const tarikhInput = document.getElementById('tarikh');
@@ -13,57 +170,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         tarikhInput.valueAsDate = new Date();
     }
     
-    // Check auth and load records
+    // Check auth
     const user = await checkAuth();
     if (!user) {
         window.location.href = 'login.html';
         return;
     }
     
-    // Load user items from database
-    await loadUserItems();
-    
     // Add first empty item row
-    await addItemRow();
+    addItemRow();
+    
+    // Get user's business type and render categories
+    currentUserBusinessType = await getUserBusinessType();
+    renderDynamicCategories(currentUserBusinessType);
+    
+    // Setup event listener for jenis transaksi change
+    setupJenisTransaksiListener();
     
     // Load records
     await loadRecords();
 });
 
-// Load user items from database
-async function loadUserItems() {
-    const user = await checkAuth();
-    if (!user) return [];
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('user_items')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('item_name');
-        
-        if (error) throw error;
-        userItemsList = data || [];
-        return userItemsList;
-    } catch (error) {
-        console.error('Error loading items:', error);
-        return [];
-    }
-}
-
-// Function to add new item row with dropdown
-async function addItemRow() {
+// =========================================
+// 6. ITEM MANAGEMENT FUNCTIONS
+// =========================================
+function addItemRow() {
     const itemsList = document.getElementById('itemsList');
     if (!itemsList) return;
     
     const itemId = Date.now() + itemCounter++;
-    
-    // Build options for dropdown
-    let optionsHtml = '<option value="">-- Pilih Item (pilih atau taip baru) --</option>';
-    userItemsList.forEach(item => {
-        optionsHtml += `<option value="${item.item_name}" data-price="${item.item_price}" data-category="${item.category || ''}">${item.item_name} (RM${item.item_price.toFixed(2)})</option>`;
-    });
-    optionsHtml += '<option value="new">+ Tambah Item Baru (taip manual)</option>';
     
     const itemRow = document.createElement('div');
     itemRow.className = 'item-row';
@@ -71,10 +206,7 @@ async function addItemRow() {
     itemRow.innerHTML = `
         <div class="item-col item-name-col">
             <label>Nama Item</label>
-            <select class="item-select" onchange="onItemSelect(this, '${itemId}')">
-                ${optionsHtml}
-            </select>
-            <input type="text" class="item-name manual-name" placeholder="Taip nama item baru" style="display:none; margin-top:5px;">
+            <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap" required>
         </div>
         <div class="item-col item-qty-col">
             <label>Kuantiti</label>
@@ -93,7 +225,7 @@ async function addItemRow() {
         </div>
     `;
     
-    // Add event listeners
+    // Add event listeners for calculation
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
     
@@ -104,66 +236,6 @@ async function addItemRow() {
     calculateTotalAmount();
 }
 
-// Handle item select change
-function onItemSelect(select, itemId) {
-    const row = document.getElementById(`item-${itemId}`);
-    if (!row) return;
-    
-    const priceInput = row.querySelector('.item-price');
-    const manualNameInput = row.querySelector('.manual-name');
-    const selectedOption = select.options[select.selectedIndex];
-    const selectedValue = select.value;
-    
-    if (selectedValue === 'new') {
-        // Show manual input for new item
-        manualNameInput.style.display = 'block';
-        manualNameInput.required = true;
-        manualNameInput.focus();
-        priceInput.value = '';
-        priceInput.readOnly = false;
-        
-        // Clear select and mark that we're adding new item
-        select.style.border = '1px solid #ff9800';
-        
-        // Add event to manual name input
-        manualNameInput.oninput = function() {
-            if (this.value.trim()) {
-                select.style.border = '1px solid #cbd5e1';
-            }
-        };
-    } else if (selectedValue && selectedValue !== '') {
-        // Existing item selected
-        manualNameInput.style.display = 'none';
-        manualNameInput.required = false;
-        const price = selectedOption.getAttribute('data-price');
-        if (price) {
-            priceInput.value = parseFloat(price).toFixed(2);
-        }
-        priceInput.readOnly = false;
-        select.style.border = '1px solid #cbd5e1';
-    } else {
-        // No selection
-        manualNameInput.style.display = 'none';
-        priceInput.value = '';
-    }
-    
-    calculateItemSubtotal(itemId);
-}
-
-// Function to get item name from row
-function getItemNameFromRow(row) {
-    const select = row.querySelector('.item-select');
-    const manualName = row.querySelector('.manual-name');
-    
-    if (select.value === 'new' && manualName.value.trim()) {
-        return manualName.value.trim();
-    } else if (select.value && select.value !== '' && select.value !== 'new') {
-        return select.value;
-    }
-    return '';
-}
-
-// Function to remove item row
 function removeItemRow(itemId) {
     const itemRow = document.getElementById(`item-${itemId}`);
     if (itemRow) {
@@ -172,7 +244,6 @@ function removeItemRow(itemId) {
     }
 }
 
-// Function to calculate subtotal for an item
 function calculateItemSubtotal(itemId) {
     const itemRow = document.getElementById(`item-${itemId}`);
     if (!itemRow) return;
@@ -187,7 +258,6 @@ function calculateItemSubtotal(itemId) {
     calculateTotalAmount();
 }
 
-// Function to calculate total amount from all items
 function calculateTotalAmount() {
     const itemRows = document.querySelectorAll('.item-row');
     let total = 0;
@@ -206,13 +276,12 @@ function calculateTotalAmount() {
     return total;
 }
 
-// Function to get items data from form
 function getItemsData() {
     const itemRows = document.querySelectorAll('.item-row');
     const items = [];
     
     itemRows.forEach(row => {
-        const name = getItemNameFromRow(row);
+        const name = row.querySelector('.item-name').value.trim();
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         
@@ -229,7 +298,9 @@ function getItemsData() {
     return items;
 }
 
-// Handle form submission
+// =========================================
+// 7. FORM SUBMISSION
+// =========================================
 const jualanForm = document.getElementById('jualanForm');
 if (jualanForm) {
     jualanForm.addEventListener('submit', async (e) => {
@@ -250,6 +321,11 @@ if (jualanForm) {
         
         if (!tarikh) {
             alert('Sila pilih tarikh');
+            return;
+        }
+        
+        if (!kategori) {
+            alert('Sila pilih kategori');
             return;
         }
         
@@ -284,36 +360,20 @@ if (jualanForm) {
             
             if (error) throw error;
             
-            // Check if there are new items to save to user_items
-            for (const item of items) {
-                // Check if item already exists in user_items
-                const exists = userItemsList.some(ui => ui.item_name.toLowerCase() === item.name.toLowerCase());
-                if (!exists) {
-                    await supabaseClient
-                        .from('user_items')
-                        .insert([{
-                            user_id: user.id,
-                            item_name: item.name,
-                            item_price: item.price,
-                            category: kategori
-                        }]);
-                }
-            }
-            
-            // Reload user items
-            await loadUserItems();
-            
             // Reset form
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             
-            // Clear items and add one empty row
+            // Reset items list
             const itemsList = document.getElementById('itemsList');
             if (itemsList) {
                 itemsList.innerHTML = '';
             }
             itemCounter = 0;
-            await addItemRow();
+            addItemRow();
+            
+            // Re-render categories (to ensure dropdown is fresh)
+            renderDynamicCategories(currentUserBusinessType);
             
             // Show success message
             const formMessage = document.getElementById('formMessage');
@@ -343,7 +403,9 @@ if (jualanForm) {
     });
 }
 
-// Load records from database
+// =========================================
+// 8. LOAD, FILTER, DISPLAY RECORDS
+// =========================================
 async function loadRecords() {
     const user = await checkAuth();
     if (!user) return;
@@ -373,7 +435,6 @@ async function loadRecords() {
     }
 }
 
-// Filter and display records
 function filterRecords() {
     const filter = document.getElementById('filterJenis')?.value || 'semua';
     currentFilter = filter;
@@ -388,7 +449,6 @@ function filterRecords() {
     prepareChartData(filtered);
 }
 
-// Display records in list
 function displayRecords(records) {
     const rekodList = document.getElementById('rekodList');
     
@@ -403,6 +463,9 @@ function displayRecords(records) {
         const jenisClass = record.jenis === 'jualan' ? 'jualan' : 'belanja';
         const jenisIcon = record.jenis === 'jualan' ? '💰' : '📉';
         const jenisText = record.jenis === 'jualan' ? 'Jualan' : 'Perbelanjaan';
+        
+        // Format kategori dengan emoji jika ada
+        let kategoriDisplay = record.kategori || 'Tiada kategori';
         
         // Display items detail
         let itemsHtml = '';
@@ -420,7 +483,7 @@ function displayRecords(records) {
             <div class="rekod-item ${jenisClass}" data-id="${record.id}">
                 <div class="rekod-info">
                     <div class="rekod-tarikh">${tanggal}</div>
-                    <div class="rekod-keterangan">${jenisIcon} ${jenisText} - ${record.kategori}</div>
+                    <div class="rekod-keterangan">${jenisIcon} ${jenisText} - ${kategoriDisplay}</div>
                     ${itemsHtml}
                 </div>
                 <div class="rekod-jumlah ${jenisClass}">
@@ -434,7 +497,6 @@ function displayRecords(records) {
     rekodList.innerHTML = html;
 }
 
-// Update summary cards
 function updateSummary(records) {
     let totalJualan = 0;
     let totalBelanja = 0;
@@ -461,7 +523,9 @@ function updateSummary(records) {
     }
 }
 
-// Prepare chart data
+// =========================================
+// 9. CHART FUNCTIONS
+// =========================================
 function prepareChartData(records) {
     const months = [];
     const jualanByMonth = {};
@@ -498,7 +562,6 @@ function prepareChartData(records) {
     updateChart(jualanData, belanjaData, labels);
 }
 
-// Update chart
 function updateChart(jualanData, belanjaData, labels) {
     const ctx = document.getElementById('salesChart');
     if (!ctx) return;
@@ -554,7 +617,9 @@ function updateChart(jualanData, belanjaData, labels) {
     });
 }
 
-// Delete record
+// =========================================
+// 10. DELETE RECORD
+// =========================================
 async function deleteRecord(recordId) {
     if (!confirm('⚠️ Padam rekod ini? Tindakan ini tidak boleh dibatalkan.')) return;
     
@@ -574,7 +639,9 @@ async function deleteRecord(recordId) {
     }
 }
 
-// Generate Professional PDF Report
+// =========================================
+// 11. GENERATE PDF REPORT
+// =========================================
 async function generateReport() {
     if (currentRecords.length === 0) {
         alert('📭 Tiada rekod untuk dijana laporan.');
@@ -603,13 +670,14 @@ async function generateReport() {
     // Build HTML for report
     let tableRows = '';
     filtered.forEach(record => {
+        const kategoriDisplay = record.kategori || 'Tiada kategori';
         if (record.items && Array.isArray(record.items) && record.items.length > 0) {
             record.items.forEach(item => {
                 tableRows += `
                     <tr>
                         <td>${record.tarikh}</td>
                         <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
-                        <td>${record.kategori}</td>
+                        <td>${kategoriDisplay}</td>
                         <td>${item.name}</td>
                         <td>${item.quantity}</td>
                         <td>${item.price.toFixed(2)}</td>
@@ -622,7 +690,7 @@ async function generateReport() {
                 <tr>
                     <td>${record.tarikh}</td>
                     <td>${record.jenis === 'jualan' ? '💰 Jualan' : '📉 Perbelanjaan'}</td>
-                    <td>${record.kategori}</td>
+                    <td>${kategoriDisplay}</td>
                     <td colspan="4">${record.keterangan || 'Tiada detail item'}</td>
                 </tr>
             `;
@@ -671,14 +739,11 @@ async function generateReport() {
                     display: flex;
                     justify-content: space-around;
                     text-align: center;
-                    flex-wrap: wrap;
-                    gap: 1rem;
                 }
                 .summary-item {
                     background: white;
                     padding: 15px 25px;
                     border-radius: 10px;
-                    min-width: 150px;
                 }
                 .summary-item span {
                     display: block;
@@ -746,15 +811,7 @@ async function generateReport() {
                 <h3>📋 Senarai Transaksi</h3>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Tarikh</th>
-                            <th>Jenis</th>
-                            <th>Kategori</th>
-                            <th>Item</th>
-                            <th>Kuantiti</th>
-                            <th>Harga (RM)</th>
-                            <th>Jumlah (RM)</th>
-                        </tr>
+                        <tr><th>Tarikh</th><th>Jenis</th><th>Kategori</th><th>Item</th><th>Kuantiti</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr>
                     </thead>
                     <tbody>
                         ${tableRows}
@@ -763,7 +820,6 @@ async function generateReport() {
                 
                 <div class="footer">
                     <p>Dijana oleh Portal UsahawanDigital © ${new Date().getFullYear()}</p>
-                    <p>Portal literasi digital untuk usahawan mikro Malaysia</p>
                 </div>
             </div>
             <script>
@@ -773,7 +829,6 @@ async function generateReport() {
         </html>
     `;
     
-    // Open print window
     const printWindow = window.open('', '_blank');
     printWindow.document.write(reportHtml);
     printWindow.document.close();
