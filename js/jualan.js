@@ -1,3 +1,44 @@
+// Pada awal file jualan.js, sebelum KATEGORI_PERNIAGAAN, tambah:
+
+// Get business type from localStorage (set by dashboard)
+function getActiveBusinessType() {
+    return localStorage.getItem('userBusinessType') || 'fnb';
+}
+
+// Kemudian update function getUserBusinessType():
+
+async function getUserBusinessType() {
+    // First try to get from localStorage (faster)
+    const localType = getActiveBusinessType();
+    if (localType && KATEGORI_PERNIAGAAN[localType]) {
+        return localType;
+    }
+    
+    // Fallback to database
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return DEFAULT_KATEGORI;
+    
+    try {
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('business_type, jenis_perniagaan')
+            .eq('id', user.id)
+            .single();
+        
+        if (error) throw error;
+        
+        let businessType = profile?.business_type || profile?.jenis_perniagaan || DEFAULT_KATEGORI;
+        if (!KATEGORI_PERNIAGAAN[businessType]) businessType = DEFAULT_KATEGORI;
+        
+        // Update localStorage
+        localStorage.setItem('userBusinessType', businessType);
+        
+        return businessType;
+    } catch (err) {
+        console.error('Error in getUserBusinessType:', err);
+        return DEFAULT_KATEGORI;
+    }
+}
 // =========================================
 // 1. STRUKTUR DATA KATEGORI (MAPPING OBJECT)
 // =========================================
