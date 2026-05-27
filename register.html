@@ -70,8 +70,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label>🏪 Jenis Perniagaan (Untuk Sistem Dinamik)</label>
-                        <select id="jenisPerniagaan" required>
+                        <label>🏪 Jenis Perniagaan</label>
+                        <select id="businessType" required>
+                            <option value="">-- Pilih Jenis --</option>
                             <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
                             <option value="retail">👗 Retail / Butik</option>
                             <option value="servis">✂️ Perkhidmatan / Servis</option>
@@ -219,13 +220,13 @@
                 const businessName = document.getElementById('businessName').value;
                 const businessCategory = document.getElementById('businessCategory').value;
                 
-                // TAMBAHAN BARU: Ambil nilai jenis perniagaan yang dipilih
-                const jenisPerniagaan = document.getElementById('jenisPerniagaan').value;
+                // Mengambil nilai dari ID businessType yang baru dikemaskini
+                const businessType = document.getElementById('businessType').value;
                  
                 const items = dapatkanSemuaItem();
                 const messageDiv = document.getElementById('registerMessage');
                  
-                if (!fullName || !email || !password || !businessName || !businessCategory || !jenisPerniagaan) {
+                if (!fullName || !email || !password || !businessName || !businessCategory || !businessType) {
                     messageDiv.innerHTML = '<div class="message-box error">Sila lengkapkan semua maklumat asas</div>';
                     return;
                 }
@@ -255,7 +256,7 @@
                                 full_name: fullName,
                                 business_name: businessName,
                                 business_category: businessCategory,
-                                business_type: jenisPerniagaan
+                                business_type: businessType
                             }
                         }
                     });
@@ -272,7 +273,7 @@
                                 email: email,
                                 business_name: businessName,
                                 business_category: businessCategory,
-                                business_type: jenisPerniagaan
+                                business_type: businessType
                             }]);
                          
                         // 3. Simpan item-item produk awal
