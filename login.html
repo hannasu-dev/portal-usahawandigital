@@ -25,7 +25,7 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="back-button-container">
-            <a href="index.html" class="back-btn">Kembali ke Utama</a>
+                <a href="index.html" class="back-btn">← Kembali ke Utama</a>
             </div>
             <h2>Log Masuk</h2>
             <p class="auth-subtitle">Selamat kembali ke Portal UsahawanDigital</p>
@@ -38,7 +38,14 @@
                 
                 <div class="form-group">
                     <label>Kata Laluan</label>
-                    <input type="password" id="password" placeholder="********" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="********" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                    </div>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordBtn">Lupa Kata Laluan?</a>
                 </div>
                 
                 <button type="submit" class="btn-primary btn-full" id="loginBtn">Log Masuk →</button>
@@ -51,13 +58,45 @@
         </div>
     </div>
 
-        <!-- Supabase Library CDN - MUST BE FIRST -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Your custom files -->
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
-</body>
-</html>
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        }
+
+        // Handle Forgot Password
+        const forgotBtn = document.getElementById('forgotPasswordBtn');
+        if (forgotBtn) {
+            forgotBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                
+                if (!email) {
+                    alert('Sila masukkan emel anda terlebih dahulu');
+                    return;
+                }
+                
+                forgotBtn.textContent = 'Menghantar...';
+                
+                try {
+                    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/reset-password.html'
+                    });
+                    
+                    if (error) throw error;
+                    
+                    alert('Link reset password telah dihantar ke emel anda. Sila semak kotak masuk/spam.');
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                } finally {
+                    forgotBtn.textContent = 'Lupa Kata Laluan?';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
