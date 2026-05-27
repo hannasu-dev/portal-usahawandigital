@@ -229,12 +229,6 @@
         .text-center {
             text-align: center;
         }
-        .report-section {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 20px;
-        }
         @media (max-width: 768px) {
             .summary-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -250,7 +244,6 @@
                 flex-direction: column;
             }
         }
-        /* Hide delete buttons and PDF button in PDF */
         @media print {
             .rekod-delete, .btn-pdf, .filter-container, .financial-tabs, 
             .back-button-container, footer, .tab-buttons, .btn-add-item,
@@ -258,9 +251,6 @@
                 display: none !important;
             }
             .rekod-item {
-                break-inside: avoid;
-            }
-            .summary-grid, .chart-card, .top-product-card {
                 break-inside: avoid;
             }
         }
@@ -508,9 +498,7 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            position: 'top',
-                        },
+                        legend: { position: 'top' },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -520,74 +508,75 @@
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Jumlah (RM)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Tarikh'
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Jumlah (RM)' } },
+                        x: { title: { display: true, text: 'Tarikh' } }
                     }
                 }
             });
         }
 
-        // ==================== DRAW CHART FOR MONTHLY ====================
-        function drawMonthlyChart(records, selectedMonth) {
-            const daysInMonth = new Date(parseInt(selectedMonth.split('-')[0]), parseInt(selectedMonth.split('-')[1]), 0).getDate();
-            const jualanByDay = {};
-            const belanjaByDay = {};
-            
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayStr = i.toString();
-                jualanByDay[dayStr] = 0;
-                belanjaByDay[dayStr] = 0;
+        // ==================== LOAD ALL FINANCIAL DATA FROM BOTH TABLES ====================
+        async function loadAllFinancialData() {
+            try {
+                // Load from rekod_kewangan table (new system)
+                const { data: newData, error: newError } = await supabaseClient
+                    .from('rekod_kewangan')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('tarikh', { ascending: false });
+                
+                if (newError) throw newError;
+                
+                // Load from jualan_records table (old system)
+                const { data: oldData, error: oldError } = await supabaseClient
+                    .from('jualan_records')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('tarikh', { ascending: false });
+                
+                if (oldError && oldError.message !== 'relation "jualan_records" does not exist') {
+                    console.error('Error loading old data:', oldError);
+                }
+                
+                // Convert old data format to match new format
+                let convertedOldData = [];
+                if (oldData && oldData.length > 0) {
+                    convertedOldData = oldData.map(record => {
+                        let keterangan = record.keterangan || '';
+                        let itemsList = [];
+                        
+                        // Handle items from JSON if exists
+                        if (record.items && Array.isArray(record.items) && record.items.length > 0) {
+                            itemsList = record.items.map(item => `${item.name} x ${item.quantity}`);
+                            keterangan = itemsList.join(', ');
+                        }
+                        
+                        return {
+                            id: record.id,
+                            user_id: record.user_id,
+                            jenis: record.jenis,
+                            kategori: record.kategori || (record.jenis === 'jualan' ? 'produk' : 'lain_lain'),
+                            jumlah: record.jumlah || 0,
+                            keterangan: keterangan || `Rekod ${record.jenis}`,
+                            tarikh: record.tarikh,
+                            created_at: record.created_at,
+                            source: 'old' // Tandakan dari old table
+                        };
+                    });
+                }
+                
+                // Gabungkan kedua-dua data
+                let allRecords = [...(newData || []), ...convertedOldData];
+                
+                // Sort by date (newest first)
+                allRecords.sort((a, b) => new Date(b.tarikh) - new Date(a.tarikh));
+                
+                return allRecords;
+                
+            } catch (err) {
+                console.error('Error loading financial data:', err);
+                return [];
             }
-            
-            records.forEach(record => {
-                const day = parseInt(record.tarikh.split('-')[2]).toString();
-                if (record.jenis === 'jualan') {
-                    jualanByDay[day] = (jualanByDay[day] || 0) + (record.jumlah || 0);
-                } else {
-                    belanjaByDay[day] = (belanjaByDay[day] || 0) + (record.jumlah || 0);
-                }
-            });
-            
-            const labels = Object.keys(jualanByDay).map(day => `Hari ${day}`);
-            const jualanData = Object.values(jualanByDay);
-            const belanjaData = Object.values(belanjaByDay);
-            
-            drawChart(jualanData, belanjaData, labels);
-        }
-
-        // ==================== DRAW CHART FOR DAILY ====================
-        function drawDailyChart(records, selectedDate) {
-            const jualanAmounts = [];
-            const belanjaAmounts = [];
-            const labels = [];
-            
-            let totalJualan = 0;
-            let totalBelanja = 0;
-            
-            records.forEach(record => {
-                if (record.jenis === 'jualan') {
-                    totalJualan += record.jumlah || 0;
-                } else {
-                    totalBelanja += record.jumlah || 0;
-                }
-            });
-            
-            jualanAmounts.push(totalJualan);
-            belanjaAmounts.push(totalBelanja);
-            labels.push(formatDate(selectedDate));
-            
-            drawChart(jualanAmounts, belanjaAmounts, labels);
         }
 
         // ==================== LOAD USER ITEMS ====================
@@ -640,11 +629,6 @@
 
         if (kuantitiInput) kuantitiInput.addEventListener('input', updateJualanPreview);
         if (itemSelect) itemSelect.addEventListener('change', updateJualanPreview);
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
 
         // ==================== SUBMIT JUALAN ====================
         const jualanForm = document.getElementById('jualanForm');
@@ -754,9 +738,10 @@
             
             records.forEach(record => {
                 if (record.jenis === 'jualan' && record.keterangan) {
-                    const match = record.keterangan.match(/^(.+?) x (\d+)$/);
-                    if (match) {
-                        const productName = match[1];
+                    // Check for pattern "Nama Item x Qty" or "Nama Item x Qty, Nama Item x Qty"
+                    const matches = record.keterangan.matchAll(/(.+?) x (\d+)/g);
+                    for (const match of matches) {
+                        const productName = match[1].trim();
                         const quantity = parseInt(match[2]);
                         productSales[productName] = (productSales[productName] || 0) + quantity;
                     }
@@ -776,134 +761,168 @@
             return { topProduct, maxQty };
         }
 
-        // ==================== LOAD FINANCIAL DATA ====================
+        // ==================== LOAD FINANCIAL DATA WITH FILTER ====================
         async function loadFinancialData() {
             const listContainer = document.getElementById('financialRecordsList');
             const mode = currentFilterMode;
             
-            let filterCondition = {};
-            let dateLabel = '';
+            // Load all data from both tables
+            const allRecords = await loadAllFinancialData();
             
+            // Filter based on mode
+            let filteredData;
             if (mode === 'monthly') {
-                filterCondition = { column: 'tarikh', operator: 'startsWith', value: currentMonthlyFilter };
-                dateLabel = currentMonthlyFilter;
+                filteredData = allRecords.filter(record => record.tarikh && record.tarikh.startsWith(currentMonthlyFilter));
             } else {
-                filterCondition = { column: 'tarikh', operator: 'eq', value: currentDailyFilter };
-                dateLabel = currentDailyFilter;
+                filteredData = allRecords.filter(record => record.tarikh === currentDailyFilter);
             }
             
-            try {
-                let query = supabaseClient
-                    .from('rekod_kewangan')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('tarikh', { ascending: false });
-                
-                const { data, error } = await query;
-                if (error) throw error;
-                
-                let filteredData;
-                if (mode === 'monthly') {
-                    filteredData = data.filter(record => record.tarikh.startsWith(currentMonthlyFilter));
-                } else {
-                    filteredData = data.filter(record => record.tarikh === currentDailyFilter);
-                }
-                
-                // Calculate accounting variables
-                let totalJualan = 0;
-                let totalBelanja = 0;
-                let kosBahanMentah = 0;
-                let kosLain = 0;
-                let listHTML = '';
-                
-                if (filteredData.length === 0) {
-                    listContainer.innerHTML = '<p class="text-center" style="color: #64748b; padding: 20px;">📭 Tiada rekod transaksi untuk tempoh ini.</p>';
-                } else {
-                    filteredData.forEach(record => {
-                        const amount = parseFloat(record.jumlah);
-                        const dateLocal = new Date(record.tarikh).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+            // Calculate accounting variables
+            let totalJualan = 0;
+            let totalBelanja = 0;
+            let kosBahanMentah = 0;
+            let kosLain = 0;
+            let listHTML = '';
+            
+            if (filteredData.length === 0) {
+                listContainer.innerHTML = '<p class="text-center" style="color: #64748b; padding: 20px;">📭 Tiada rekod transaksi untuk tempoh ini.</p>';
+            } else {
+                filteredData.forEach(record => {
+                    const amount = parseFloat(record.jumlah);
+                    const dateLocal = new Date(record.tarikh).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+                    
+                    if (record.jenis === 'jualan') {
+                        totalJualan += amount;
                         
-                        if (record.jenis === 'jualan') {
-                            totalJualan += amount;
-                            
-                            const kategoriMap = { 'makanan': '🍔', 'minuman': '🥤', 'produk': '📦', 'perkhidmatan': '⚙️', 'lain_lain': '📝' };
-                            const kategoriEmoji = kategoriMap[record.kategori] || '💰';
-                            
-                            listHTML += `
-                                <div class="rekod-item jualan">
-                                    <div>
-                                        <strong style="color:#16a34a;">🟢 JUALAN</strong> ${kategoriEmoji} - ${record.keterangan}
-                                        <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:15px;">
-                                        <span class="rekod-jumlah jualan">+ RM ${amount.toFixed(2)}</span>
-                                        <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>
-                                    </div>
-                                </div>`;
+                        const kategoriMap = { 'makanan': '🍔', 'minuman': '🥤', 'produk': '📦', 'perkhidmatan': '⚙️', 'lain_lain': '📝' };
+                        const kategoriEmoji = kategoriMap[record.kategori] || '💰';
+                        const sourceBadge = record.source === 'old' ? '<span style="font-size:10px; background:#e2e8f0; padding:2px 6px; border-radius:10px; margin-left:5px;">lama</span>' : '';
+                        
+                        listHTML += `
+                            <div class="rekod-item jualan">
+                                <div>
+                                    <strong style="color:#16a34a;">🟢 JUALAN</strong> ${kategoriEmoji} - ${record.keterangan} ${sourceBadge}
+                                    <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <span class="rekod-jumlah jualan">+ RM ${amount.toFixed(2)}</span>
+                                    ${record.source !== 'old' ? `<button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>` : ''}
+                                </div>
+                            </div>`;
+                    } else {
+                        totalBelanja += amount;
+                        
+                        if (record.kategori === 'bahan_mentah') {
+                            kosBahanMentah += amount;
                         } else {
-                            totalBelanja += amount;
-                            
-                            if (record.kategori === 'bahan_mentah') {
-                                kosBahanMentah += amount;
-                            } else {
-                                kosLain += amount;
-                            }
-                            
-                            const kategoriMap = { 'bahan_mentah': '📦 Kos Bahan Mentah', 'operasi': '🏢 Kos Operasi', 'pemasaran': '📣 Kos Pemasaran', 'lain_lain': '💸 Kos Lain-lain' };
-                            const kategoriDisplay = kategoriMap[record.kategori] || 'Belanja';
-                            
-                            listHTML += `
-                                <div class="rekod-item belanja">
-                                    <div>
-                                        <strong style="color:#dc2626;">🔴 BELANJA</strong> (${kategoriDisplay}) - ${record.keterangan}
-                                        <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:15px;">
-                                        <span class="rekod-jumlah belanja">- RM ${amount.toFixed(2)}</span>
-                                        <button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>
-                                    </div>
-                                </div>`;
+                            kosLain += amount;
                         }
-                    });
-                    listContainer.innerHTML = listHTML;
-                }
-                
-                // Calculate profits
-                const untungKasar = totalJualan - kosBahanMentah;
-                const untungBersih = untungKasar - kosLain;
-                
-                // Update summary cards
-                document.getElementById('totalJualanCard').textContent = `RM ${totalJualan.toFixed(2)}`;
-                document.getElementById('totalBelanjaCard').textContent = `RM ${totalBelanja.toFixed(2)}`;
-                
-                const kasarCard = document.getElementById('untungKasarCard');
-                kasarCard.textContent = `RM ${untungKasar.toFixed(2)}`;
-                kasarCard.className = untungKasar >= 0 ? "summary-value text-success" : "summary-value text-danger";
-                
-                const bersihCard = document.getElementById('untungBersihCard');
-                bersihCard.textContent = `RM ${untungBersih.toFixed(2)}`;
-                bersihCard.className = untungBersih >= 0 ? "summary-value text-success" : "summary-value text-danger";
-                
-                // Update top product
-                const { topProduct, maxQty } = findTopProduct(filteredData);
-                const topProductText = document.getElementById('topProductText');
-                if (topProduct && maxQty > 0) {
-                    topProductText.innerHTML = `🏆 ${topProduct} (${maxQty} unit terjual)`;
-                } else {
-                    topProductText.innerHTML = 'Tiada data jualan';
-                }
-                
-                // Update chart based on mode
-                if (mode === 'monthly') {
-                    drawMonthlyChart(filteredData, currentMonthlyFilter);
-                } else {
-                    drawDailyChart(filteredData, currentDailyFilter);
-                }
-                
-            } catch (err) {
-                console.error('Error loading financial data:', err);
-                listContainer.innerHTML = '<p class="text-center" style="color: #dc2626; padding: 20px;">❌ Ralat memuatkan data. Sila cuba lagi.</p>';
+                        
+                        const kategoriMap = { 'bahan_mentah': '📦 Kos Bahan Mentah', 'operasi': '🏢 Kos Operasi', 'pemasaran': '📣 Kos Pemasaran', 'lain_lain': '💸 Kos Lain-lain' };
+                        const kategoriDisplay = kategoriMap[record.kategori] || 'Belanja';
+                        const sourceBadge = record.source === 'old' ? '<span style="font-size:10px; background:#e2e8f0; padding:2px 6px; border-radius:10px; margin-left:5px;">lama</span>' : '';
+                        
+                        listHTML += `
+                            <div class="rekod-item belanja">
+                                <div>
+                                    <strong style="color:#dc2626;">🔴 BELANJA</strong> (${kategoriDisplay}) - ${record.keterangan} ${sourceBadge}
+                                    <div style="font-size:12px; color:#94a3b8;">Tarikh: ${dateLocal}</div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <span class="rekod-jumlah belanja">- RM ${amount.toFixed(2)}</span>
+                                    ${record.source !== 'old' ? `<button type="button" class="rekod-delete" onclick="padamRekodTransaksi('${record.id}')">🗑️</button>` : ''}
+                                </div>
+                            </div>`;
+                    }
+                });
+                listContainer.innerHTML = listHTML;
             }
+            
+            // Calculate profits
+            const untungKasar = totalJualan - kosBahanMentah;
+            const untungBersih = untungKasar - kosLain;
+            
+            // Update summary cards
+            document.getElementById('totalJualanCard').textContent = `RM ${totalJualan.toFixed(2)}`;
+            document.getElementById('totalBelanjaCard').textContent = `RM ${totalBelanja.toFixed(2)}`;
+            
+            const kasarCard = document.getElementById('untungKasarCard');
+            kasarCard.textContent = `RM ${untungKasar.toFixed(2)}`;
+            kasarCard.className = untungKasar >= 0 ? "summary-value text-success" : "summary-value text-danger";
+            
+            const bersihCard = document.getElementById('untungBersihCard');
+            bersihCard.textContent = `RM ${untungBersih.toFixed(2)}`;
+            bersihCard.className = untungBersih >= 0 ? "summary-value text-success" : "summary-value text-danger";
+            
+            // Update top product
+            const { topProduct, maxQty } = findTopProduct(filteredData);
+            const topProductText = document.getElementById('topProductText');
+            if (topProduct && maxQty > 0) {
+                topProductText.innerHTML = `🏆 ${topProduct} (${maxQty} unit terjual)`;
+            } else {
+                topProductText.innerHTML = 'Tiada data jualan';
+            }
+            
+            // Update chart based on mode
+            if (mode === 'monthly') {
+                drawMonthlyChart(filteredData, currentMonthlyFilter);
+            } else {
+                drawDailyChart(filteredData, currentDailyFilter);
+            }
+        }
+        
+        // ==================== DRAW MONTHLY CHART ====================
+        function drawMonthlyChart(records, selectedMonth) {
+            const daysInMonth = new Date(parseInt(selectedMonth.split('-')[0]), parseInt(selectedMonth.split('-')[1]), 0).getDate();
+            const jualanByDay = {};
+            const belanjaByDay = {};
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = i.toString();
+                jualanByDay[dayStr] = 0;
+                belanjaByDay[dayStr] = 0;
+            }
+            
+            records.forEach(record => {
+                if (record.tarikh) {
+                    const day = parseInt(record.tarikh.split('-')[2]).toString();
+                    if (record.jenis === 'jualan') {
+                        jualanByDay[day] = (jualanByDay[day] || 0) + (record.jumlah || 0);
+                    } else {
+                        belanjaByDay[day] = (belanjaByDay[day] || 0) + (record.jumlah || 0);
+                    }
+                }
+            });
+            
+            const labels = Object.keys(jualanByDay).map(day => `Hari ${day}`);
+            const jualanData = Object.values(jualanByDay);
+            const belanjaData = Object.values(belanjaByDay);
+            
+            drawChart(jualanData, belanjaData, labels);
+        }
+
+        // ==================== DRAW DAILY CHART ====================
+        function drawDailyChart(records, selectedDate) {
+            const jualanAmounts = [];
+            const belanjaAmounts = [];
+            const labels = [];
+            
+            let totalJualan = 0;
+            let totalBelanja = 0;
+            
+            records.forEach(record => {
+                if (record.jenis === 'jualan') {
+                    totalJualan += record.jumlah || 0;
+                } else {
+                    totalBelanja += record.jumlah || 0;
+                }
+            });
+            
+            jualanAmounts.push(totalJualan);
+            belanjaAmounts.push(totalBelanja);
+            labels.push(selectedDate);
+            
+            drawChart(jualanAmounts, belanjaAmounts, labels);
         }
 
         // ==================== FILTER MODE CHANGE HANDLER ====================
@@ -995,7 +1014,7 @@
             });
         }
 
-        // ==================== DELETE RECORD ====================
+        // ==================== DELETE RECORD (NEW ONLY) ====================
         window.padamRekodTransaksi = async function(recordId) {
             if (!confirm('⚠️ Adakah anda pasti mahu memadamkan rekod transaksi kewangan ini?')) return;
             
