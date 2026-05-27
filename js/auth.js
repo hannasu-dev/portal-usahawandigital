@@ -1,9 +1,4 @@
-/**
- * UsahawanDigital - Authentication Logic
- * Menguruskan Pendaftaran, Log Masuk, dan Kawalan Sesi
- */
-
-// --- 1. HANDLE REGISTRATION ---
+// Handle Registration
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
@@ -16,7 +11,6 @@ if (registerForm) {
         const registerBtn = document.getElementById('registerBtn');
         const messageDiv = document.getElementById('registerMessage');
         
-        // Validasi ringkas
         if (password.length < 6) {
             messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
             return;
@@ -27,7 +21,7 @@ if (registerForm) {
         messageDiv.innerHTML = '';
         
         try {
-            // A. Daftar dengan Supabase Auth
+            // Register with Supabase Auth
             const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -42,7 +36,7 @@ if (registerForm) {
             if (error) throw error;
             
             if (data.user) {
-                // B. Simpan profil tambahan ke dalam table 'profiles'
+                // Create profile in profiles table
                 const { error: profileError } = await supabaseClient
                     .from('profiles')
                     .insert([
@@ -55,9 +49,9 @@ if (registerForm) {
                         }
                     ]);
                 
-                if (profileError) console.error('Ralat Profil:', profileError);
+                if (profileError) console.error('Profile error:', profileError);
                 
-                messageDiv.innerHTML = '<div class="message-box success">Pendaftaran berjaya! Anda akan dialihkan sebentar lagi...</div>';
+                messageDiv.innerHTML = '<div class="message-box success">Pendaftaran berjaya! Anda akan dihubungkan ke dashboard...</div>';
                 
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
@@ -73,7 +67,7 @@ if (registerForm) {
     });
 }
 
-// --- 2. HANDLE LOGIN ---
+// Handle Login
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -113,7 +107,7 @@ if (loginForm) {
     });
 }
 
-// --- 3. HANDLE LOGOUT ---
+// Handle Logout
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
@@ -123,17 +117,48 @@ if (logoutBtn) {
         
         if (error) {
             console.error('Logout error:', error);
-            alert('Ralat ketika log keluar');
-        } else {
-            window.location.href = 'index.html';
+        }
+        
+        window.location.href = 'index.html';
+    });
+}
+
+// Handle Forgot Password (Reset Password)
+const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        
+        if (!email) {
+            alert('Sila masukkan emel anda terlebih dahulu');
+            return;
+        }
+        
+        forgotPasswordBtn.textContent = 'Menghantar...';
+        forgotPasswordBtn.style.opacity = '0.7';
+        
+        try {
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html'
+            });
+            
+            if (error) throw error;
+            
+            alert('Link reset password telah dihantar ke emel anda. Sila semak kotak masuk/spam.');
+            
+        } catch (error) {
+            console.error('Reset password error:', error);
+            alert('Error: ' + error.message);
+        } finally {
+            forgotPasswordBtn.textContent = 'Lupa Kata Laluan?';
+            forgotPasswordBtn.style.opacity = '1';
         }
     });
 }
 
-// --- 4. NAVBAR & SESSION MANAGEMENT ---
-/**
- * Mengemaskini paparan navigasi berdasarkan status log masuk pengguna.
- */
+// Update navbar based on auth status
 async function updateNavbar() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     
@@ -141,7 +166,6 @@ async function updateNavbar() {
     const registerBtn = document.getElementById('registerNavBtn');
     const dashboardBtn = document.getElementById('dashboardNavBtn');
     
-    // Pastikan elemen wujud sebelum manipulasi style
     if (user) {
         if (loginBtn) loginBtn.style.display = 'none';
         if (registerBtn) registerBtn.style.display = 'none';
@@ -150,15 +174,20 @@ async function updateNavbar() {
         if (loginBtn) loginBtn.style.display = 'inline-block';
         if (registerBtn) registerBtn.style.display = 'inline-block';
         if (dashboardBtn) dashboardBtn.style.display = 'none';
-        
-        // Protect Dashboard: Jika pengguna tiada sesi dan berada di dashboard/jualan, tendang ke login
-        const protectedPages = ['dashboard.html', 'jualan.html'];
-        const currentPage = window.location.pathname.split('/').pop();
-        if (protectedPages.includes(currentPage)) {
-            window.location.href = 'login.html';
-        }
     }
 }
 
-// Jalankan pemeriksaan status setiap kali halaman dimuatkan
-document.addEventListener('DOMContentLoaded', updateNavbar);
+// Check auth status on page load
+async function checkAuth() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+        window.currentUser = user;
+        return user;
+    }
+    return null;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    updateNavbar();
+});
