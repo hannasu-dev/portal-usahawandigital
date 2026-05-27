@@ -15,239 +15,90 @@
             </div>
             <div class="nav-links">
                 <a href="index.html">Utama</a>
-                <a href="modul.html">Modul</a>
-                <a href="templat.html">Templat</a>
                 <a href="login.html">Log Masuk</a>
+                <a href="register.html" class="active">Daftar</a>
             </div>
         </div>
     </nav>
 
     <div class="auth-container">
         <div class="auth-card">
-            <div class="back-button-container">
-                <a href="index.html" class="back-btn">← Kembali ke Utama</a>
-            </div>
             <h2>Daftar Akaun Baru</h2>
             <p class="auth-subtitle">Percuma selama-lamanya untuk usahawan mikro</p>
-             
+            
             <form id="registerForm">
-                <div class="form-section">
-                    <h4>📋 Maklumat Asas</h4>
-                    <div class="form-group">
-                        <label>Nama Penuh</label>
-                        <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
-                    </div>
-                     
-                    <div class="form-group">
-                        <label>Emel</label>
-                        <input type="email" id="email" placeholder="email@contoh.com" required>
-                    </div>
-                     
-                    <div class="form-group">
-                        <label>Kata Laluan</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="password" placeholder="Minimum 6 aksara" required>
-                            <button type="button" class="toggle-password" id="togglePasswordBtn">👁️</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Nama Perniagaan</label>
-                        <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>📁 Kategori Perniagaan</label>
-                        <select id="businessCategory" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <option value="fnb">🍔 Makanan & Minuman (F&B)</option>
-                            <option value="retail">🛍️ Retail / Kedai Runcit</option>
-                            <option value="service">⚙️ Perkhidmatan (Service)</option>
-                            <option value="fashion">👗 Fesyen & Pakaian</option>
-                            <option value="craft">🎨 Kraf Tangan / Homemade</option>
-                            <option value="other">📝 Lain-lain</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>🏪 Jenis Perniagaan</label>
-                        <select id="businessType" required>
-                            <option value="">-- Pilih Jenis --</option>
-                            <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                            <option value="retail">👗 Retail / Butik</option>
-                            <option value="servis">✂️ Perkhidmatan / Servis</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" id="fullName" placeholder="contoh: Nurul Hanna Binti Suhaidy" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Emel</label>
+                    <input type="email" id="email" placeholder="email@contoh.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Kata Laluan (minimum 6 aksara)</label>
+                    <input type="password" id="password" placeholder="********" required>
                 </div>
 
-                <div class="form-section">
-                    <h4>🛒 Senarai Produk/Item Perniagaan</h4>
-                    <p class="section-note">Masukkan item awal yang anda jual. Item ini akan dipanggil secara automatik di halaman Rekod Jualan nanti supaya anda hanya perlu masukkan kuantiti sahaja.</p>
-                     
-                    <div id="itemsListContainer"></div>
-                     
-                    <button type="button" class="btn-add-item-reg" id="addItemBtn">+ Tambah Item Lagi</button>
+                <div class="form-group">
+                    <label>Nama Perniagaan (optional)</label>
+                    <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade">
                 </div>
-                 
+
+                <div class="form-group">
+                    <label>🏪 Jenis Perniagaan</label>
+                    <select id="businessType" required>
+                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                        <option value="retail">👗 Retail / Butik</option>
+                        <option value="servis">✂️ Perkhidmatan / Servis</option>
+                    </select>
+                    <small class="form-note">Jenis perniagaan ini akan menentukan kategori jualan & perbelanjaan anda nanti.</small>
+                </div>
+                
                 <button type="submit" class="btn-primary btn-full" id="registerBtn">Daftar Sekarang →</button>
             </form>
-             
+            
             <p class="auth-footer">
                 Sudah ada akaun? <a href="login.html">Log Masuk di sini</a>
             </p>
-            <div id="registerMessage" class="message-box"></div>
+            <div id="registerMessage" class="message-box" style="display:none;"></div>
         </div>
     </div>
 
+    <!-- Supabase Library CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
-     
+    
     <script>
-        // ==================== TOGGLE PASSWORD ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle password
-            const toggleBtn = document.getElementById('togglePasswordBtn');
-            const pwdField = document.getElementById('password');
-            if (toggleBtn && pwdField) {
-                toggleBtn.addEventListener('click', function() {
-                    const type = pwdField.type === 'password' ? 'text' : 'password';
-                    pwdField.type = type;
-                    this.textContent = type === 'password' ? '👁️' : '🙈';
-                });
-            }
-             
-            // Initialize items list
-            initItemsList();
-             
-            // Add item button
-            const addBtn = document.getElementById('addItemBtn');
-            if (addBtn) {
-                addBtn.addEventListener('click', function() {
-                    addNewItemRow();
-                });
-            }
-        });
-         
-        // Fungsi untuk mencipta baris item baru
-        function createItemRow() {
-            const div = document.createElement('div');
-            div.className = 'item-row-register';
-            div.innerHTML = `
-                <div class="item-col-reg">
-                    <input type="text" class="item-name-reg" placeholder="Nama Item (contoh: Mushroom Soup)" required>
-                </div>
-                <div class="item-col-reg">
-                    <input type="number" class="item-price-reg" placeholder="Harga seunit RM (contoh: 5.00)" step="0.01" required>
-                </div>
-                <div class="item-col-reg">
-                    <select class="item-category-reg" required>
-                        <option value="">Kategori Item</option>
-                        <option value="makanan">🍔 Makanan</option>
-                        <option value="minuman">🥤 Minuman</option>
-                        <option value="produk">📦 Produk</option>
-                        <option value="perkhidmatan">⚙️ Perkhidmatan</option>
-                    </select>
-                </div>
-                <div class="item-col-reg item-action">
-                    <button type="button" class="remove-item-btn">🗑️ Buang</button>
-                </div>
-            `;
-             
-            // Add event listener untuk button buang
-            const removeBtn = div.querySelector('.remove-item-btn');
-            removeBtn.addEventListener('click', function() {
-                removeItemRow(this);
-            });
-             
-            return div;
-        }
-         
-        // Fungsi untuk tambah baris item baru
-        function addNewItemRow() {
-            const container = document.getElementById('itemsListContainer');
-            const newRow = createItemRow();
-            container.appendChild(newRow);
-        }
-         
-        // Fungsi untuk buang baris item
-        function removeItemRow(button) {
-            const container = document.getElementById('itemsListContainer');
-            const rows = container.querySelectorAll('.item-row-register');
-             
-            if (rows.length <= 1) {
-                alert('Anda perlu memasukkan sekurang-kurangnya satu item perniagaan.');
-                return;
-            }
-             
-            button.closest('.item-row-register').remove();
-        }
-         
-        // Fungsi untuk initialize dengan satu baris item
-        function initItemsList() {
-            const container = document.getElementById('itemsListContainer');
-            if (container && container.children.length === 0) {
-                const firstRow = createItemRow();
-                container.appendChild(firstRow);
-            }
-        }
-         
-        // Fungsi untuk dapatkan semua item
-        function dapatkanSemuaItem() {
-            const items = [];
-            const rows = document.querySelectorAll('.item-row-register');
-             
-            rows.forEach(row => {
-                const name = row.querySelector('.item-name-reg').value.trim();
-                const price = parseFloat(row.querySelector('.item-price-reg').value);
-                const category = row.querySelector('.item-category-reg').value;
-                 
-                if (name && !isNaN(price) && price > 0) {
-                    items.push({ name: name, price: price, category: category });
-                }
-            });
-            return items;
-        }
-
-        // ==================== PROSES REGISTER KE SUPABASE ====================
+        // Handle Registration
         const registerForm = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('registerMessage');
+        
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                 
+                
                 const fullName = document.getElementById('fullName').value;
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
-                const businessName = document.getElementById('businessName').value;
-                const businessCategory = document.getElementById('businessCategory').value;
-                
-                // Mengambil nilai dari ID businessType yang baru dikemaskini
+                const businessName = document.getElementById('businessName').value || '';
                 const businessType = document.getElementById('businessType').value;
-                 
-                const items = dapatkanSemuaItem();
-                const messageDiv = document.getElementById('registerMessage');
-                 
-                if (!fullName || !email || !password || !businessName || !businessCategory || !businessType) {
-                    messageDiv.innerHTML = '<div class="message-box error">Sila lengkapkan semua maklumat asas</div>';
-                    return;
-                }
-                 
-                if (password.length < 6) {
-                    messageDiv.innerHTML = '<div class="message-box error">Kata laluan mesti sekurang-kurangnya 6 aksara</div>';
-                    return;
-                }
-                 
-                if (items.length === 0) {
-                    messageDiv.innerHTML = '<div class="message-box error">Sila masukkan sekurang-kurangnya satu item perniagaan yang sah</div>';
-                    return;
-                }
-                 
                 const registerBtn = document.getElementById('registerBtn');
+                
+                // Validation
+                if (password.length < 6) {
+                    showMessage('Kata laluan mesti sekurang-kurangnya 6 aksara', 'error');
+                    return;
+                }
+                
                 registerBtn.disabled = true;
                 registerBtn.textContent = 'Mendaftar...';
-                messageDiv.innerHTML = '';
-                 
+                messageDiv.style.display = 'none';
+                
                 try {
-                    // 1. Daftar pengguna (Sertakan business_type di dalam user metadata)
+                    // Register with Supabase Auth
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
@@ -255,54 +106,84 @@
                             data: {
                                 full_name: fullName,
                                 business_name: businessName,
-                                business_category: businessCategory,
-                                business_type: businessType
+                                business_type: businessType,
+                                jenis_perniagaan: businessType
                             }
                         }
                     });
-                     
+                    
                     if (error) throw error;
-                     
+                    
                     if (data.user) {
-                        // 2. Simpan profil ke dalam jadual 'profiles' beserta business_type
-                        await supabaseClient
+                        // Create profile in profiles table
+                        const { error: profileError } = await supabaseClient
                             .from('profiles')
-                            .insert([{
-                                id: data.user.id,
-                                full_name: fullName,
-                                email: email,
-                                business_name: businessName,
-                                business_category: businessCategory,
-                                business_type: businessType
-                            }]);
-                         
-                        // 3. Simpan item-item produk awal
-                        const itemsToInsert = items.map(item => ({
-                            user_id: data.user.id,
-                            item_name: item.name,
-                            item_price: item.price,
-                            category: item.category
-                        }));
-                         
-                        await supabaseClient
-                            .from('user_items')
-                            .insert(itemsToInsert);
-                         
-                        messageDiv.innerHTML = '<div class="message-box success">✅ Pendaftaran berjaya! Menghubungkan ke dashboard...</div>';
-                         
+                            .insert([
+                                {
+                                    id: data.user.id,
+                                    full_name: fullName,
+                                    email: email,
+                                    business_name: businessName,
+                                    business_type: businessType,
+                                    jenis_perniagaan: businessType,
+                                    created_at: new Date().toISOString()
+                                }
+                            ]);
+                        
+                        if (profileError) {
+                            console.error('Profile error:', profileError);
+                            // If profile insert fails, but auth success, still let user know
+                            showMessage('Pendaftaran berjaya! Tetapi terdapat ralat menyimpan profil. Sila log masuk dan kemas kini profil anda.', 'warning');
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 3000);
+                            return;
+                        }
+                        
+                        showMessage('Pendaftaran berjaya! Anda akan dihubungkan ke dashboard...', 'success');
+                        
                         setTimeout(() => {
                             window.location.href = 'dashboard.html';
                         }, 2000);
                     }
                 } catch (error) {
-                    console.error('Pendaftaran gagal:', error);
-                    messageDiv.innerHTML = `<div class="message-box error">❌ Ralat: ${error.message}</div>`;
+                    console.error('Registration error:', error);
+                    showMessage(`Ralat: ${error.message}`, 'error');
                 } finally {
                     registerBtn.disabled = false;
                     registerBtn.textContent = 'Daftar Sekarang →';
                 }
             });
         }
+        
+        function showMessage(msg, type) {
+            messageDiv.style.display = 'block';
+            messageDiv.className = `message-box ${type}`;
+            messageDiv.innerHTML = msg;
+            
+            // Auto hide after 5 seconds for success, keep error longer
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // For form-note styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .form-note {
+                display: block;
+                font-size: 0.7rem;
+                color: #64748b;
+                margin-top: 0.3rem;
+            }
+            .message-box.warning {
+                background: #fef3c7;
+                color: #d97706;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
