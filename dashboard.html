@@ -1,195 +1,48 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - UsahawanDigital</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
-            <div class="nav-links">
-                <a href="dashboard.html">Dashboard</a>
-                <a href="modul.html">Modul</a>
-                <a href="jualan.html">Rekod Jualan</a>
-                <a href="templat.html">Templat</a>
-                <a href="#" id="logoutBtn">Log Keluar</a>
-            </div>
+<div id="profileModal" class="modal">
+    <div class="modal-content modal-large">
+        <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+        
+        <div class="modal-header">
+            <h3>⚙️ Kemaskini Profil & Produk</h3>
         </div>
-    </nav>
-
-    <div class="dashboard-container">
-        <div class="container">
-            <!-- Profile Card -->
-            <div class="profile-card">
-                <div class="profile-info">
-                    <div class="profile-avatar">👤</div>
-                    <div class="profile-details">
-                        <h2>Selamat Datang, <span id="userName">Usahawan</span>!</h2>
-                        <p id="businessNameDisplay">🏪 Perniagaan: -</p>
-                        <p id="businessTypeDisplay">📋 Jenis Bisnes: 🍔 Makanan & Minuman</p>
-                    </div>
-                    <button class="btn-edit-profile" id="editProfileBtn">⚙️ Tetapan Profil</button>
-                </div>
-            </div>
-
-            <!-- Dashboard Grid Menu -->
-            <div class="dashboard-grid">
-                <a href="modul.html" class="dashboard-card">
-                    <div class="card-icon">📚</div>
-                    <h3>Modul Pembelajaran</h3>
-                    <p>Video, infografik & panduan bergambar</p>
-                </a>
-                <a href="jualan.html" class="dashboard-card">
-                    <div class="card-icon">💰</div>
-                    <h3>Rekod Jualan</h3>
-                    <p>Catat jualan & perbelanjaan dengan detail item</p>
-                </a>
-                <a href="templat.html" class="dashboard-card">
-                    <div class="card-icon">📄</div>
-                    <h3>Templat Perniagaan</h3>
-                    <p>Invois, caption & dokumen perniagaan</p>
-                </a>
-                <div class="dashboard-card tip-card">
-                    <div class="card-icon">💡</div>
-                    <h3>Tip Hari Ini</h3>
-                    <p>"Gunakan kata laluan yang berbeza untuk setiap akaun perniagaan anda."</p>
-                </div>
-            </div>
-
-            <!-- Progress Section -->
-            <div class="progress-section">
-                <h3>📈 Kemajuan Anda</h3>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul Pemasaran Digital</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul e-Pembayaran</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul Keselamatan Dalam Talian</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <p class="progress-note">✨ Selepas login, anda boleh tandakan modul yang sudah selesai (akan datang)</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Profil (dengan senarai produk) - LAYOUT KEMAS -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3>⚙️ Tetapan Profil Perniagaan</h3>
-                <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+        
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="editBusinessName">Nama Perniagaan</label>
+                <input type="text" id="editBusinessName" required placeholder="Masukkan nama bisnes anda">
             </div>
             
-            <form id="profileForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>🏪 Nama Perniagaan</label>
-                        <input type="text" id="editBusinessName" placeholder="Nama perniagaan anda">
+            <div class="form-group">
+                <label for="editBusinessType">Jenis Perniagaan</label>
+                <select id="editBusinessType" required>
+                    <option value="fnb">🍔 Makanan & Minuman (F&B)</option>
+                    <option value="retail">👗 Peruncitan (Retail)</option>
+                    <option value="servis">✂️ Perkhidmatan (Servis)</option>
+                </select>
+            </div>
+            
+            <div class="profile-products-section">
+                <div class="products-header">
+                    <div class="products-title">
+                        <span class="products-icon">📦</span>
+                        <h4>Senarai Produk Anda</h4>
                     </div>
-                    <div class="form-group">
-                        <label>📋 Jenis Perniagaan</label>
-                        <select id="editBusinessType" required>
-                            <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                            <option value="retail">👗 Retail / Butik</option>
-                            <option value="servis">✂️ Perkhidmatan / Servis</option>
-                        </select>
-                    </div>
+                    <button type="button" id="addProductInModalBtn" class="btn-add-product">+ Tambah Produk</button>
                 </div>
+                <p class="form-note">Semua produk yang anda daftarkan akan dipaparkan di bawah.</p>
                 
-                <!-- Products Management inside Profile Modal - SCROLLABLE -->
-                <div class="profile-products-section">
-                    <div class="products-header">
-                        <div class="products-title">
-                            <span class="products-icon">📦</span>
-                            <h4>Senarai Produk / Item Perniagaan</h4>
+                <div class="products-list-container">
+                    <div id="productsListInModal" class="products-list-modal">
                         </div>
-                        <button type="button" class="btn-add-product" id="addProductInModalBtn">+ Tambah Produk</button>
-                    </div>
-                    <p class="form-note">💡 Produk ini akan memudahkan anda mengisi rekod jualan nanti.</p>
-                    
-                    <!-- Scrollable Products List -->
-                    <div class="products-list-container">
-                        <div id="productsListInModal" class="products-list-modal">
-                            <div class="loading-state">📂 Loading produk...</div>
-                        </div>
-                    </div>
                 </div>
-                
-                <div class="modal-actions">
-                    <button type="submit" class="btn-primary">💾 Simpan Perubahan</button>
-                    <button type="button" class="btn-outline" onclick="closeProfileModal()">Batal</button>
-                </div>
-            </form>
-            <div id="profileMessage" class="message-box" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- Modal untuk Tambah/Edit Produk -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="productModalTitle">➕ Tambah Produk</h3>
-                <span class="close-modal" onclick="closeProductModal()">&times;</span>
             </div>
-            <form id="productForm">
-                <input type="hidden" id="editProductId" value="">
-                <div class="form-group">
-                    <label>📝 Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Cth: Kek Coklat, Air Sirap" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>💰 Harga Seunit (RM)</label>
-                        <input type="number" id="productPrice" step="0.01" min="0" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📁 Kategori</label>
-                        <select id="productCategory" required>
-                            <option value="">Pilih kategori</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button type="submit" class="btn-primary">💾 Simpan Produk</button>
-                    <button type="button" class="btn-outline" onclick="closeProductModal()">Batal</button>
-                </div>
-            </form>
-            <div id="productMessage" class="message-box" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- Modal Delete Confirmation -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h3>⚠️ Padam Produk?</h3>
-                <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
+            
+            <div id="profileMessage" class="message-box" style="display: none;"></div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeProfileModal()">Batal</button>
+                <button type="submit" class="btn-primary">Simpan Profil</button>
             </div>
-            <p>Produk ini akan dikeluarkan dari senarai. Tindakan ini tidak boleh dibatalkan.</p>
-            <div class="delete-actions">
-                <button class="btn-outline" onclick="closeDeleteModal()">Batal</button>
-                <button class="btn-danger" id="confirmDeleteBtn">Padam</button>
-            </div>
-        </div>
+        </form>
     </div>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/dashboard.js"></script>
-</body>
-</html>
+</div>
