@@ -26,7 +26,7 @@
 
     <div class="dashboard-container">
         <div class="container">
-            <!-- Profile Card dengan Edit Button -->
+            <!-- Profile Card -->
             <div class="profile-card">
                 <div class="profile-info">
                     <div class="profile-avatar">👤</div>
@@ -36,6 +36,19 @@
                         <p id="businessTypeDisplay">📋 Jenis Bisnes: 🍔 Makanan & Minuman</p>
                     </div>
                     <button class="btn-edit-profile" id="editProfileBtn">⚙️ Tetapan Profil</button>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="products-section">
+                <div class="products-header">
+                    <h3>📦 Senarai Produk / Item Perniagaan</h3>
+                    <button class="btn-add-product" id="addProductBtn">+ Tambah Produk</button>
+                </div>
+                <p class="products-note">Tambahkan produk/item perniagaan anda untuk memudahkan pengisian rekod jualan nanti.</p>
+                
+                <div id="productsList" class="products-list">
+                    <p class="loading-text">📂 Loading produk...</p>
                 </div>
             </div>
 
@@ -108,6 +121,48 @@
                 <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
             </form>
             <div id="profileMessage" class="message-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Tambah/Edit Produk -->
+    <div id="productModal" class="modal">
+        <div class="modal-content modal-product">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <h3 id="productModalTitle">➕ Tambah Produk Baru</h3>
+            <form id="productForm">
+                <input type="hidden" id="editProductId" value="">
+                <div class="form-group">
+                    <label>📝 Nama Produk/Item</label>
+                    <input type="text" id="productName" placeholder="Contoh: Kek Coklat, Air Sirap, Baju Kurung" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>💰 Harga Seunit (RM)</label>
+                        <input type="number" id="productPrice" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📁 Kategori Produk</label>
+                        <select id="productCategory" required>
+                            <option value="">Pilih kategori</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary btn-full" id="saveProductBtn">💾 Simpan Produk</button>
+            </form>
+            <div id="productMessage" class="message-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Delete Confirmation -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
+            <h3>⚠️ Padam Produk?</h3>
+            <p>Adakah anda pasti mahu memadam produk ini? Tindakan ini tidak boleh dibatalkan.</p>
+            <div class="delete-actions">
+                <button class="btn-outline" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn-danger" id="confirmDeleteBtn">Padam</button>
+            </div>
         </div>
     </div>
 
