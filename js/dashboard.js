@@ -86,11 +86,11 @@ function displayProductsInModal(products) {
                 <div class="product-info-modal">
                     <span class="product-name-modal">📦 ${escapeHtml(product.name)}</span>
                     <span class="product-price-modal">RM ${product.price.toFixed(2)}</span>
-                    <span class="product-category-modal">${escapeHtml(product.category)}</span>
+                    <span class="product-category-modal">📁 ${escapeHtml(product.category)}</span>
                 </div>
                 <div class="product-actions-modal">
-                    <button type="button" class="btn-edit-product-modal" onclick="editProduct('${product.id}')">✏️ Edit</button>
-                    <button type="button" class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')">🗑️ Padam</button>
+                    <button type="button" class="btn-edit-product-modal" onclick="editProduct('${product.id}')" title="Edit">✏️</button>
+                    <button type="button" class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')" title="Padam">🗑️</button>
                 </div>
             </div>
         `;
