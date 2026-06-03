@@ -1,9 +1,13 @@
-// Global variables
+// ==========================================================================
+// GLOBAL VARIABLES
+// ==========================================================================
 let currentBusinessType = 'fnb';
 let currentProducts = [];
 let productToDelete = null;
 
-// Load data on page load
+// ==========================================================================
+// INITIALIZATION
+// ==========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await checkAuth();
     if (!user) {
@@ -15,9 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 });
 
-// =========================================
+// ==========================================================================
 // PROFILE FUNCTIONS
-// =========================================
+// ==========================================================================
 async function loadUserProfile(userId) {
     try {
         const { data: profile, error } = await supabaseClient
@@ -43,15 +47,15 @@ async function loadUserProfile(userId) {
     }
 }
 
-// =========================================
+// ==========================================================================
 // PRODUCTS FUNCTIONS (Dalam Modal)
-// =========================================
+// ==========================================================================
 async function loadProducts() {
     const user = await checkAuth();
     if (!user) return;
     
     const productsContainer = document.getElementById('productsListInModal');
-    productsContainer.innerHTML = '<p class="loading-text">📂 Loading produk...</p>';
+    productsContainer.innerHTML = '<div class="loading-state">📂 Loading produk...</div>';
     
     try {
         const { data, error } = await supabaseClient
@@ -64,34 +68,33 @@ async function loadProducts() {
         currentProducts = data || [];
         displayProductsInModal(currentProducts);
     } catch (error) {
-        productsContainer.innerHTML = '<p class="error-text">❌ Ralat memuatkan produk.</p>';
+        productsContainer.innerHTML = '<div class="loading-state">❌ Ralat memuatkan produk.</div>';
     }
 }
 
 function displayProductsInModal(products) {
     const container = document.getElementById('productsListInModal');
     if (products.length === 0) {
-        container.innerHTML = '<p class="no-products">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</p>';
+        container.innerHTML = '<div class="empty-state">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</div>';
         return;
     }
     
-    let html = '<div class="products-grid-modal">';
+    let html = '';
     products.forEach(product => {
         html += `
             <div class="product-item-modal">
                 <div class="product-info-modal">
-                    <strong>📦 ${escapeHtml(product.name)}</strong>
+                    <span class="product-name-modal">📦 ${escapeHtml(product.name)}</span>
                     <span class="product-price-modal">RM ${product.price.toFixed(2)}</span>
-                    <span class="product-category-modal">📁 ${escapeHtml(product.category)}</span>
+                    <span class="product-category-modal">${escapeHtml(product.category)}</span>
                 </div>
                 <div class="product-actions-modal">
-                    <button class="btn-edit-product" onclick="editProduct('${product.id}')">✏️</button>
-                    <button class="btn-delete-product" onclick="confirmDeleteProduct('${product.id}')">🗑️</button>
+                    <button class="btn-edit-product-modal" onclick="editProduct('${product.id}')">✏️ Edit</button>
+                    <button class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')">🗑️ Padam</button>
                 </div>
             </div>
         `;
     });
-    html += '</div>';
     container.innerHTML = html;
 }
 
@@ -102,9 +105,9 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// =========================================
-// MODAL CONTROLS
-// =========================================
+// ==========================================================================
+// EVENT LISTENERS & MODAL CONTROLS
+// ==========================================================================
 function setupEventListeners() {
     const editBtn = document.getElementById('editProfileBtn');
     if (editBtn) editBtn.addEventListener('click', () => openProfileModal());
@@ -143,7 +146,7 @@ async function openProfileModal() {
         document.getElementById('editBusinessName').value = profile.business_name || '';
         document.getElementById('editBusinessType').value = profile.business_type || profile.jenis_perniagaan || 'fnb';
         
-        // Load products for display
+        // Load products for inside structural display
         await loadProducts();
         
         document.getElementById('profileModal').style.display = 'block';
@@ -196,9 +199,9 @@ async function updateProfile() {
     }
 }
 
-// =========================================
-// PRODUCT CRUD
-// =========================================
+// ==========================================================================
+// PRODUCT CRUD FUNCTIONS
+// ==========================================================================
 function populateCategoryDropdown(select, businessType) {
     const categories = {
         fnb: [
@@ -300,7 +303,7 @@ async function saveProduct() {
         
         setTimeout(() => {
             closeProductModal();
-            loadProducts(); // Refresh product list in modal
+            loadProducts(); // Refresh dynamic list inside parent modal
         }, 1500);
     } catch (error) {
         messageDiv.className = 'message-box error';
@@ -349,7 +352,9 @@ async function deleteProduct() {
     }
 }
 
-// Close modals on outside click
+// ==========================================================================
+// CLOSING MODALS VIA OUTSIDE WINDOW CLICKS
+// ==========================================================================
 window.onclick = function(event) {
     if (event.target === document.getElementById('profileModal')) closeProfileModal();
     if (event.target === document.getElementById('productModal')) closeProductModal();
