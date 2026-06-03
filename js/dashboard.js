@@ -74,11 +74,14 @@ async function loadProducts() {
 
 function displayProductsInModal(products) {
     const container = document.getElementById('productsListInModal');
+    
+    // 1. Jika tiada produk, paparkan mesej kosong yang kemas
     if (products.length === 0) {
         container.innerHTML = '<div class="empty-state">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</div>';
         return;
     }
     
+    // 2. Jana struktur HTML baharu (Sebaris & Sokong Skrol)
     let html = '';
     products.forEach(product => {
         html += `
@@ -95,6 +98,7 @@ function displayProductsInModal(products) {
             </div>
         `;
     });
+    
     container.innerHTML = html;
 }
 
