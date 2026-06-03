@@ -89,8 +89,8 @@ function displayProductsInModal(products) {
                     <span class="product-category-modal">${escapeHtml(product.category)}</span>
                 </div>
                 <div class="product-actions-modal">
-                    <button class="btn-edit-product-modal" onclick="editProduct('${product.id}')">✏️ Edit</button>
-                    <button class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')">🗑️ Padam</button>
+                    <button type="button" class="btn-edit-product-modal" onclick="editProduct('${product.id}')">✏️ Edit</button>
+                    <button type="button" class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')">🗑️ Padam</button>
                 </div>
             </div>
         `;
@@ -146,7 +146,6 @@ async function openProfileModal() {
         document.getElementById('editBusinessName').value = profile.business_name || '';
         document.getElementById('editBusinessType').value = profile.business_type || profile.jenis_perniagaan || 'fnb';
         
-        // Load products for inside structural display
         await loadProducts();
         
         document.getElementById('profileModal').style.display = 'block';
@@ -303,7 +302,7 @@ async function saveProduct() {
         
         setTimeout(() => {
             closeProductModal();
-            loadProducts(); // Refresh dynamic list inside parent modal
+            loadProducts(); 
         }, 1500);
     } catch (error) {
         messageDiv.className = 'message-box error';
