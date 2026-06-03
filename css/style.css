@@ -1751,7 +1751,6 @@ footer {
         align-items: flex-start;
     }
     
-    /* Transaction Dynamic Table Inputs */
     .item-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -1788,7 +1787,6 @@ footer {
         text-align: center;
     }
     
-    /* Products Section (Responsive Override) */
     .products-header {
         flex-direction: column;
         align-items: stretch;
@@ -1814,7 +1812,6 @@ footer {
         grid-template-columns: 1fr;
     }
     
-    /* Registration Input Element Groups */
     .item-row-register {
         flex-direction: column;
     }
@@ -1840,7 +1837,6 @@ footer {
         text-align: center;
     }
     
-    /* Dashboard Profile Card Responsive adjustments */
     .profile-info {
         flex-direction: column;
         text-align: center;
@@ -1851,7 +1847,6 @@ footer {
         margin-top: 0.5rem;
     }
 
-    /* Modal Mobile Responsive Layout Extensions */
     .modal-large {
         width: 95%;
         margin: 10% auto;
