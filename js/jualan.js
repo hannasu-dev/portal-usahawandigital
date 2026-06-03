@@ -61,6 +61,7 @@ let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
 let currentUserBusinessType = 'fnb';
+let userProductsCache = []; // Cache untuk menyimpan senarai produk pengguna
 
 // =========================================
 // 2. FUNGSI RENDER DROPDOWN KATEGORI DINAMIK
@@ -90,6 +91,13 @@ function renderDynamicCategories(jenisPerniagaan) {
     
     if (kategoriList.length > 0 && kategoriSelect.options.length > 1) {
         kategoriSelect.value = kategoriList[0].value;
+    }
+
+    // Refresh baris item yang sedia ada untuk kemas kini input nama/dropdown produk
+    const itemRows = document.querySelectorAll('.item-row');
+    if (itemRows.length > 0) {
+        document.getElementById('itemsList').innerHTML = '';
+        addItemRow();
     }
 }
 
@@ -139,21 +147,49 @@ function setupJenisTransaksiListener() {
 }
 
 // =========================================
-// 4. ITEM MANAGEMENT FUNCTIONS (IMPROVED LAYOUT)
+// 4. ITEM MANAGEMENT FUNCTIONS (WITH PRODUCT DROPDOWN)
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
     if (!itemsList) return;
     
     const itemId = Date.now() + itemCounter++;
+    const jenisTransaksi = document.getElementById('jenis')?.value || 'jualan';
     
     const itemRow = document.createElement('div');
     itemRow.className = 'item-row';
     itemRow.id = `item-${itemId}`;
+    
+    // Jana input nama item berdasarkan jenis transaksi (Dropdown jika Jualan & ada produk sedia ada)
+    let nameColumnHtml = '';
+    
+    if (jenisTransaksi === 'jualan' && userProductsCache.length > 0) {
+        let optionsHtml = '<option value="">-- Pilih Produk --</option>';
+        userProductsCache.forEach(prod => {
+            optionsHtml += `<option value="${prod.name}" data-price="${prod.price || 0}">${prod.name} (RM ${(prod.price || 0).toFixed(2)})</option>`;
+        });
+        optionsHtml += '<option value="custom">✍️ Taip Manual...</option>';
+        
+        nameColumnHtml = `
+            <label>🛍️ Pilih Produk</label>
+            <div class="product-select-wrapper" style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <select class="item-product-select" onchange="handleProductSelectChange('${itemId}', this)" required>
+                    ${optionsHtml}
+                </select>
+                <input type="text" class="item-name" placeholder="Nama item manual" style="display: none;">
+            </div>
+        `;
+    } else {
+        // Jika Perbelanjaan atau pengguna belum daftar sebarang produk, tunjuk input text biasa
+        nameColumnHtml = `
+            <label>📝 Nama Item</label>
+            <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap, Kos Pembungkusan" required>
+        `;
+    }
+    
     itemRow.innerHTML = `
         <div class="item-col item-name-col">
-            <label>📝 Nama Item</label>
-            <input type="text" class="item-name" placeholder="Contoh: Kek Coklat, Air Sirap" required>
+            ${nameColumnHtml}
         </div>
         <div class="item-col item-qty-col">
             <label>🔢 Kuantiti</label>
@@ -179,6 +215,40 @@ function addItemRow() {
     
     itemsList.appendChild(itemRow);
     calculateTotalAmount();
+}
+
+// Fungsi baru untuk menguruskan auto-isi harga apabila produk dipilih
+function handleProductSelectChange(itemId, selectElement) {
+    const itemRow = document.getElementById(`item-${itemId}`);
+    if (!itemRow) return;
+    
+    const textInput = itemRow.querySelector('.item-name');
+    const priceInput = itemRow.querySelector('.item-price');
+    
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    
+    if (selectElement.value === 'custom') {
+        // Jika pilih "Taip Manual", paparkan input text dan reset harga
+        textInput.style.display = 'block';
+        textInput.value = '';
+        textInput.required = true;
+        priceInput.value = 0;
+    } else if (selectElement.value !== '') {
+        // Jika pilih produk sedia ada, masukkan nilai nama ke input tersembunyi dan auto-isi harga
+        textInput.style.display = 'none';
+        textInput.value = selectElement.value;
+        textInput.required = false;
+        
+        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+        priceInput.value = price;
+    } else {
+        // Jika kembali kepada default "-- Pilih Produk --"
+        textInput.style.display = 'none';
+        textInput.value = '';
+        priceInput.value = 0;
+    }
+    
+    calculateItemSubtotal(itemId);
 }
 
 function removeItemRow(itemId) {
@@ -223,10 +293,12 @@ function getItemsData() {
     const items = [];
     
     itemRows.forEach(row => {
-        const name = row.querySelector('.item-name').value.trim();
+        const nameInput = row.querySelector('.item-name');
+        const name = nameInput ? nameInput.value.trim() : '';
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        if (name && quantity > 0 && price > 0) {
+        
+        if (name && quantity > 0 && price >= 0) {
             items.push({ name, quantity, price, subtotal: quantity * price });
         }
     });
@@ -245,6 +317,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = 'login.html';
         return;
     }
+    
+    // Muatkan produk pengguna dan masukkan ke dalam global cache terlebih dahulu
+    userProductsCache = await loadUserProducts();
     
     addItemRow();
     currentUserBusinessType = await getUserBusinessType();
@@ -276,7 +351,7 @@ if (jualanForm) {
         
         if (!tarikh) { alert('Sila pilih tarikh'); return; }
         if (!kategori) { alert('Sila pilih kategori'); return; }
-        if (items.length === 0) { alert('Sila tambah sekurang-kurangnya satu item'); return; }
+        if (items.length === 0) { alert('Sila tambah sekurang-kurangnya satu item lengkap dengan nama'); return; }
         if (total <= 0) { alert('Jumlah mesti lebih dari RM0'); return; }
         
         const submitBtn = document.getElementById('submitBtn');
@@ -302,6 +377,9 @@ if (jualanForm) {
             document.getElementById('tarikh').valueAsDate = new Date();
             document.getElementById('itemsList').innerHTML = '';
             itemCounter = 0;
+            
+            // Muatkan semula produk terkini jika ada perubahan di database
+            userProductsCache = await loadUserProducts();
             addItemRow();
             renderDynamicCategories(currentUserBusinessType);
             
@@ -508,4 +586,26 @@ async function generateReport() {
     const printWindow = window.open('', '_blank');
     printWindow.document.write(reportHtml);
     printWindow.document.close();
+}
+
+// =========================================
+// 9. PRODUCT FETCH DATA FROM DATABASE
+// =========================================
+async function loadUserProducts() {
+    const user = await checkAuth();
+    if (!user) return [];
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('products')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('name', { ascending: true });
+        
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('Error loading products:', error);
+        return [];
+    }
 }
