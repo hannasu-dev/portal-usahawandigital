@@ -575,3 +575,113 @@ footer {
         padding-top: 0.4rem;
     }
 }
+/* ==========================================================================
+   REKABENTUK KOTAK SKROL PRODUK (JIMAT RUANG)
+   ========================================================================== */
+
+/* Kotak luar yang mengawal had tinggi senarai produk */
+.modal-scroll-box {
+    width: 100%;
+    max-height: 220px;          /* Had tinggi: muat dalam 3 item sebelum skrol muncul */
+    overflow-y: auto !important; /* Paksa skrol menegak aktif */
+    border: 1px solid #cbd5e1;   /* Border kelabu kemas */
+    border-radius: 12px;
+    background: #f8fafc;        /* Latar belakang lembut */
+    margin-top: 10px;
+    padding: 5px;
+}
+
+/* Custom Scrollbar supaya nampak premium */
+.modal-scroll-box::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-scroll-box::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+.modal-scroll-box::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+/* Container untuk baris item */
+.modal-scroll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Rekabentuk setiap baris produk (Sebaris / Horizontal) */
+.modal-product-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Bahagian Kiri: Nama & Info Harga */
+.product-details-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.p-icon {
+    font-size: 1.2rem;
+}
+
+.p-texts {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-name {
+    font-size: 0.95rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.p-meta {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Bahagian Kanan: Butang Aksi Sebaris */
+.product-actions-right {
+    display: flex;
+    gap: 6px;
+}
+
+/* Butang Edit & Padam Versi Kompak */
+.btn-action-edit, .btn-action-delete {
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-action-edit {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+.btn-action-edit:hover {
+    background: #bae6fd;
+}
+
+.btn-action-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.btn-action-delete:hover {
+    background: #fecaca;
+}
