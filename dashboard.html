@@ -82,56 +82,48 @@
 
     <!-- Modal Profil (dengan senarai produk) - LAYOUT KEMAS -->
     <div id="profileModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3>⚙️ Tetapan Profil Perniagaan</h3>
-                <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+        
+        <div class="modal-header">
+            <h3>⚙️ Tetapan Profil Perniagaan</h3>
+        </div>
+        
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="editBusinessName">🏪 Nama Perniagaan</label>
+                <input type="text" id="editBusinessName" required placeholder="Masukkan nama bisnes anda">
             </div>
             
-            <form id="profileForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>🏪 Nama Perniagaan</label>
-                        <input type="text" id="editBusinessName" placeholder="Nama perniagaan anda">
-                    </div>
-                    <div class="form-group">
-                        <label>📋 Jenis Perniagaan</label>
-                        <select id="editBusinessType" required>
-                            <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                            <option value="retail">👗 Retail / Butik</option>
-                            <option value="servis">✂️ Perkhidmatan / Servis</option>
-                        </select>
-                    </div>
+            <div class="form-group">
+                <label for="editBusinessType">📋 Jenis Perniagaan</label>
+                <select id="editBusinessType" required>
+                    <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                    <option value="retail">👗 Retail (Peruncitan)</option>
+                    <option value="servis">✂️ Servis (Perkhidmatan)</option>
+                </select>
+            </div>
+            
+            <div class="profile-products-section">
+                <div class="products-header">
+                    <h4>📦 Senarai Produk / Item Perniagaan</h4>
+                    <button type="button" id="addProductInModalBtn" class="btn-add-product">+ Tambah Produk</button>
                 </div>
+                <p class="form-note">Produk ini akan muncul sebagai pilihan semasa mengisi rekod jualan.</p>
                 
-                <!-- Products Management inside Profile Modal - SCROLLABLE -->
-                <div class="profile-products-section">
-                    <div class="products-header">
-                        <div class="products-title">
-                            <span class="products-icon">📦</span>
-                            <h4>Senarai Produk / Item Perniagaan</h4>
-                        </div>
-                        <button type="button" class="btn-add-product" id="addProductInModalBtn">+ Tambah Produk</button>
+                <div id="productsListInModal">
                     </div>
-                    <p class="form-note">💡 Produk ini akan memudahkan anda mengisi rekod jualan nanti.</p>
-                    
-                    <!-- Scrollable Products List -->
-                    <div class="products-list-container">
-                        <div id="productsListInModal" class="products-list-modal">
-                            <div class="loading-state">📂 Loading produk...</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-actions">
-                    <button type="submit" class="btn-primary">💾 Simpan Perubahan</button>
-                    <button type="button" class="btn-outline" onclick="closeProfileModal()">Batal</button>
-                </div>
-            </form>
-            <div id="profileMessage" class="message-box" style="display:none;"></div>
-        </div>
+            </div>
+            
+            <div id="profileMessage" class="message-box" style="display: none;"></div>
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
+            </div>
+        </form>
     </div>
-
+</div>
+    
     <!-- Modal untuk Tambah/Edit Produk -->
     <div id="productModal" class="modal">
         <div class="modal-content">
