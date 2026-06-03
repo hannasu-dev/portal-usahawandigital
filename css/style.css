@@ -1143,7 +1143,171 @@ body {
 }
 
 /* ==========================================================================
-   NAVIGATION NAVIGATION BACK BUTTON
+   ITEMIZED FORM STYLES (DASHBOARD TRANSACTION TABLE)
+   ========================================================================== */
+.items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.items-header span {
+    font-weight: 600;
+    color: #1a5f7a;
+    font-size: 1rem;
+}
+
+.btn-add-item {
+    background: #1a5f7a;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-add-item:hover {
+    background: #0e4a62;
+    transform: scale(1.02);
+}
+
+#itemsList {
+    margin-bottom: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+#itemsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#itemsList::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+#itemsList::-webkit-scrollbar-thumb {
+    background: #1a5f7a;
+    border-radius: 10px;
+}
+
+.item-row {
+    display: grid;
+    grid-template-columns: 2.5fr 0.8fr 0.8fr 0.8fr 0.5fr;
+    gap: 0.8rem;
+    align-items: center;
+    background: #f8fafc;
+    padding: 0.8rem;
+    border-radius: 12px;
+    margin-bottom: 0.8rem;
+    border: 1px solid #e2e8f0;
+}
+
+.item-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.item-col label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.item-col input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.item-col input:focus {
+    outline: none;
+    border-color: #1a5f7a;
+    box-shadow: 0 0 0 2px rgba(26, 95, 122, 0.1);
+}
+
+.item-subtotal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0f2fe;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #1a5f7a;
+    text-align: center;
+    height: 100%;
+    min-height: 38px;
+}
+
+.btn-remove-item {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-remove-item:hover {
+    background: #fecaca;
+    transform: scale(1.02);
+}
+
+.items-total {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.total-row span {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.total-row strong {
+    font-size: 1.3rem;
+    color: #1a5f7a;
+    background: white;
+    padding: 0.3rem 1rem;
+    border-radius: 30px;
+}
+
+/* ==========================================================================
+   NAVIGATION BACK BUTTON
    ========================================================================== */
 .back-button-container {
     margin-bottom: 1rem;
@@ -1253,7 +1417,7 @@ footer {
         align-items: flex-start;
     }
     
-    /* Transaction Dynamic Table Inputs */
+    /* Transaction Dynamic Table Inputs (Responsive Override) */
     .item-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -1263,15 +1427,31 @@ footer {
         width: 100%;
     }
     
+    .item-subtotal {
+        text-align: center;
+        padding: 0.5rem;
+    }
+    
     .btn-remove-item {
         width: 100%;
-        margin-top: 0.5rem;
+        margin-top: 0.3rem;
     }
     
     .items-header {
         flex-direction: column;
+        align-items: stretch;
+        text-align: center;
         gap: 0.5rem;
-        align-items: flex-start;
+    }
+    
+    .btn-add-item {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .total-row {
+        flex-direction: column;
+        text-align: center;
     }
     
     /* Registration Input Element Groups */
