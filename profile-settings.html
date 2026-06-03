@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetapan Profil - UsahawanDigital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="modul.html">Modul</a>
+                <a href="jualan.html">Rekod Jualan</a>
+                <a href="templat.html">Templat</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-settings-container">
+        <div class="back-button-container">
+            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+        </div>
+
+        <div class="profile-settings-card">
+            <h2>⚙️ Tetapan Profil Perniagaan</h2>
+            
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>🏪 Nama Perniagaan</label>
+                    <input type="text" id="businessName" placeholder="Nama perniagaan anda">
+                </div>
+                <div class="form-group">
+                    <label>📋 Jenis Perniagaan</label>
+                    <select id="businessType" required>
+                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                        <option value="retail">👗 Retail / Butik</option>
+                        <option value="servis">✂️ Perkhidmatan / Servis</option>
+                    </select>
+                </div>
+                
+                <div class="profile-products-section">
+                    <div class="products-header">
+                        <h3>📦 Senarai Produk / Item Perniagaan</h3>
+                        <button type="button" class="btn-add-product" id="addProductBtn">+ Tambah Produk</button>
+                    </div>
+                    <p class="form-note">Produk ini akan muncul sebagai pilihan semasa mengisi rekod jualan.</p>
+                    <div id="productsList" class="products-list-settings">
+                        <p class="loading-text">📂 Loading produk...</p>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
+            </form>
+            <div id="profileMessage" class="message-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Tambah/Edit Produk -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <h3 id="productModalTitle">➕ Tambah Produk</h3>
+            <form id="productForm">
+                <input type="hidden" id="editProductId" value="">
+                <div class="form-group">
+                    <label>📝 Nama Produk</label>
+                    <input type="text" id="productName" placeholder="Cth: Kek Coklat" required>
+                </div>
+                <div class="form-group">
+                    <label>💰 Harga Seunit (RM)</label>
+                    <input type="number" id="productPrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>📁 Kategori</label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih kategori</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Produk</button>
+            </form>
+            <div id="productMessage" class="message-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Modal Delete Confirmation -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
+            <h3>⚠️ Padam Produk?</h3>
+            <p>Tindakan ini tidak boleh dibatalkan.</p>
+            <div class="delete-actions">
+                <button class="btn-outline" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn-danger" id="confirmDeleteBtn">Padam</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentBusinessType = 'fnb';
+        let currentProducts = [];
+        let productToDelete = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await checkAuth();
+            if (!user) { window.location.href = 'login.html'; return; }
+            await loadProfile();
+            await loadProducts();
+            setupEventListeners();
+        });
+
+        async function loadProfile() {
+            const user = await checkAuth();
+            if (!user) return;
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+            if (profile) {
+                document.getElementById('businessName').value = profile.business_name || '';
+                let bt = profile.business_type || profile.jenis_perniagaan || 'fnb';
+                document.getElementById('businessType').value = bt;
+                currentBusinessType = bt;
+            }
+        }
+
+        async function loadProducts() {
+            const user = await checkAuth();
+            if (!user) return;
+            const container = document.getElementById('productsList');
+            container.innerHTML = '<p>📂 Loading...</p>';
+            const { data, error } = await supabaseClient.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            if (error) { container.innerHTML = '<p>❌ Error loading</p>'; return; }
+            currentProducts = data || [];
+            displayProducts(currentProducts);
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsList');
+            if (products.length === 0) { container.innerHTML = '<p class="no-products">📭 Tiada produk. Klik "+ Tambah Produk"</p>'; return; }
+            let html = '<div class="products-grid-settings">';
+            products.forEach(p => {
+                html += `<div class="product-card-settings"><div class="product-info-settings"><strong>📦 ${escapeHtml(p.name)}</strong><span class="product-price-settings">RM ${p.price.toFixed(2)}</span><span class="product-category-settings">📁 ${escapeHtml(p.category)}</span></div><div class="product-actions-settings"><button class="btn-edit-product" onclick="editProduct('${p.id}')">✏️</button><button class="btn-delete-product" onclick="confirmDeleteProduct('${p.id}')">🗑️</button></div></div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+        function setupEventListeners() {
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await updateProfile();
+            });
+            document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
+            document.getElementById('productForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProduct();
+            });
+            document.getElementById('confirmDeleteBtn').addEventListener('click', () => deleteProduct());
+        }
+
+        async function updateProfile() {
+            const user = await checkAuth();
+            if (!user) return;
+            const businessName = document.getElementById('businessName').value;
+            const businessType = document.getElementById('businessType').value;
+            const btn = document.querySelector('#profileForm button[type="submit"]');
+            const msgDiv = document.getElementById('profileMessage');
+            btn.disabled = true;
+            const { error } = await supabaseClient.from('profiles').update({ business_name: businessName, business_type: businessType, jenis_perniagaan: businessType }).eq('id', user.id);
+            if (error) { msgDiv.className = 'message-box error'; msgDiv.innerHTML = '❌ Error: ' + error.message; msgDiv.style.display = 'block'; }
+            else { msgDiv.className = 'message-box success'; msgDiv.innerHTML = '✅ Profil dikemas kini!'; msgDiv.style.display = 'block'; setTimeout(() => window.location.href = 'dashboard.html', 1500); }
+            btn.disabled = false;
+        }
+
+        function populateCategoryDropdown(select, type) {
+            const cats = { fnb: [{ value: "Kek & Pastri", label: "🍰 Kek & Pastri" }, { value: "Minuman", label: "🥤 Minuman" }, { value: "Makanan", label: "🍝 Makanan" }], retail: [{ value: "Pakaian", label: "👗 Pakaian" }, { value: "Aksesori", label: "💍 Aksesori" }], servis: [{ value: "Servis", label: "✂️ Servis" }, { value: "Rawatan", label: "💆 Rawatan" }] };
+            const list = cats[type] || cats.fnb;
+            select.innerHTML = '<option value="">Pilih kategori</option>';
+            list.forEach(c => { const opt = document.createElement('option'); opt.value = c.value; opt.textContent = c.label; select.appendChild(opt); });
+        }
+
+        function openProductModal(productId = null) {
+            const modal = document.getElementById('productModal');
+            document.getElementById('productForm').reset();
+            document.getElementById('editProductId').value = '';
+            populateCategoryDropdown(document.getElementById('productCategory'), currentBusinessType);
+            if (productId) {
+                const p = currentProducts.find(p => p.id === productId);
+                if (p) {
+                    document.getElementById('productModalTitle').textContent = '✏️ Edit Produk';
+                    document.getElementById('editProductId').value = p.id;
+                    document.getElementById('productName').value = p.name;
+                    document.getElementById('productPrice').value = p.price;
+                    document.getElementById('productCategory').value = p.category;
+                }
+            } else { document.getElementById('productModalTitle').textContent = '➕ Tambah Produk'; }
+            modal.style.display = 'block';
+        }
+
+        function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
+
+        async function saveProduct() {
+            const user = await checkAuth();
+            if (!user) return;
+            const editId = document.getElementById('editProductId').value;
+            const name = document.getElementById('productName').value.trim();
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const category = document.getElementById('productCategory').value;
+            const btn = document.querySelector('#productForm button');
+            const msgDiv = document.getElementById('productMessage');
+            if (!name || isNaN(price) || price <= 0 || !category) { msgDiv.className = 'message-box error'; msgDiv.innerHTML = '❌ Lengkapkan semua maklumat'; msgDiv.style.display = 'block'; return; }
+            btn.disabled = true;
+            if (editId) {
+                await supabaseClient.from('products').update({ name, price, category, updated_at: new Date().toISOString() }).eq('id', editId);
+                msgDiv.innerHTML = '✅ Produk dikemas kini!';
+            } else {
+                await supabaseClient.from('products').insert([{ user_id: user.id, name, price, category, business_type: currentBusinessType }]);
+                msgDiv.innerHTML = '✅ Produk ditambah!';
+            }
+            msgDiv.className = 'message-box success';
+            msgDiv.style.display = 'block';
+            setTimeout(() => { closeProductModal(); loadProducts(); }, 1500);
+            btn.disabled = false;
+        }
+
+        function editProduct(id) { openProductModal(id); }
+        function confirmDeleteProduct(id) { productToDelete = id; document.getElementById('deleteModal').style.display = 'block'; }
+        function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; productToDelete = null; }
+        async function deleteProduct() {
+            if (!productToDelete) return;
+            await supabaseClient.from('products').delete().eq('id', productToDelete);
+            closeDeleteModal();
+            loadProducts();
+        }
+        window.onclick = (e) => { if (e.target === document.getElementById('productModal')) closeProductModal(); if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); };
+    </script>
+</body>
+</html>
