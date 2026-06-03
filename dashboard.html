@@ -1,35 +1,32 @@
 <div id="profileModal" class="modal">
-    <div class="modal-content modal-large">
+    <div class="modal-content">
         <span class="close-modal" onclick="closeProfileModal()">&times;</span>
         
         <div class="modal-header">
-            <h3>⚙️ Kemaskini Profil & Produk</h3>
+            <h3>⚙️ Tetapan Profil Perniagaan</h3>
         </div>
         
         <form id="profileForm">
             <div class="form-group">
-                <label for="editBusinessName">Nama Perniagaan</label>
+                <label for="editBusinessName">🏪 Nama Perniagaan</label>
                 <input type="text" id="editBusinessName" required placeholder="Masukkan nama bisnes anda">
             </div>
             
             <div class="form-group">
-                <label for="editBusinessType">Jenis Perniagaan</label>
+                <label for="editBusinessType">📋 Jenis Perniagaan</label>
                 <select id="editBusinessType" required>
-                    <option value="fnb">🍔 Makanan & Minuman (F&B)</option>
-                    <option value="retail">👗 Peruncitan (Retail)</option>
-                    <option value="servis">✂️ Perkhidmatan (Servis)</option>
+                    <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                    <option value="retail">👗 Retail (Peruncitan)</option>
+                    <option value="servis">✂️ Servis (Perkhidmatan)</option>
                 </select>
             </div>
             
             <div class="profile-products-section">
                 <div class="products-header">
-                    <div class="products-title">
-                        <span class="products-icon">📦</span>
-                        <h4>Senarai Produk Anda</h4>
-                    </div>
+                    <h4>📦 Senarai Produk / Item Perniagaan</h4>
                     <button type="button" id="addProductInModalBtn" class="btn-add-product">+ Tambah Produk</button>
                 </div>
-                <p class="form-note">Semua produk yang anda daftarkan akan dipaparkan di bawah.</p>
+                <p class="form-note">Produk ini akan muncul sebagai pilihan semasa mengisi rekod jualan.</p>
                 
                 <div class="products-list-container">
                     <div id="productsListInModal" class="products-list-modal">
@@ -40,8 +37,7 @@
             <div id="profileMessage" class="message-box" style="display: none;"></div>
             
             <div class="modal-actions">
-                <button type="button" class="btn-outline" onclick="closeProfileModal()">Batal</button>
-                <button type="submit" class="btn-primary">Simpan Profil</button>
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
             </div>
         </form>
     </div>
