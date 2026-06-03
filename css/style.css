@@ -365,12 +365,13 @@ body {
 }
 
 /* ==========================================================================
-   KEMASKINI: SENARAI PRODUK DALAM MODAL (SCROLLABLE & SEBARIS)
+   KEMASKINI: SENARAI PRODUK DALAM MODAL (PASTIKAN SKROL BERFUNGSI)
    ========================================================================== */
 .profile-products-section {
     margin: 1.5rem 0;
     border-top: 1px solid #e2e8f0;
     padding-top: 1.2rem;
+    display: block; /* Memastikan elemen berkelakuan seperti kotak normal */
 }
 
 .products-header {
@@ -402,34 +403,43 @@ body {
     background: #0e4a62;
 }
 
-/* Ruangan Skrol (Scrollable Box Container) */
+/* KOD KRITIKAL: Kontainer ini DIPAKSA untuk mempunyai tinggi maksimum 
+   dan menyembunyikan limpahan produk supaya skrol WAJIB keluar.
+*/
 .products-list-container {
-    max-height: 240px;       /* Mengawal had tinggi maksima kotak senarai */
-    overflow-y: auto;        /* Memaparkan scrollbar menegak sekiranya melebihi limit */
-    padding-right: 6px;
+    display: block !important;    /* Paksa block format */
+    max-height: 200px !important; /* Hadkan tinggi kotak (muat sekitar 3 produk) */
+    overflow-y: scroll !important;/* Paksa paksi-Y sentiasa aktifkan fungsi skrol */
+    position: relative;
+    padding-right: 8px;
     margin-top: 0.75rem;
+    border: 1px solid #f1f5f9;    /* Memberi sempadan visual kawasan skrol */
+    border-radius: 10px;
+    background: #fafafa;
 }
 
 /* Custom Desain Scrollbar Semata-mata untuk Ruangan Produk */
 .products-list-container::-webkit-scrollbar {
-    width: 6px;
+    width: 6px !important;
+    display: block !important;
 }
 .products-list-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #f1f5f9 !important;
     border-radius: 10px;
 }
 .products-list-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #cbd5e1 !important;
     border-radius: 10px;
 }
 .products-list-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #94a3b8 !important;
 }
 
 .products-list-modal {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    padding: 0.5rem; /* Beri sedikit ruang dalam */
 }
 
 /* Pembungkusan Item Sebaris (Horizontal Align) */
@@ -437,7 +447,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f8fafc;
+    background: white; /* Tukar ke putih supaya kontra dengan background kontainer */
     padding: 0.6rem 0.8rem;
     border-radius: 10px;
     border: 1px solid #e2e8f0;
@@ -511,17 +521,6 @@ body {
 .btn-delete-product-modal:hover {
     background: #fecaca;
     transform: scale(1.05);
-}
-
-/* Paparan Status */
-.empty-state, .loading-state {
-    text-align: center;
-    padding: 1.5rem;
-    color: #64748b;
-    font-size: 0.9rem;
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 10px;
 }
 
 /* ==========================================================================
