@@ -75,29 +75,39 @@ async function loadProducts() {
 function displayProductsInModal(products) {
     const container = document.getElementById('productsListInModal');
     
-    // 1. Jika tiada produk, paparkan mesej kosong yang kemas
     if (products.length === 0) {
         container.innerHTML = '<div class="empty-state">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</div>';
         return;
     }
     
-    // 2. Jana struktur HTML baharu (Sebaris & Sokong Skrol)
-    let html = '';
+    // Kita bina satu kotak container khas (scroll-box) dan masukkan senarai produk ke dalam bentuk baris yang kompak
+    let html = `
+        <div class="modal-scroll-box">
+            <div class="modal-scroll-list">
+    `;
+    
     products.forEach(product => {
         html += `
-            <div class="product-item-modal">
-                <div class="product-info-modal">
-                    <span class="product-name-modal">📦 ${escapeHtml(product.name)}</span>
-                    <span class="product-price-modal">RM ${product.price.toFixed(2)}</span>
-                    <span class="product-category-modal">📁 ${escapeHtml(product.category)}</span>
+            <div class="modal-product-row">
+                <div class="product-details-left">
+                    <span class="p-icon">📦</span>
+                    <div class="p-texts">
+                        <strong class="p-name">${escapeHtml(product.name)}</strong>
+                        <span class="p-meta">RM ${product.price.toFixed(2)} • 📁 ${escapeHtml(product.category)}</span>
+                    </div>
                 </div>
-                <div class="product-actions-modal">
-                    <button type="button" class="btn-edit-product-modal" onclick="editProduct('${product.id}')" title="Edit">✏️</button>
-                    <button type="button" class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')" title="Padam">🗑️</button>
+                <div class="product-actions-right">
+                    <button type="button" class="btn-action-edit" onclick="editProduct('${product.id}')" title="Edit">✏️</button>
+                    <button type="button" class="btn-action-delete" onclick="confirmDeleteProduct('${product.id}')" title="Padam">🗑️</button>
                 </div>
             </div>
         `;
     });
+    
+    html += `
+            </div>
+        </div>
+    `;
     
     container.innerHTML = html;
 }
