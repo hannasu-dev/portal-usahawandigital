@@ -593,7 +593,7 @@ body {
 }
 
 /* ==========================================================================
-   MODAL WINDOW STYLES
+   BASE MODAL WINDOW STYLES
    ========================================================================== */
 .modal {
     display: none;
@@ -621,20 +621,6 @@ body {
 @keyframes modalFadeIn {
     from { opacity: 0; transform: translateY(-50px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-.close-modal {
-    position: absolute;
-    right: 1.5rem;
-    top: 1rem;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: #64748b;
-    transition: color 0.3s;
-}
-
-.close-modal:hover {
-    color: #1a5f7a;
 }
 
 .form-note {
@@ -1307,7 +1293,7 @@ body {
 }
 
 /* ==========================================================================
-   PRODUCTS SECTION & PRODUCT MODALS
+   PRODUCTS SECTION & BASE PRODUCT MODALS
    ========================================================================== */
 .products-section {
     background: white;
@@ -1329,23 +1315,6 @@ body {
 .products-header h3 {
     color: #1a5f7a;
     font-size: 1.2rem;
-}
-
-.btn-add-product {
-    background: #1a5f7a;
-    color: white;
-    border: none;
-    padding: 0.5rem 1.2rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.btn-add-product:hover {
-    background: #0e4a62;
-    transform: scale(1.02);
 }
 
 .products-note {
@@ -1447,35 +1416,8 @@ body {
     max-width: 550px;
 }
 
-.modal-small {
-    max-width: 400px;
-    text-align: center;
-}
-
-.delete-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.btn-danger {
-    background: #dc2626;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.5rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-}
-
-.btn-danger:hover {
-    background: #b91c1c;
-}
-
 /* ==========================================================================
-   NAVIGATION BACK BUTTON
+   NAVIGATION BACK BUTTON & FOOTER
    ========================================================================== */
 .back-button-container {
     margin-bottom: 1rem;
@@ -1500,9 +1442,6 @@ body {
     color: #0e4a62;
 }
 
-/* ==========================================================================
-   FOOTER AREA
-   ========================================================================== */
 footer {
     background: #1e293b;
     color: #94a3b8;
@@ -1511,9 +1450,6 @@ footer {
     margin-top: 3rem;
 }
 
-/* ==========================================================================
-   UTILITY HELPER INTERFACES
-   ========================================================================== */
 .section-desc {
     text-align: center;
     color: #64748b;
@@ -1524,6 +1460,236 @@ footer {
     text-align: center;
     padding: 2rem;
     color: #64748b;
+}
+
+/* ==========================================================================
+   IMPROVED MODAL LAYOUT (NEW ADDITIONS)
+   ========================================================================== */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.modal-header h3 {
+    color: #1a5f7a;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.close-modal {
+    position: absolute;
+    right: 1.5rem;
+    top: 1rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: #1a5f7a;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.modal-actions .btn-primary,
+.modal-actions .btn-outline {
+    padding: 0.5rem 1.2rem;
+}
+
+.profile-products-section {
+    margin: 1.5rem 0;
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.products-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.products-icon {
+    font-size: 1.2rem;
+}
+
+.products-header h4 {
+    color: #1a5f7a;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.btn-add-product {
+    background: #1a5f7a;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-add-product:hover {
+    background: #0e4a62;
+    transform: scale(1.02);
+}
+
+.form-note {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-bottom: 0.8rem;
+}
+
+.products-list-container {
+    max-height: 280px;
+    overflow-y: auto;
+    border-radius: 12px;
+    margin-top: 0.5rem;
+}
+
+.products-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.products-list-container::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.products-list-container::-webkit-scrollbar-thumb {
+    background: #1a5f7a;
+    border-radius: 10px;
+}
+
+.products-list-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.product-item-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.product-item-modal:hover {
+    border-color: #1a5f7a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.product-info-modal {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.product-name-modal {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.product-price-modal {
+    color: #1a5f7a;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: #e0f2fe;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+}
+
+.product-category-modal {
+    color: #64748b;
+    font-size: 0.7rem;
+    background: #f1f5f9;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+}
+
+.product-actions-modal {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.product-actions-modal button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-edit-product-modal {
+    color: #1a5f7a;
+}
+.btn-edit-product-modal:hover {
+    background: #e0f2fe;
+}
+
+.btn-delete-product-modal {
+    color: #dc2626;
+}
+.btn-delete-product-modal:hover {
+    background: #fee2e2;
+}
+
+.loading-state, .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    background: white;
+    border-radius: 12px;
+}
+
+.modal-small {
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
 }
 
 /* ==========================================================================
@@ -1684,9 +1850,36 @@ footer {
         width: 100%;
         margin-top: 0.5rem;
     }
+
+    /* Modal Mobile Responsive Layout Extensions */
+    .modal-large {
+        width: 95%;
+        margin: 10% auto;
+        padding: 1rem;
+    }
+    
+    .product-info-modal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .product-item-modal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .product-actions-modal {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions button {
+        width: 100%;
+    }
 }
-
-
-
-
-
