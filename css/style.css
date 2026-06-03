@@ -1143,7 +1143,7 @@ body {
 }
 
 /* ==========================================================================
-   ITEMIZED FORM STYLES (DASHBOARD TRANSACTION TABLE)
+   ITEMIZED FORM STYLES (TRANSACTION DYNAMIC INPUTS)
    ========================================================================== */
 .items-header {
     display: flex;
@@ -1307,6 +1307,174 @@ body {
 }
 
 /* ==========================================================================
+   PRODUCTS SECTION & PRODUCT MODALS
+   ========================================================================== */
+.products-section {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.products-header h3 {
+    color: #1a5f7a;
+    font-size: 1.2rem;
+}
+
+.btn-add-product {
+    background: #1a5f7a;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-add-product:hover {
+    background: #0e4a62;
+    transform: scale(1.02);
+}
+
+.products-note {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.products-list {
+    min-height: 150px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.product-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.product-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.product-info h4 {
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+}
+
+.product-price {
+    font-weight: 700;
+    color: #1a5f7a;
+    font-size: 0.9rem;
+    margin: 0.2rem 0;
+}
+
+.product-category {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-edit-product {
+    background: #e0f2fe;
+    color: #1a5f7a;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.3s;
+}
+
+.btn-edit-product:hover {
+    background: #bae6fd;
+}
+
+.btn-delete-product {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.3s;
+}
+
+.btn-delete-product:hover {
+    background: #fecaca;
+}
+
+.no-products {
+    text-align: center;
+    color: #64748b;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.modal-product {
+    max-width: 550px;
+}
+
+.modal-small {
+    max-width: 400px;
+    text-align: center;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+/* ==========================================================================
    NAVIGATION BACK BUTTON
    ========================================================================== */
 .back-button-container {
@@ -1417,7 +1585,7 @@ footer {
         align-items: flex-start;
     }
     
-    /* Transaction Dynamic Table Inputs (Responsive Override) */
+    /* Transaction Dynamic Table Inputs */
     .item-row {
         grid-template-columns: 1fr;
         gap: 0.5rem;
@@ -1452,6 +1620,32 @@ footer {
     .total-row {
         flex-direction: column;
         text-align: center;
+    }
+    
+    /* Products Section (Responsive Override) */
+    .products-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-add-product {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .product-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.8rem;
+    }
+    
+    .product-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
     }
     
     /* Registration Input Element Groups */
