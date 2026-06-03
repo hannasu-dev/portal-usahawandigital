@@ -6,24 +6,19 @@
     <title>Rekod Jualan - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js untuk visual -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="logo">
-                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
-            </div>
-            <div class="nav-links" id="navLinks">
+            <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
+            <div class="nav-links">
                 <a href="index.html">Utama</a>
                 <a href="modul.html">Modul</a>
                 <a href="jualan.html" class="active">Rekod Jualan</a>
                 <a href="templat.html">Templat</a>
-                <a href="login.html" id="loginNavBtn">Log Masuk</a>
-                <a href="dashboard.html" id="dashboardNavBtn" style="display:none;">Dashboard</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
@@ -33,7 +28,7 @@
         </div>
         
         <h2>💰 Rekod Jualan & Perbelanjaan</h2>
-        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item (contoh: Kek Coklat 3 biji, Air Sirap 2 gelas)</p>
+        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item</p>
 
         <!-- Form Tambah Rekod -->
         <div class="form-card">
@@ -59,7 +54,6 @@
                     </div>
                 </div>
 
-                <!-- Item List Container -->
                 <div class="items-header">
                     <span>🛒 Senarai Item</span>
                     <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
@@ -67,7 +61,6 @@
                 
                 <div id="itemsList"></div>
 
-                <!-- Total Ringkasan -->
                 <div class="items-total">
                     <div class="total-row">
                         <span>💰 Jumlah Keseluruhan:</span>
@@ -80,16 +73,16 @@
             <div id="formMessage" class="message-box" style="display:none;"></div>
         </div>
 
-        <!-- Senarai Rekod - Scrollable -->
+        <!-- Senarai Rekod -->
         <div class="rekod-header">
             <h3>📋 Senarai Rekod Terkini</h3>
             <div class="filter-section">
                 <select id="filterJenis" onchange="filterRecords()">
                     <option value="semua">📌 Semua</option>
-                    <option value="jualan">💰 Jualan Sahaja</option>
-                    <option value="belanja">📉 Perbelanjaan Sahaja</option>
+                    <option value="jualan">💰 Jualan</option>
+                    <option value="belanja">📉 Perbelanjaan</option>
                 </select>
-                <button id="generateReportBtn" class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
+                <button class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
             </div>
         </div>
 
@@ -99,35 +92,24 @@
             </div>
         </div>
 
-        <!-- Bar Chart -->
         <div class="chart-card">
-            <h3>📊 Ringkasan Bulanan (Jualan vs Perbelanjaan)</h3>
+            <h3>📊 Ringkasan Bulanan</h3>
             <canvas id="salesChart" width="400" height="200"></canvas>
         </div>
 
-        <!-- Ringkasan Kewangan -->
         <div class="summary-card">
             <h3>💰 Ringkasan Kewangan</h3>
             <div class="summary-grid">
-                <div class="summary-item">
-                    <span>Jumlah Jualan</span>
-                    <strong id="totalJualan">RM 0.00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Jumlah Perbelanjaan</span>
-                    <strong id="totalBelanja">RM 0.00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Untung Bersih</span>
-                    <strong id="keuntungan">RM 0.00</strong>
-                </div>
+                <div class="summary-item"><span>Jumlah Jualan</span><strong id="totalJualan">RM 0.00</strong></div>
+                <div class="summary-item"><span>Jumlah Perbelanjaan</span><strong id="totalBelanja">RM 0.00</strong></div>
+                <div class="summary-item"><span>Untung Bersih</span><strong id="keuntungan">RM 0.00</strong></div>
             </div>
         </div>
     </div>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+            <p>&copy; 2025 Portal UsahawanDigital</p>
         </div>
     </footer>
 
