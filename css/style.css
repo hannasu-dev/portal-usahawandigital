@@ -1527,58 +1527,6 @@ footer {
 }
 
 /* ==========================================================================
-   PROFILE SETTINGS PAGE & SUB-COMPONENTS
-   ========================================================================== */
-.profile-settings-container {
-    padding: 2rem 0;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.profile-settings-card {
-    background: white;
-    border-radius: 24px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-}
-
-.profile-settings-card h2 {
-    color: #1a5f7a;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-
-/* Products Section in Settings */
-.profile-products-section {
-    margin: 1.5rem 0;
-    padding: 1rem 0;
-    border-top: 2px solid #e2e8f0;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.products-list-settings {
-    max-height: 300px;
-    overflow-y: auto;
-    margin-top: 0.8rem;
-}
-
-.products-grid-settings {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.product-card-settings {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #f8fafc;
-    padding: 1rem;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-}
-
-/* ==========================================================================
    RESPONSIVE MEDIA QUERIES
    ========================================================================== */
 @media (max-width: 900px) {
@@ -1737,3 +1685,8 @@ footer {
         margin-top: 0.5rem;
     }
 }
+
+
+
+
+
