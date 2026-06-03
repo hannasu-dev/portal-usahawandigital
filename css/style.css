@@ -108,11 +108,6 @@ body {
     color: white;
 }
 
-.btn-large {
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
-}
-
 .btn-full {
     width: 100%;
     text-align: center;
@@ -287,7 +282,7 @@ body {
 }
 
 /* ==========================================================================
-   MODAL WINDOW BASE STYLES
+   BASE MODAL WINDOW STYLES
    ========================================================================== */
 .modal {
     display: none;
@@ -304,17 +299,17 @@ body {
 .modal-content {
     background-color: white;
     margin: 5% auto;
-    padding: 2rem;
-    border-radius: 24px;
-    max-width: 550px;
-    width: 90%;
+    padding: 1.8rem;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 92%;
     position: relative;
     animation: modalFadeIn 0.3s ease-out;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-30px); }
+    from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -323,25 +318,25 @@ body {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 0.8rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #f1f5f9;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .modal-header h3 {
-    color: #1a5f7a;
-    font-size: 1.3rem;
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
 .close-modal {
     position: absolute;
     right: 1.5rem;
     top: 1.2rem;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: bold;
     cursor: pointer;
     color: #94a3b8;
     transition: color 0.2s;
-    line-height: 1;
 }
 
 .close-modal:hover {
@@ -349,29 +344,24 @@ body {
 }
 
 .form-note {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #64748b;
-    margin-bottom: 0.8rem;
-    line-height: 1.4;
+    margin-bottom: 0.5rem;
 }
 
 .modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid #e2e8f0;
 }
 
 /* ==========================================================================
-   KEMASKINI: SENARAI PRODUK DALAM MODAL (PASTIKAN SKROL BERFUNGSI)
+   FUNGSI UTAMA: KOTAK SKROL PRODUK (ANTI-MEMANJANG & KELUAR SKROL)
    ========================================================================== */
 .profile-products-section {
-    margin: 1.5rem 0;
+    margin: 1.5rem 0 0 0;
     border-top: 1px solid #e2e8f0;
-    padding-top: 1.2rem;
-    display: block; /* Memastikan elemen berkelakuan seperti kotak normal */
+    padding-top: 1rem;
 }
 
 .products-header {
@@ -403,195 +393,19 @@ body {
     background: #0e4a62;
 }
 
-/* KOD KRITIKAL: Kontainer ini DIPAKSA untuk mempunyai tinggi maksimum 
-   dan menyembunyikan limpahan produk supaya skrol WAJIB keluar.
-*/
-.products-list-container {
-    display: block !important;    /* Paksa block format */
-    max-height: 200px !important; /* Hadkan tinggi kotak (muat sekitar 3 produk) */
-    overflow-y: scroll !important;/* Paksa paksi-Y sentiasa aktifkan fungsi skrol */
-    position: relative;
-    padding-right: 8px;
-    margin-top: 0.75rem;
-    border: 1px solid #f1f5f9;    /* Memberi sempadan visual kawasan skrol */
-    border-radius: 10px;
-    background: #fafafa;
-}
-
-/* Custom Desain Scrollbar Semata-mata untuk Ruangan Produk */
-.products-list-container::-webkit-scrollbar {
-    width: 6px !important;
-    display: block !important;
-}
-.products-list-container::-webkit-scrollbar-track {
-    background: #f1f5f9 !important;
-    border-radius: 10px;
-}
-.products-list-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1 !important;
-    border-radius: 10px;
-}
-.products-list-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8 !important;
-}
-
-.products-list-modal {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem; /* Beri sedikit ruang dalam */
-}
-
-/* Pembungkusan Item Sebaris (Horizontal Align) */
-.product-item-modal {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white; /* Tukar ke putih supaya kontra dengan background kontainer */
-    padding: 0.6rem 0.8rem;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    transition: border-color 0.2s;
-}
-
-.product-item-modal:hover {
-    border-color: #1a5f7a;
-}
-
-/* Info Item (Susunan Blok Kecil Sebaris) */
-.product-info-modal {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap; 
-}
-
-.product-name-modal {
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 0.9rem;
-}
-
-.product-price-modal {
-    color: #1a5f7a;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.product-category-modal {
-    color: #64748b;
-    font-size: 0.75rem;
-    background: #e2e8f0;
-    padding: 0.15rem 0.5rem;
-    border-radius: 6px;
-}
-
-/* Butang Tindakan Berbentuk Ikon Mini */
-.product-actions-modal {
-    display: flex;
-    gap: 0.4rem;
-}
-
-.product-actions-modal button {
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.btn-edit-product-modal {
-    background: #e0f2fe;
-    color: #1a5f7a;
-}
-.btn-edit-product-modal:hover {
-    background: #bae6fd;
-    transform: scale(1.05);
-}
-
-.btn-delete-product-modal {
-    background: #fee2e2;
-    color: #dc2626;
-}
-.btn-delete-product-modal:hover {
-    background: #fecaca;
-    transform: scale(1.05);
-}
-
-/* ==========================================================================
-   FOOTER
-   ========================================================================== */
-footer {
-    background: #1e293b;
-    color: #94a3b8;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
-}
-
-/* ==========================================================================
-   RESPONSIVE MEDIA QUERIES (RESPONSIF TELEFON BIMBIT)
-   ========================================================================== */
-@media (max-width: 768px) {
-    .navbar .container {
-        padding: 1rem;
-    }
-
-    .nav-links {
-        display: none;
-    }
-
-    .mobile-menu-btn {
-        display: block;
-    }
-
-    .modal-content {
-        width: 95%;
-        margin: 15% auto;
-        padding: 1.5rem;
-    }
-
-    .product-item-modal {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.6rem;
-    }
-
-    .product-info-modal {
-        flex-direction: row;
-        align-items: center;
-        width: 100%;
-    }
-
-    .product-actions-modal {
-        width: 100%;
-        justify-content: flex-end;
-        border-top: 1px dashed #e2e8f0;
-        padding-top: 0.4rem;
-    }
-}
-/* ==========================================================================
-   REKABENTUK KOTAK SKROL PRODUK (JIMAT RUANG)
-   ========================================================================== */
-
-/* Kotak luar yang mengawal had tinggi senarai produk */
+/* KOTAK SKROL MANDIRI (MENGURUNG LIST PRODUK) */
 .modal-scroll-box {
     width: 100%;
-    max-height: 220px;          /* Had tinggi: muat dalam 3 item sebelum skrol muncul */
-    overflow-y: auto !important; /* Paksa skrol menegak aktif */
-    border: 1px solid #cbd5e1;   /* Border kelabu kemas */
+    max-height: 200px !important;    /* Dikunci supaya muat dalam 3 produk sahaja */
+    overflow-y: scroll !important;   /* Wajib paksa keluar skrol jika produk banyak */
+    border: 1px solid #cbd5e1;
     border-radius: 12px;
-    background: #f8fafc;        /* Latar belakang lembut */
+    background: #f8fafc;            /* Warna latar belakang petak skrol */
     margin-top: 10px;
-    padding: 5px;
+    padding: 6px;
 }
 
-/* Custom Scrollbar supaya nampak premium */
+/* Gaya Scrollbar Minimalis */
 .modal-scroll-box::-webkit-scrollbar {
     width: 6px;
 }
@@ -604,25 +418,24 @@ footer {
     border-radius: 10px;
 }
 
-/* Container untuk baris item */
 .modal-scroll-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-/* Rekabentuk setiap baris produk (Sebaris / Horizontal) */
+/* Susunan Baris Item Secara Horizontal (Sebaris) */
 .modal-product-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
 }
 
-/* Bahagian Kiri: Nama & Info Harga */
+/* Bahagian Kiri: Ikon, Nama, Harga & Kategori */
 .product-details-left {
     display: flex;
     align-items: center;
@@ -630,7 +443,7 @@ footer {
 }
 
 .p-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .p-texts {
@@ -639,35 +452,34 @@ footer {
 }
 
 .p-name {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #1e293b;
     font-weight: 600;
 }
 
 .p-meta {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #64748b;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
-/* Bahagian Kanan: Butang Aksi Sebaris */
+/* Bahagian Kanan: Butang Aksi */
 .product-actions-right {
     display: flex;
     gap: 6px;
 }
 
-/* Butang Edit & Padam Versi Kompak */
 .btn-action-edit, .btn-action-delete {
     border: none;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    transition: all 0.2s;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
 }
 
 .btn-action-edit {
@@ -684,4 +496,52 @@ footer {
 }
 .btn-action-delete:hover {
     background: #fecaca;
+}
+
+/* Status Kosong */
+.empty-state, .loading-state {
+    text-align: center;
+    padding: 1.5rem;
+    color: #64748b;
+    font-size: 0.85rem;
+    background: white;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+}
+
+/* ==========================================================================
+   FOOTER & RESPONSIVE TELEFON
+   ========================================================================== */
+footer {
+    background: #1e293b;
+    color: #94a3b8;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+    .navbar .container {
+        padding: 1rem;
+    }
+    .nav-links {
+        display: none;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 1.2rem;
+    }
+    .modal-product-row {
+        padding: 8px;
+    }
+    .p-name {
+        font-size: 0.85rem;
+    }
+    .p-meta {
+        font-size: 0.7rem;
+    }
 }
