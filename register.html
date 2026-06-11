@@ -20,20 +20,20 @@
     </nav>
 
     <div class="auth-container">
-        <div class="auth-card">
+        <div class="auth-card auth-card-large">
             <h2>Daftar Akaun Baru</h2>
             <p class="auth-subtitle">Percuma selama-lamanya untuk usahawan mikro</p>
             
             <form id="registerForm">
-                <!-- Basic Info -->
-                <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" id="fullName" placeholder="contoh: Nurul Hanna" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Emel</label>
-                    <input type="email" id="email" placeholder="email@contoh.com" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nama Penuh</label>
+                        <input type="text" id="fullName" placeholder="contoh: Nurul Hanna" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Emel</label>
+                        <input type="email" id="email" placeholder="email@contoh.com" required>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -41,28 +41,29 @@
                     <input type="password" id="password" placeholder="********" required>
                 </div>
 
-                <div class="form-group">
-                    <label>🏪 Nama Perniagaan</label>
-                    <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🏪 Nama Perniagaan</label>
+                        <input type="text" id="businessName" placeholder="contoh: Kek Hanna Homemade">
+                    </div>
+                    <div class="form-group">
+                        <label>📋 Jenis Perniagaan</label>
+                        <select id="businessType" required>
+                            <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                            <option value="retail">👗 Retail / Butik</option>
+                            <option value="servis">✂️ Perkhidmatan / Servis</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>📋 Jenis Perniagaan</label>
-                    <select id="businessType" required>
-                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                        <option value="retail">👗 Retail / Butik</option>
-                        <option value="servis">✂️ Perkhidmatan / Servis</option>
-                    </select>
-                </div>
-
-                <!-- Products Section (Initial Products) -->
+                <!-- Products Section -->
                 <div class="products-register-section">
                     <div class="products-header">
                         <span>📦 Produk/Item Perniagaan (Optional)</span>
                         <button type="button" class="btn-add-item-register" onclick="addRegisterProductRow()">+ Tambah Produk</button>
                     </div>
                     <p class="form-note">Tambah produk/item perniagaan anda untuk memudahkan pengisian rekod jualan nanti.</p>
-                    <div id="registerProductsList"></div>
+                    <div id="registerProductsList" class="register-products-list"></div>
                 </div>
                 
                 <button type="submit" class="btn-primary btn-full" id="registerBtn">Daftar Sekarang →</button>
@@ -77,6 +78,44 @@
     <script src="js/supabase.js"></script>
     <script>
         let productCounter = 0;
+        let currentBusinessType = 'fnb';
+        
+        // Kategori berdasarkan jenis perniagaan
+        const categoryOptions = {
+            fnb: [
+                { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
+                { value: "Minuman", label: "🥤 Minuman" },
+                { value: "Makanan Utama", label: "🍝 Makanan Utama" },
+                { value: "Pencuci Mulut", label: "🍨 Pencuci Mulut" },
+                { value: "Lain-lain", label: "📝 Lain-lain" }
+            ],
+            retail: [
+                { value: "Pakaian Wanita", label: "👗 Pakaian Wanita" },
+                { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" },
+                { value: "Pakaian Kanak-Kanak", label: "👶 Pakaian Kanak-Kanak" },
+                { value: "Aksesori", label: "💍 Aksesori" },
+                { value: "Kasut & Beg", label: "👟 Kasut & Beg" },
+                { value: "Lain-lain", label: "📝 Lain-lain" }
+            ],
+            servis: [
+                { value: "Servis Utama", label: "✂️ Servis Utama" },
+                { value: "Rawatan", label: "💆 Rawatan" },
+                { value: "Konsultasi", label: "📋 Konsultasi" },
+                { value: "Produk Tambahan", label: "🧴 Produk Tambahan" },
+                { value: "Lain-lain", label: "📝 Lain-lain" }
+            ]
+        };
+        
+        function getCategorySelectHtml() {
+            const cats = categoryOptions[currentBusinessType] || categoryOptions.fnb;
+            let html = '<select class="product-category-select" required>';
+            html += '<option value="">Pilih kategori</option>';
+            cats.forEach(cat => {
+                html += `<option value="${cat.value}">${cat.label}</option>`;
+            });
+            html += '</select>';
+            return html;
+        }
         
         function addRegisterProductRow() {
             const container = document.getElementById('registerProductsList');
@@ -86,9 +125,9 @@
             row.className = 'product-row-register';
             row.id = `reg-product-${productId}`;
             row.innerHTML = `
-                <input type="text" class="product-name" placeholder="Nama produk (cth: Kek Coklat)" style="flex:2;">
+                <input type="text" class="product-name" placeholder="Nama produk" style="flex:2;">
                 <input type="number" class="product-price" placeholder="Harga (RM)" step="0.01" style="flex:1;">
-                <input type="text" class="product-category" placeholder="Kategori (cth: Kek)" style="flex:1.5;">
+                ${getCategorySelectHtml()}
                 <button type="button" class="btn-remove-product" onclick="removeRegisterProductRow('${productId}')">🗑️</button>
             `;
             container.appendChild(row);
@@ -99,13 +138,36 @@
             if (row) row.remove();
         }
         
+        function refreshAllProductRows() {
+            const rows = document.querySelectorAll('#registerProductsList .product-row-register');
+            rows.forEach(row => {
+                const oldSelect = row.querySelector('.product-category-select');
+                if (oldSelect) {
+                    const oldValue = oldSelect.value;
+                    const newSelectHtml = getCategorySelectHtml();
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = newSelectHtml;
+                    const newSelect = tempDiv.firstChild;
+                    if (oldValue && newSelect.querySelector(`option[value="${oldValue}"]`)) {
+                        newSelect.value = oldValue;
+                    }
+                    oldSelect.replaceWith(newSelect);
+                }
+            });
+        }
+        
+        document.getElementById('businessType').addEventListener('change', (e) => {
+            currentBusinessType = e.target.value;
+            refreshAllProductRows();
+        });
+        
         function getRegisterProducts() {
             const products = [];
             const rows = document.querySelectorAll('#registerProductsList .product-row-register');
             rows.forEach(row => {
                 const name = row.querySelector('.product-name')?.value.trim();
                 const price = parseFloat(row.querySelector('.product-price')?.value);
-                const category = row.querySelector('.product-category')?.value.trim();
+                const category = row.querySelector('.product-category-select')?.value;
                 if (name && price > 0 && category) {
                     products.push({ name, price, category });
                 }
@@ -139,7 +201,6 @@
                 messageDiv.style.display = 'none';
                 
                 try {
-                    // Register with Supabase Auth
                     const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
@@ -171,7 +232,7 @@
                         
                         if (profileError) throw profileError;
                         
-                        // Insert products if any
+                        // Insert products
                         if (products.length > 0) {
                             const productsToInsert = products.map(p => ({
                                 user_id: data.user.id,
@@ -211,59 +272,61 @@
             setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
         }
         
-        // Add CSS for register product rows
-        const style = document.createElement('style');
-        style.textContent = `
-            .products-register-section {
-                margin-top: 1.5rem;
-                padding-top: 1rem;
-                border-top: 1px solid #e2e8f0;
-            }
-            .products-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 0.5rem;
-            }
-            .btn-add-item-register {
-                background: #1a5f7a;
-                color: white;
-                border: none;
-                padding: 0.3rem 0.8rem;
-                border-radius: 20px;
-                cursor: pointer;
-                font-size: 0.75rem;
-            }
-            .product-row-register {
-                display: flex;
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-                align-items: center;
-            }
-            .product-row-register input {
-                padding: 0.5rem;
-                border: 1px solid #cbd5e1;
-                border-radius: 8px;
-                font-size: 0.85rem;
-            }
-            .btn-remove-product {
-                background: #fee2e2;
-                color: #dc2626;
-                border: none;
-                padding: 0.4rem 0.6rem;
-                border-radius: 8px;
-                cursor: pointer;
-            }
-            @media (max-width: 768px) {
-                .product-row-register {
-                    flex-wrap: wrap;
-                }
-                .product-row-register input {
-                    flex: 1 1 100% !important;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        // Add first product row
+        addRegisterProductRow();
     </script>
+    <style>
+        .auth-card-large {
+            max-width: 700px;
+        }
+        .register-products-list {
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .product-row-register {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .product-row-register input, .product-row-register select {
+            padding: 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .btn-add-item-register {
+            background: #1a5f7a;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .btn-remove-product {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .products-register-section {
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        @media (max-width: 768px) {
+            .product-row-register {
+                flex-direction: column;
+            }
+            .product-row-register input, .product-row-register select {
+                width: 100%;
+            }
+        }
+    </style>
 </body>
 </html>
