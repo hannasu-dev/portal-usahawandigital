@@ -52,13 +52,48 @@ let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
 let currentUserBusinessType = 'fnb';
+let userProducts = []; // Store user's products from database
 
-// Helper function
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Load user's products from database
+async function loadUserProducts() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return [];
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('products')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('name', { ascending: true });
+        if (error) throw error;
+        userProducts = data || [];
+        return userProducts;
+    } catch (error) {
+        console.error('Error loading products:', error);
+        return [];
+    }
+}
+
+// Get product dropdown HTML
+function getProductDropdownHtml(selectedValue = '') {
+    let html = '<select class="item-product-select" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">';
+    html += '<option value="">-- Pilih Produk --</option>';
+    if (userProducts.length > 0) {
+        userProducts.forEach(product => {
+            const selected = selectedValue === product.name ? 'selected' : '';
+            html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}" ${selected}>${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
+        });
+    }
+    html += '<option value="other">+ Tambah Produk Baru (Manual)</option>';
+    html += '</select>';
+    return html;
 }
 
 // Render kategori dinamik
@@ -81,7 +116,6 @@ function renderDynamicCategories(jenisPerniagaan) {
     }
 }
 
-// Dapatkan jenis perniagaan pengguna
 async function getUserBusinessType() {
     const localType = localStorage.getItem('userBusinessType');
     if (localType && KATEGORI_PERNIAGAAN[localType]) return localType;
@@ -102,7 +136,6 @@ async function getUserBusinessType() {
     }
 }
 
-// Setup listener untuk jenis transaksi
 function setupJenisTransaksiListener() {
     const jenisSelect = document.getElementById('jenis');
     if (jenisSelect) {
@@ -111,7 +144,7 @@ function setupJenisTransaksiListener() {
 }
 
 // =========================================
-// ITEM MANAGEMENT
+// ITEM MANAGEMENT with Product Dropdown
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
@@ -121,16 +154,35 @@ function addItemRow() {
     itemRow.className = 'item-row';
     itemRow.id = `item-${itemId}`;
     itemRow.innerHTML = `
-        <input type="text" class="item-name" placeholder="Nama item" style="flex:2;">
-        <input type="number" class="item-qty" value="1" min="1" step="1" style="flex:0.8;">
-        <input type="number" class="item-price" value="0" min="0" step="0.01" style="flex:0.8;">
+        ${getProductDropdownHtml()}
+        <input type="number" class="item-qty" value="1" min="1" step="1" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
+        <input type="number" class="item-price" value="0" min="0" step="0.01" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
         <span class="item-subtotal">RM 0.00</span>
         <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
     `;
+    
+    const productSelect = itemRow.querySelector('.item-product-select');
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
+    
+    productSelect.addEventListener('change', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        if (selectedOption.value === 'other') {
+            // Manual entry - clear and let user type
+            priceInput.value = '';
+            priceInput.placeholder = 'Masukkan harga';
+            productSelect.style.border = '1px solid #f59e0b';
+        } else if (selectedOption.value) {
+            const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            priceInput.value = productPrice;
+            productSelect.style.border = '1px solid #cbd5e1';
+        }
+        calculateItemSubtotal(itemId);
+    });
+    
     qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
+    
     itemsList.appendChild(itemRow);
     calculateTotalAmount();
 }
@@ -166,7 +218,14 @@ function calculateTotalAmount() {
 function getItemsData() {
     const items = [];
     document.querySelectorAll('.item-row').forEach(row => {
-        const name = row.querySelector('.item-name').value.trim();
+        const productSelect = row.querySelector('.item-product-select');
+        let name = '';
+        if (productSelect && productSelect.value && productSelect.value !== 'other') {
+            name = productSelect.options[productSelect.selectedIndex]?.text.split(' -')[0] || '';
+        } else {
+            const manualInput = row.querySelector('.item-name-manual');
+            if (manualInput) name = manualInput.value.trim();
+        }
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         if (name && quantity > 0 && price > 0) {
@@ -187,6 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = 'login.html';
         return;
     }
+    await loadUserProducts();
     addItemRow();
     currentUserBusinessType = await getUserBusinessType();
     renderDynamicCategories(currentUserBusinessType);
@@ -344,7 +404,7 @@ function updateSummary(records) {
 }
 
 // =========================================
-// DAILY SUMMARY
+// DAILY & MONTHLY SUMMARY
 // =========================================
 async function loadDailySummary() {
     const user = await checkAuth();
@@ -391,9 +451,6 @@ async function loadDailySummary() {
     }
 }
 
-// =========================================
-// MONTHLY SUMMARY
-// =========================================
 async function loadMonthlySummary() {
     const user = await checkAuth();
     if (!user) return;
@@ -478,29 +535,11 @@ function updateChart(jualanData, belanjaData, labels) {
         data: {
             labels: labels,
             datasets: [
-                {
-                    label: 'Jualan (RM)',
-                    data: jualanData,
-                    backgroundColor: 'rgba(34,197,94,0.6)',
-                    borderColor: '#16a34a',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Perbelanjaan (RM)',
-                    data: belanjaData,
-                    backgroundColor: 'rgba(239,68,68,0.6)',
-                    borderColor: '#dc2626',
-                    borderWidth: 1
-                }
+                { label: 'Jualan (RM)', data: jualanData, backgroundColor: 'rgba(34,197,94,0.6)', borderColor: '#16a34a', borderWidth: 1 },
+                { label: 'Perbelanjaan (RM)', data: belanjaData, backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#dc2626', borderWidth: 1 }
             ]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
     });
 }
 
@@ -531,27 +570,10 @@ async function generateReport() {
     filtered.forEach(r => {
         if (r.items && r.items.length) {
             r.items.forEach(item => {
-                rows += `
-                    <tr>
-                        <td>${r.tarikh}</td>
-                        <td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td>
-                        <td>${r.kategori}</td>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.price.toFixed(2)}</td>
-                        <td>${item.subtotal.toFixed(2)}</td>
-                    </tr>
-                `;
+                rows += `<tr><td>${r.tarikh}</td><td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td><td>${r.kategori}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price.toFixed(2)}</td><td>${item.subtotal.toFixed(2)}</td></tr>`;
             });
         } else {
-            rows += `
-                <tr>
-                    <td>${r.tarikh}</td>
-                    <td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td>
-                    <td>${r.kategori}</td>
-                    <td colspan="4">Tiada detail</td>
-                </tr>
-            `;
+            rows += `<tr><td>${r.tarikh}</td><td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td><td>${r.kategori}</td><td colspan="4">Tiada detail</td></tr>`;
         }
     });
     const win = window.open('', '_blank');
