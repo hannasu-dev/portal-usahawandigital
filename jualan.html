@@ -11,9 +11,11 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
             <div class="nav-links">
-                <a href="index.html">Utama</a>
+                <a href="dashboard.html">Dashboard</a>
                 <a href="modul.html">Modul</a>
                 <a href="jualan.html" class="active">Rekod Jualan</a>
                 <a href="templat.html">Templat</a>
@@ -27,18 +29,12 @@
             <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
         </div>
 
-        <div class="page-header">
-            <h2>💰 Rekod Jualan & Perbelanjaan</h2>
-            <p class="section-desc">Catat jualan & perbelanjaan dengan detail item perniagaan anda</p>
-        </div>
+        <h2>💰 Rekod Jualan & Perbelanjaan</h2>
+        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item perniagaan anda</p>
 
         <!-- Form Tambah Rekod -->
         <div class="form-card">
-            <div class="form-card-header">
-                <span class="form-card-icon">➕</span>
-                <h3>Tambah Rekod Baru</h3>
-            </div>
-            
+            <h3>➕ Tambah Rekod Baru</h3>
             <form id="jualanForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -60,42 +56,34 @@
                     </div>
                 </div>
 
-                <!-- Item List Container - IMPROVED LAYOUT -->
-                <div class="items-section">
-                    <div class="items-header">
-                        <div class="items-title">
-                            <span class="items-icon">🛒</span>
-                            <span>Senarai Item</span>
-                        </div>
-                        <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
-                    </div>
-                    
-                    <div id="itemsList" class="items-list-container"></div>
+                <div class="items-header">
+                    <span>🛒 Senarai Item</span>
+                    <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
+                </div>
+                
+                <div id="itemsList" class="items-list"></div>
 
-                    <div class="items-total">
-                        <div class="total-row">
-                            <span>💰 Jumlah Keseluruhan:</span>
-                            <strong id="totalAmountDisplay">RM 0.00</strong>
-                        </div>
+                <div class="items-total">
+                    <div class="total-row">
+                        <span>💰 Jumlah Keseluruhan:</span>
+                        <strong id="totalAmountDisplay">RM 0.00</strong>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary btn-full" id="submitBtn">
-                    <span class="btn-icon">💾</span> Simpan Rekod
-                </button>
+                <button type="submit" class="btn-primary" id="submitBtn">💾 Simpan Rekod</button>
             </form>
             <div id="formMessage" class="message-box" style="display:none;"></div>
         </div>
 
-        <!-- Tab Navigation untuk Rekod -->
-        <div class="records-tabs">
-            <button class="tab-record-btn active" data-tab="terkini">📋 Senarai Terkini</button>
-            <button class="tab-record-btn" data-tab="harian">📅 Ringkasan Harian</button>
-            <button class="tab-record-btn" data-tab="bulanan">📊 Ringkasan Bulanan</button>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="terkini">📋 Senarai Terkini</button>
+            <button class="tab-btn" data-tab="harian">📅 Ringkasan Harian</button>
+            <button class="tab-btn" data-tab="bulanan">📊 Ringkasan Bulanan</button>
         </div>
 
-        <!-- Tab Content: Senarai Terkini (Scrollable) -->
-        <div id="tab-terkini" class="tab-record-content active">
+        <!-- Tab 1: Senarai Terkini -->
+        <div id="tab-terkini" class="tab-panel active">
             <div class="rekod-header">
                 <h3>📋 Senarai Rekod Terkini</h3>
                 <div class="filter-section">
@@ -107,61 +95,58 @@
                     <button class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
                 </div>
             </div>
-            <div class="rekod-list-container">
+            <div class="rekod-scroll-container">
                 <div id="rekodList" class="rekod-list">
-                    <div class="loading-state">📂 Loading rekod...</div>
+                    <p class="loading-text">📂 Loading rekod...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Tab Content: Ringkasan Harian -->
-        <div id="tab-harian" class="tab-record-content">
-            <h3>📅 Ringkasan Harian (7 Hari Terkini)</h3>
-            <div class="daily-summary-container">
-                <div id="dailySummaryList" class="daily-summary-list">
-                    <div class="loading-state">📂 Loading ringkasan harian...</div>
+        <!-- Tab 2: Ringkasan Harian -->
+        <div id="tab-harian" class="tab-panel">
+            <h3>📅 Ringkasan Harian (30 Hari Terkini)</h3>
+            <div class="rekod-scroll-container">
+                <div id="dailySummaryList" class="summary-list">
+                    <p class="loading-text">📂 Loading...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Tab Content: Ringkasan Bulanan -->
-        <div id="tab-bulanan" class="tab-record-content">
+        <!-- Tab 3: Ringkasan Bulanan -->
+        <div id="tab-bulanan" class="tab-panel">
             <h3>📊 Ringkasan Bulanan</h3>
-            <div class="chart-card">
-                <canvas id="salesChart" width="400" height="200"></canvas>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
             </div>
-            <div class="monthly-summary-container">
-                <div id="monthlySummaryList" class="monthly-summary-list">
-                    <div class="loading-state">📂 Loading ringkasan bulanan...</div>
+            <div class="rekod-scroll-container">
+                <div id="monthlySummaryList" class="summary-list">
+                    <p class="loading-text">📂 Loading...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Ringkasan Kewangan - UI Menarik -->
-        <div class="financial-summary">
-            <div class="financial-card total-sales">
-                <div class="financial-icon">💰</div>
-                <div class="financial-info">
-                    <span class="financial-label">Jumlah Jualan</span>
-                    <strong class="financial-value" id="totalJualan">RM 0.00</strong>
+        <!-- Ringkasan Kewangan -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-details">
+                    <span class="summary-label">Jumlah Jualan</span>
+                    <strong class="summary-value" id="totalJualan">RM 0.00</strong>
                 </div>
-                <div class="financial-trend up">↑</div>
             </div>
-            <div class="financial-card total-expenses">
-                <div class="financial-icon">📉</div>
-                <div class="financial-info">
-                    <span class="financial-label">Jumlah Perbelanjaan</span>
-                    <strong class="financial-value" id="totalBelanja">RM 0.00</strong>
+            <div class="summary-card">
+                <div class="summary-icon">📉</div>
+                <div class="summary-details">
+                    <span class="summary-label">Jumlah Perbelanjaan</span>
+                    <strong class="summary-value" id="totalBelanja">RM 0.00</strong>
                 </div>
-                <div class="financial-trend down">↓</div>
             </div>
-            <div class="financial-card total-profit">
-                <div class="financial-icon">🎯</div>
-                <div class="financial-info">
-                    <span class="financial-label">Untung Bersih</span>
-                    <strong class="financial-value" id="keuntungan">RM 0.00</strong>
+            <div class="summary-card">
+                <div class="summary-icon">🎯</div>
+                <div class="summary-details">
+                    <span class="summary-label">Untung Bersih</span>
+                    <strong class="summary-value" id="keuntungan">RM 0.00</strong>
                 </div>
-                <div class="financial-trend" id="profitTrend">📈</div>
             </div>
         </div>
     </div>
