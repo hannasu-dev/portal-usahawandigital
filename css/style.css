@@ -1,547 +1,512 @@
-/* ==========================================================================
-   GLOBAL STYLES & RESET
-   ========================================================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* =========================================
+   JUALAN PAGE - IMPROVED LAYOUT
+   ========================================= */
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: #f0f7ff;
+.page-header h2 {
     color: #1e293b;
-    line-height: 1.6;
+    font-size: 1.8rem;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* ==========================================================================
-   NAVBAR
-   ========================================================================== */
-.navbar {
+/* Form Card */
+.form-card {
     background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.navbar .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 20px;
-}
-
-.logo h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.logo span {
-    color: #1a5f7a;
-}
-
-.nav-links {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #334155;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-.nav-links a:hover, .nav-links a.active {
-    color: #1a5f7a;
-}
-
-.mobile-menu-btn {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-/* ==========================================================================
-   BUTTONS
-   ========================================================================== */
-.btn-primary, .btn-outline {
-    padding: 0.6rem 1.2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: inline-block;
-    border: none;
-    font-size: 1rem;
-}
-
-.btn-primary {
-    background: #1a5f7a;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #0e4a62;
-    transform: translateY(-2px);
-}
-
-.btn-outline {
-    border: 2px solid #1a5f7a;
-    color: #1a5f7a;
-    background: transparent;
-}
-
-.btn-outline:hover {
-    background: #1a5f7a;
-    color: white;
-}
-
-.btn-full {
-    width: 100%;
-    text-align: center;
-}
-
-/* ==========================================================================
-   AUTH PAGES (LOGIN/REGISTER)
-   ========================================================================== */
-.auth-container {
-    min-height: calc(100vh - 200px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-}
-
-.auth-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    max-width: 600px;
-    width: 100%;
-}
-
-.auth-card h2 {
-    text-align: center;
-    color: #1a5f7a;
-    margin-bottom: 0.5rem;
-}
-
-.auth-subtitle {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.2rem;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.4rem;
-    color: #334155;
-}
-
-.form-group input, .form-group select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.form-group input:focus, .form-group select:focus {
-    outline: none;
-    border-color: #1a5f7a;
-}
-
-.message-box {
-    margin-top: 1rem;
-    padding: 0.8rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.message-box.error {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.message-box.success {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-/* ==========================================================================
-   DASHBOARD & USER PROFILE STYLES
-   ========================================================================== */
-.dashboard-container {
-    padding: 2rem 0;
-    min-height: calc(100vh - 200px);
-}
-
-.profile-card {
-    background: linear-gradient(135deg, #1a5f7a, #2c7da0);
-    color: white;
+    border-radius: 24px;
     padding: 1.5rem;
-    border-radius: 20px;
     margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.profile-info {
+.form-card-header {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e0f2fe;
 }
 
-.profile-avatar {
-    font-size: 3.5rem;
-    background: rgba(255,255,255,0.2);
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.form-card-icon {
+    font-size: 1.5rem;
 }
 
-.profile-details {
-    flex: 1;
+.form-card-header h3 {
+    color: #1a5f7a;
+    margin: 0;
 }
 
-.profile-details h2 {
-    margin-bottom: 0.3rem;
-    font-size: 1.3rem;
-}
-
-.profile-details p {
-    margin: 0.2rem 0;
-    opacity: 0.9;
-    font-size: 0.9rem;
-}
-
-.btn-edit-profile {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.5);
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.3s;
-}
-
-.btn-edit-profile:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-2px);
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.dashboard-card {
-    background: white;
-    padding: 1.8rem;
+/* Items Section */
+.items-section {
+    background: #f8fafc;
     border-radius: 16px;
-    text-decoration: none;
-    color: #1e293b;
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: block;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 1rem;
+    margin: 1rem 0;
 }
 
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-}
-
-.card-icon {
-    font-size: 2.8rem;
+.items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-/* ==========================================================================
-   BASE MODAL WINDOW STYLES
-   ========================================================================== */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    overflow-y: auto;
-}
-
-.modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 1.8rem;
-    border-radius: 20px;
-    max-width: 500px;
-    width: 92%;
-    position: relative;
-    animation: modalFadeIn 0.3s ease-out;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-header {
+.items-title {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.8rem;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.modal-header h3 {
-    color: #1e293b;
-    font-size: 1.25rem;
-    font-weight: 700;
-}
-
-.close-modal {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.2rem;
-    font-size: 1.6rem;
-    font-weight: bold;
-    cursor: pointer;
-    color: #94a3b8;
-    transition: color 0.2s;
-}
-
-.close-modal:hover {
-    color: #ef4444;
-}
-
-.form-note {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
-}
-
-.modal-actions {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
-}
-
-/* ==========================================================================
-   FUNGSI UTAMA: KOTAK SKROL PRODUK (ANTI-MEMANJANG & KELUAR SKROL)
-   ========================================================================== */
-.profile-products-section {
-    margin: 1.5rem 0 0 0;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 1rem;
-}
-
-.products-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.25rem;
-}
-
-.products-header h4 {
-    color: #1e293b;
-    font-size: 1rem;
+    gap: 0.5rem;
     font-weight: 600;
+    color: #1a5f7a;
 }
 
-.btn-add-product {
+.items-icon {
+    font-size: 1.2rem;
+}
+
+.btn-add-item {
     background: #1a5f7a;
     color: white;
     border: none;
     padding: 0.4rem 1rem;
-    border-radius: 8px;
+    border-radius: 30px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: background 0.2s;
+    font-size: 0.8rem;
+    transition: all 0.2s;
 }
 
-.btn-add-product:hover {
+.btn-add-item:hover {
     background: #0e4a62;
+    transform: scale(1.02);
 }
 
-/* KOTAK SKROL MANDIRI (MENGURUNG LIST PRODUK) */
-.modal-scroll-box {
-    width: 100%;
-    max-height: 200px !important;    /* Dikunci supaya muat dalam 3 produk sahaja */
-    overflow-y: scroll !important;   /* Wajib paksa keluar skrol jika produk banyak */
-    border: 1px solid #cbd5e1;
-    border-radius: 12px;
-    background: #f8fafc;            /* Warna latar belakang petak skrol */
-    margin-top: 10px;
-    padding: 6px;
+/* Items List Container */
+.items-list-container {
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
 }
 
-/* Gaya Scrollbar Minimalis */
-.modal-scroll-box::-webkit-scrollbar {
+.items-list-container::-webkit-scrollbar {
     width: 6px;
 }
-.modal-scroll-box::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-.modal-scroll-box::-webkit-scrollbar-thumb {
-    background: #94a3b8;
+
+.items-list-container::-webkit-scrollbar-track {
+    background: #e2e8f0;
     border-radius: 10px;
 }
 
-.modal-scroll-list {
+.items-list-container::-webkit-scrollbar-thumb {
+    background: #1a5f7a;
+    border-radius: 10px;
+}
+
+/* Item Row - Improved */
+.item-row {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.5fr;
+    gap: 0.8rem;
+    align-items: center;
+    background: white;
+    padding: 0.8rem;
+    border-radius: 12px;
+    margin-bottom: 0.6rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.item-row:hover {
+    border-color: #1a5f7a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.item-col {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0.2rem;
 }
 
-/* Susunan Baris Item Secara Horizontal (Sebaris) */
-.modal-product-row {
+.item-col label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.item-col input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.item-subtotal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0f2fe;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #1a5f7a;
+    text-align: center;
+}
+
+.btn-remove-item {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-remove-item:hover {
+    background: #fecaca;
+}
+
+/* Items Total */
+.items-total {
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    margin-top: 0.5rem;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.total-row strong {
+    font-size: 1.3rem;
+    color: #1a5f7a;
+    background: white;
+    padding: 0.2rem 1rem;
+    border-radius: 30px;
+}
+
+/* Records Tabs */
+.records-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.tab-record-btn {
+    background: none;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.tab-record-btn:hover {
+    color: #1a5f7a;
+}
+
+.tab-record-btn.active {
+    color: #1a5f7a;
+}
+
+.tab-record-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #1a5f7a;
+}
+
+.tab-record-content {
+    display: none;
+}
+
+.tab-record-content.active {
+    display: block;
+}
+
+/* Scrollable Rekod List */
+.rekod-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+}
+
+.rekod-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rekod-list-container::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.rekod-list-container::-webkit-scrollbar-thumb {
+    background: #1a5f7a;
+    border-radius: 10px;
+}
+
+.rekod-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Rekod Item */
+.rekod-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 12px;
+    border-left: 4px solid;
+    transition: all 0.2s;
 }
 
-/* Bahagian Kiri: Ikon, Nama, Harga & Kategori */
-.product-details-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.rekod-item.jualan {
+    border-left-color: #16a34a;
 }
 
-.p-icon {
-    font-size: 1.1rem;
+.rekod-item.belanja {
+    border-left-color: #dc2626;
 }
 
-.p-texts {
-    display: flex;
-    flex-direction: column;
+.rekod-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.p-name {
-    font-size: 0.9rem;
-    color: #1e293b;
-    font-weight: 600;
+.rekod-info {
+    flex: 1;
 }
 
-.p-meta {
-    font-size: 0.75rem;
+.rekod-tarikh {
+    font-size: 0.7rem;
     color: #64748b;
-    margin-top: 1px;
+    margin-bottom: 0.2rem;
 }
 
-/* Bahagian Kanan: Butang Aksi */
-.product-actions-right {
-    display: flex;
-    gap: 6px;
+.rekod-keterangan {
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
-.btn-action-edit, .btn-action-delete {
-    border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    transition: background-color 0.2s;
+.rekod-items {
+    margin-top: 0.5rem;
+    padding-left: 0.8rem;
+    border-left: 2px solid #e2e8f0;
 }
 
-.btn-action-edit {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-.btn-action-edit:hover {
-    background: #bae6fd;
+.rekod-item-detail {
+    font-size: 0.7rem;
+    color: #475569;
+    margin: 0.2rem 0;
 }
 
-.btn-action-delete {
+.rekod-jumlah {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.rekod-jumlah.jualan {
+    color: #16a34a;
+}
+
+.rekod-jumlah.belanja {
+    color: #dc2626;
+}
+
+.rekod-delete {
     background: #fee2e2;
-    color: #b91c1c;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #dc2626;
+    transition: all 0.2s;
 }
-.btn-action-delete:hover {
+
+.rekod-delete:hover {
     background: #fecaca;
 }
 
-/* Status Kosong */
-.empty-state, .loading-state {
-    text-align: center;
-    padding: 1.5rem;
-    color: #64748b;
-    font-size: 0.85rem;
+/* Daily Summary List */
+.daily-summary-container, .monthly-summary-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+}
+
+.daily-summary-list, .monthly-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.summary-card-item {
     background: white;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e2e8f0;
 }
 
-/* ==========================================================================
-   FOOTER & RESPONSIVE TELEFON
-   ========================================================================== */
-footer {
-    background: #1e293b;
-    color: #94a3b8;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
+.summary-date {
+    font-weight: 600;
+    color: #1a5f7a;
 }
 
+.summary-jualan {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.summary-belanja {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.summary-untung {
+    font-weight: 700;
+}
+
+/* Financial Summary Cards - IMPROVED UI */
+.financial-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.financial-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.financial-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.financial-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.financial-card.total-sales::before {
+    background: #16a34a;
+}
+
+.financial-card.total-expenses::before {
+    background: #dc2626;
+}
+
+.financial-card.total-profit::before {
+    background: #1a5f7a;
+}
+
+.financial-icon {
+    font-size: 2.5rem;
+}
+
+.financial-info {
+    flex: 1;
+}
+
+.financial-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.financial-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.financial-trend {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 30px;
+}
+
+.financial-trend.up {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.financial-trend.down {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .navbar .container {
-        padding: 1rem;
+    .item-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
     }
-    .nav-links {
-        display: none;
+    
+    .financial-summary {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
-    .mobile-menu-btn {
-        display: block;
+    
+    .records-tabs {
+        justify-content: center;
     }
-    .modal-content {
-        width: 95%;
-        margin: 10% auto;
-        padding: 1.2rem;
+    
+    .tab-record-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
     }
-    .modal-product-row {
-        padding: 8px;
+    
+    .rekod-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
-    .p-name {
-        font-size: 0.85rem;
-    }
-    .p-meta {
-        font-size: 0.7rem;
+    
+    .rekod-jumlah {
+        margin-right: 0;
     }
 }
