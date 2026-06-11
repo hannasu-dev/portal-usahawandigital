@@ -6,41 +6,155 @@
     <title>Pengenalan Pemasaran Digital - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .content-hero {
+            background: linear-gradient(135deg, #1a5f7a, #2c7da0);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+        .content-hero h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .content-card:hover {
+            transform: translateY(-3px);
+        }
+        .card-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 1rem 0 0 1rem;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            margin: 0;
+        }
+        .card-preview {
+            width: 100%;
+            height: 160px;
+            background: #f0f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a5f7a;
+            font-size: 0.8rem;
+        }
+        .card-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            background: #f8fafc;
+            text-align: center;
+            text-decoration: none;
+            color: #1a5f7a;
+            font-weight: 500;
+            border-top: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+        .card-link:hover {
+            background: #e0f2fe;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #1a5f7a;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-to-modul {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: #1a5f7a;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
-            <div class="nav-links"><a href="index.html">Utama</a><a href="modul.html">Modul</a><a href="templat.html">Templat</a><a href="dashboard.html">Dashboard</a></div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="modul.html">Modul</a>
+                <a href="jualan.html">Rekod Jualan</a>
+                <a href="templat.html">Templat</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
+            </div>
         </div>
     </nav>
-    <div class="container modul-detail-container">
-        <div class="back-button-container"><a href="modul.html" class="back-btn">Kembali ke Modul</a></div>
-        <h2>📢 Pengenalan Pemasaran Digital</h2>
-        <p class="section-desc">Pelajari asas pemasaran digital dan kenapa penting untuk perniagaan kecil.</p>
-        <div class="modul-detail-grid">
-            <div class="detail-card">
-                <div class="detail-badge">📹 Video Pendek</div>
-                <h3>Apa Itu Pemasaran Digital?</h3>
-                <div class="video-preview"><img src="https://placehold.co/600x340/1a5f7a/white?text=Video+Pengenalan+Pemasaran+Digital" alt="Preview"></div>
-                <a href="https://youtu.be/41kLQ0_LK_0" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
-                <p class="detail-desc">Video pendek 5 minit tentang asas pemasaran digital.</p>
+
+    <div class="container">
+        <a href="modul.html" class="back-to-modul">← Kembali ke Modul</a>
+
+        <div class="content-hero">
+            <h1>📢 Pengenalan Pemasaran Digital</h1>
+            <p>Pelajari asas pemasaran digital dan kenapa penting untuk perniagaan kecil anda.</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- Video Section -->
+            <div class="content-card">
+                <div class="card-badge">📹 Video Pendek</div>
+                <h3 class="card-title">Apa Itu Pemasaran Digital?</h3>
+                <div class="card-preview">
+                    🎬 Preview Video (5 minit)
+                </div>
+                <a href="https://youtu.be/41kLQ0_LK_0" target="_blank" class="card-link">▶ Tonton Video di YouTube</a>
             </div>
-            <div class="detail-card">
-                <div class="detail-badge">🖼️ Infografik</div>
-                <h3>Strategi Media Sosial Untuk Kedai Kecil</h3>
-                <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik" class="infografik-img" onerror="this.src='https://placehold.co/600x400/2c7da0/white?text=Infografik+Strategi+Media+Sosial'">
-                <a href="uploads/strategi_media_sosial_kedaikecil.png" download class="download-link">📥 Muat Turun Infografik (PNG)</a>
+
+            <!-- Infographic Section -->
+            <div class="content-card">
+                <div class="card-badge">🖼️ Infografik</div>
+                <h3 class="card-title">Strategi Media Sosial Untuk Kedai Kecil</h3>
+                <div class="card-preview">
+                    📊 Infografik Ringkasan
+                </div>
+                <a href="#" class="card-link" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi')">📥 Muat Turun Infografik (PDF)</a>
             </div>
-            <div class="detail-card">
-                <div class="detail-badge">📷 Panduan Bergambar (PDF)</div>
-                <h3>Langkah Pertama Mulakan Pemasaran Digital</h3>
-                <p class="detail-desc">Panduan langkah-demi-langkah dalam format PDF. Muat turun dan ikuti panduan ini untuk memulakan pemasaran digital.</p>
-                <a href="uploads/Panduan_Mula_Pemasaran_Digital.pdf" download class="download-link">📥 Muat Turun PDF Panduan</a>
+
+            <!-- Step-by-Step Guide -->
+            <div class="content-card">
+                <div class="card-badge">📷 Panduan Bergambar</div>
+                <h3 class="card-title">Langkah Pertama Mulakan Pemasaran Digital</h3>
+                <div class="card-preview">
+                    📖 Panduan Langkah-demi-Langkah
+                </div>
+                <a href="#" class="card-link" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi')">📥 Muat Turun PDF Panduan</a>
             </div>
         </div>
     </div>
-    <footer><div class="container"><p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p></div></footer>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
