@@ -10,7 +10,9 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
+            <div class="logo">
+                <h1>🇲🇾 Usahawan<span>Digital</span></h1>
+            </div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
                 <a href="modul.html">Modul</a>
@@ -59,100 +61,69 @@
                     <p>"Gunakan kata laluan yang berbeza untuk setiap akaun perniagaan anda."</p>
                 </div>
             </div>
-
-            <!-- Progress Section -->
-            <div class="progress-section">
-                <h3>📈 Kemajuan Anda</h3>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul Pemasaran Digital</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul e-Pembayaran</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-label">Modul Keselamatan Dalam Talian</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                </div>
-                <p class="progress-note">✨ Selepas login, anda boleh tandakan modul yang sudah selesai (akan datang)</p>
-            </div>
         </div>
     </div>
 
-    <!-- Modal Profil (dengan senarai produk) - LAYOUT KEMAS -->
+    <!-- Modal Profil -->
     <div id="profileModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeProfileModal()">&times;</span>
-        
-        <div class="modal-header">
+        <div class="modal-content modal-large">
+            <span class="close-modal" onclick="closeProfileModal()">&times;</span>
             <h3>⚙️ Tetapan Profil Perniagaan</h3>
-        </div>
-        
-        <form id="profileForm">
-            <div class="form-group">
-                <label for="editBusinessName">🏪 Nama Perniagaan</label>
-                <input type="text" id="editBusinessName" required placeholder="Masukkan nama bisnes anda">
-            </div>
             
-            <div class="form-group">
-                <label for="editBusinessType">📋 Jenis Perniagaan</label>
-                <select id="editBusinessType" required>
-                    <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                    <option value="retail">👗 Retail (Peruncitan)</option>
-                    <option value="servis">✂️ Servis (Perkhidmatan)</option>
-                </select>
-            </div>
-            
-            <div class="profile-products-section">
-                <div class="products-header">
-                    <h4>📦 Senarai Produk / Item Perniagaan</h4>
-                    <button type="button" id="addProductInModalBtn" class="btn-add-product">+ Tambah Produk</button>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>🏪 Nama Perniagaan</label>
+                    <input type="text" id="editBusinessName" placeholder="Nama perniagaan anda">
                 </div>
-                <p class="form-note">Produk ini akan muncul sebagai pilihan semasa mengisi rekod jualan.</p>
+                <div class="form-group">
+                    <label>📋 Jenis Perniagaan</label>
+                    <select id="editBusinessType" required>
+                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
+                        <option value="retail">👗 Retail / Butik</option>
+                        <option value="servis">✂️ Perkhidmatan / Servis</option>
+                    </select>
+                </div>
                 
-                <div id="productsListInModal">
+                <!-- Products Management -->
+                <div class="profile-products-section">
+                    <div class="products-header">
+                        <h4>📦 Senarai Produk / Item Perniagaan</h4>
+                        <button type="button" class="btn-add-product" id="addProductInModalBtn">+ Tambah Produk</button>
                     </div>
-            </div>
-            
-            <div id="profileMessage" class="message-box" style="display: none;"></div>
-            
-            <div class="modal-actions">
+                    <p class="form-note">Produk ini akan muncul dalam dropdown senarai item semasa rekod jualan.</p>
+                    <div id="productsListInModal" class="products-list-modal">
+                        <p class="loading-text">📂 Loading produk...</p>
+                    </div>
+                </div>
+                
                 <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
-            </div>
-        </form>
+            </form>
+            <div id="profileMessage" class="message-box" style="display:none;"></div>
+        </div>
     </div>
-</div>
-    
+
     <!-- Modal untuk Tambah/Edit Produk -->
     <div id="productModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="productModalTitle">➕ Tambah Produk</h3>
-                <span class="close-modal" onclick="closeProductModal()">&times;</span>
-            </div>
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <h3 id="productModalTitle">➕ Tambah Produk</h3>
             <form id="productForm">
                 <input type="hidden" id="editProductId" value="">
                 <div class="form-group">
                     <label>📝 Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Cth: Kek Coklat, Air Sirap" required>
+                    <input type="text" id="productName" placeholder="Cth: Kek Coklat" required>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>💰 Harga Seunit (RM)</label>
-                        <input type="number" id="productPrice" step="0.01" min="0" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📁 Kategori</label>
-                        <select id="productCategory" required>
-                            <option value="">Pilih kategori</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label>💰 Harga Seunit (RM)</label>
+                    <input type="number" id="productPrice" step="0.01" min="0" required>
                 </div>
-                <div class="modal-actions">
-                    <button type="submit" class="btn-primary">💾 Simpan Produk</button>
-                    <button type="button" class="btn-outline" onclick="closeProductModal()">Batal</button>
+                <div class="form-group">
+                    <label>📁 Kategori</label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih kategori</option>
+                    </select>
                 </div>
+                <button type="submit" class="btn-primary btn-full">💾 Simpan Produk</button>
             </form>
             <div id="productMessage" class="message-box" style="display:none;"></div>
         </div>
@@ -161,11 +132,9 @@
     <!-- Modal Delete Confirmation -->
     <div id="deleteModal" class="modal">
         <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h3>⚠️ Padam Produk?</h3>
-                <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
-            </div>
-            <p>Produk ini akan dikeluarkan dari senarai. Tindakan ini tidak boleh dibatalkan.</p>
+            <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
+            <h3>⚠️ Padam Produk?</h3>
+            <p>Tindakan ini tidak boleh dibatalkan.</p>
             <div class="delete-actions">
                 <button class="btn-outline" onclick="closeDeleteModal()">Batal</button>
                 <button class="btn-danger" id="confirmDeleteBtn">Padam</button>
