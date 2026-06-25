@@ -136,6 +136,14 @@
             font-size: 3rem;
         }
 
+        /* Preview Image with actual content */
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
         /* Button Styles */
         .btn-modul {
             display: inline-flex;
@@ -370,15 +378,20 @@
                 <div class="card-body">
                     <p>Strategi Media Sosial Untuk Kedai Kecil - ringkasan visual yang mudah difahami.</p>
                     
+                    <!-- Preview Image dengan fail sebenar -->
                     <div class="preview-image" onclick="openPopup('infografik')">
-                        <span class="preview-icon">📊</span>
-                        <span class="preview-label">Klik untuk Pratinjau</span>
+                        <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik Strategi Media Sosial" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <span class="preview-icon" style="display:none;">📊</span>
+                        <span class="preview-label" style="display:none;">Klik untuk Pratinjau</span>
                     </div>
                     
                     <div class="btn-group">
                         <button class="btn-modul btn-modul-success" onclick="openPopup('infografik')">
                             👁️ Pratinjau & Muat Turun
                         </button>
+                        <a href="uploads/strategi_media_sosial_kedaikecil.png" download class="btn-modul btn-modul-outline">
+                            📥 Muat Turun Terus (PNG)
+                        </a>
                     </div>
                 </div>
             </div>
@@ -392,6 +405,7 @@
                 <div class="card-body">
                     <p>Langkah pertama mulakan pemasaran digital - panduan step-by-step dalam PDF.</p>
                     
+                    <!-- Preview Image untuk PDF -->
                     <div class="preview-image" onclick="openPopup('panduan')">
                         <span class="preview-icon">📖</span>
                         <span class="preview-label">Klik untuk Pratinjau</span>
@@ -401,6 +415,9 @@
                         <button class="btn-modul btn-modul-warning" onclick="openPopup('panduan')">
                             👁️ Pratinjau & Muat Turun
                         </button>
+                        <a href="uploads/Panduan_Mula_Pemasaran_Digital.pdf" download class="btn-modul btn-modul-outline">
+                            📥 Muat Turun Terus (PDF)
+                        </a>
                     </div>
                 </div>
             </div>
@@ -440,11 +457,11 @@
                 html = `
                     <h3>🖼️ Strategi Media Sosial Untuk Kedai Kecil</h3>
                     <p class="popup-desc">Infografik ringkasan strategi media sosial yang sesuai untuk perniagaan kecil.</p>
-                    <img src="https://images.unsplash.com/photo-1432889821006-ca95c4a0e5b1?w=600&h=400&fit=crop" alt="Infografik Strategi Media Sosial" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
+                    <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik Strategi Media Sosial" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
                     <div class="popup-actions">
-                        <button class="btn-modul btn-modul-success" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi. Sila gunakan fail infografik sebenar.')">
+                        <a href="uploads/strategi_media_sosial_kedaikecil.png" download class="btn-modul btn-modul-success">
                             📥 Muat Turun PDF
-                        </button>
+                        </a>
                         <button class="btn-modul btn-modul-outline" onclick="closePopup()">Tutup</button>
                     </div>
                 `;
@@ -452,11 +469,15 @@
                 html = `
                     <h3>📷 Panduan Langkah Pertama Pemasaran Digital</h3>
                     <p class="popup-desc">Panduan bergambar langkah-demi-langkah untuk memulakan pemasaran digital.</p>
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop" alt="Panduan Bergambar" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📖 Panduan Bergambar%3C/text%3E%3C/svg%3E'">
+                    <img src="uploads/Panduan_Mula_Pemasaran_Digital.pdf" alt="Panduan Bergambar" class="popup-image" style="background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:3rem;color:#1a5f7a;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                    <div style="display:none;text-align:center;padding:3rem;background:#f8fafc;border-radius:12px;margin-bottom:1rem;">
+                        <span style="font-size:4rem;">📖</span>
+                        <p style="margin-top:0.5rem;color:#475569;">PDF Panduan tersedia untuk dimuat turun</p>
+                    </div>
                     <div class="popup-actions">
-                        <button class="btn-modul btn-modul-warning" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi. Sila gunakan fail panduan sebenar.')">
+                        <a href="uploads/Panduan_Mula_Pemasaran_Digital.pdf" download class="btn-modul btn-modul-warning">
                             📥 Muat Turun PDF Panduan
-                        </button>
+                        </a>
                         <button class="btn-modul btn-modul-outline" onclick="closePopup()">Tutup</button>
                     </div>
                 `;
