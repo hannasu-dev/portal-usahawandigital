@@ -106,7 +106,7 @@
             height: 180px;
             object-fit: cover;
             border-radius: 10px;
-            background: #f0f7ff;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -114,12 +114,26 @@
             color: #1a5f7a;
             margin-bottom: 0.8rem;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-direction: column;
+            gap: 0.5rem;
         }
-        .preview-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
+        .preview-image:hover {
+            border-color: #1a5f7a;
+            box-shadow: 0 4px 12px rgba(26, 95, 122, 0.15);
+            transform: scale(1.01);
+        }
+        .preview-image .preview-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a5f7a;
+            background: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+        }
+        .preview-image .preview-icon {
+            font-size: 3rem;
         }
 
         /* Button Styles */
@@ -171,6 +185,14 @@
             background: #d97706;
             transform: scale(1.02);
         }
+        .btn-modul-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-modul-danger:hover {
+            background: #b91c1c;
+            transform: scale(1.02);
+        }
 
         .btn-group {
             display: flex;
@@ -207,8 +229,8 @@
             animation: popupFadeIn 0.3s;
         }
         @keyframes popupFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .popup-close {
             position: absolute;
@@ -218,16 +240,21 @@
             cursor: pointer;
             color: #94a3b8;
             transition: color 0.2s;
+            background: none;
+            border: none;
+            line-height: 1;
         }
         .popup-close:hover {
             color: #1a5f7a;
         }
         .popup-content .popup-image {
             width: 100%;
-            max-height: 500px;
+            max-height: 400px;
             object-fit: contain;
             border-radius: 12px;
             margin-bottom: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
         }
         .popup-content h3 {
             color: #1a5f7a;
@@ -272,6 +299,9 @@
             .preview-image {
                 height: 140px;
             }
+            .preview-image .preview-icon {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -315,11 +345,16 @@
                     
                     <!-- Embedded Video -->
                     <div class="video-wrapper">
-                        <iframe src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2FNADIKgluak%2Fvideos%2F881115910127138%2F&show_text=false&width=560&t=0" width="560" height="314" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+                        <iframe 
+                            src="https://www.youtube.com/embed/QQ-YyOb3LNM" 
+                            title="Rahsia Menjadi Digital Marketer 2024 - Modul 1 (Apa itu Marketing)"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
                     </div>
                     
                     <div class="btn-group" style="margin-top: 0.8rem;">
-                        <a href="https://youtu.be/MZfiS6JOnvo" target="_blank" class="btn-modul btn-modul-primary">
+                        <a href="https://www.youtube.com/watch?v=QQ-YyOb3LNM" target="_blank" class="btn-modul btn-modul-primary">
                             ▶ Tonton Video (YouTube)
                         </a>
                     </div>
@@ -335,8 +370,9 @@
                 <div class="card-body">
                     <p>Strategi Media Sosial Untuk Kedai Kecil - ringkasan visual yang mudah difahami.</p>
                     
-                    <div class="preview-image" onclick="openPopup('infografik')" style="cursor:pointer;">
-                        📊 Klik untuk Pratinjau
+                    <div class="preview-image" onclick="openPopup('infografik')">
+                        <span class="preview-icon">📊</span>
+                        <span class="preview-label">Klik untuk Pratinjau</span>
                     </div>
                     
                     <div class="btn-group">
@@ -356,8 +392,9 @@
                 <div class="card-body">
                     <p>Langkah pertama mulakan pemasaran digital - panduan step-by-step dalam PDF.</p>
                     
-                    <div class="preview-image" onclick="openPopup('panduan')" style="cursor:pointer;">
-                        📖 Klik untuk Pratinjau
+                    <div class="preview-image" onclick="openPopup('panduan')">
+                        <span class="preview-icon">📖</span>
+                        <span class="preview-label">Klik untuk Pratinjau</span>
                     </div>
                     
                     <div class="btn-group">
@@ -374,7 +411,7 @@
     <!-- ========== POPUP MODAL ========== -->
     <div id="popupModal" class="popup-modal">
         <div class="popup-content">
-            <span class="popup-close" onclick="closePopup()">&times;</span>
+            <button class="popup-close" onclick="closePopup()">&times;</button>
             
             <div id="popupContent">
                 <!-- Dynamic content will be inserted here -->
@@ -403,7 +440,7 @@
                 html = `
                     <h3>🖼️ Strategi Media Sosial Untuk Kedai Kecil</h3>
                     <p class="popup-desc">Infografik ringkasan strategi media sosial yang sesuai untuk perniagaan kecil.</p>
-                    <img src="https://placehold.co/600x400/2c7da0/white?text=Infografik+Strategi+Media+Sosial" alt="Infografik" class="popup-image">
+                    <img src="https://images.unsplash.com/photo-1432889821006-ca95c4a0e5b1?w=600&h=400&fit=crop" alt="Infografik Strategi Media Sosial" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
                     <div class="popup-actions">
                         <button class="btn-modul btn-modul-success" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi. Sila gunakan fail infografik sebenar.')">
                             📥 Muat Turun PDF
@@ -415,7 +452,7 @@
                 html = `
                     <h3>📷 Panduan Langkah Pertama Pemasaran Digital</h3>
                     <p class="popup-desc">Panduan bergambar langkah-demi-langkah untuk memulakan pemasaran digital.</p>
-                    <img src="https://placehold.co/600x400/3b82f6/white?text=Panduan+Step-by-Step+Pemasaran+Digital" alt="Panduan" class="popup-image">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop" alt="Panduan Bergambar" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📖 Panduan Bergambar%3C/text%3E%3C/svg%3E'">
                     <div class="popup-actions">
                         <button class="btn-modul btn-modul-warning" onclick="alert('📥 Muat turun PDF akan tersedia tidak lama lagi. Sila gunakan fail panduan sebenar.')">
                             📥 Muat Turun PDF Panduan
