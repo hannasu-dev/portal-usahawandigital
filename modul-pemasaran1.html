@@ -14,7 +14,6 @@
             margin: 0 auto;
         }
 
-        /* Hero Section */
         .modul-hero {
             background: linear-gradient(135deg, #1a5f7a 0%, #2c7da0 100%);
             color: white;
@@ -34,7 +33,7 @@
             margin: 0 auto;
         }
 
-        /* Content Grid - 3 columns */
+        /* Content Grid */
         .modul-content-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -82,10 +81,10 @@
             margin-bottom: 1rem;
         }
 
-        /* Video Section */
+        /* Video */
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             border-radius: 10px;
@@ -100,51 +99,63 @@
             border: none;
         }
 
-        /* Preview Image - for infographic and guide */
-        .preview-image {
+        /* Preview Card - UNTUK INFOGRAFIK & PDF */
+        .preview-card {
             width: 100%;
             height: 180px;
-            object-fit: cover;
             border-radius: 10px;
-            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: #1a5f7a;
             margin-bottom: 0.8rem;
             border: 1px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.2s;
+            overflow: hidden;
+            position: relative;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-direction: column;
-            gap: 0.5rem;
         }
-        .preview-image:hover {
+        .preview-card:hover {
             border-color: #1a5f7a;
             box-shadow: 0 4px 12px rgba(26, 95, 122, 0.15);
             transform: scale(1.01);
         }
-        .preview-image .preview-label {
-            font-size: 0.8rem;
+
+        .preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-card .preview-icon {
+            font-size: 3.5rem;
+            opacity: 0.8;
+        }
+        .preview-card .preview-label {
+            font-size: 0.75rem;
             font-weight: 600;
             color: #1a5f7a;
             background: white;
             padding: 0.2rem 0.8rem;
             border-radius: 20px;
+            margin-top: 0.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .preview-image .preview-icon {
-            font-size: 3rem;
+        .preview-card .preview-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(26, 95, 122, 0.9);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
         }
 
-        /* Preview Image with actual content */
-        .preview-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        /* Button Styles */
+        /* Buttons */
         .btn-modul {
             display: inline-flex;
             align-items: center;
@@ -191,14 +202,6 @@
         }
         .btn-modul-warning:hover {
             background: #d97706;
-            transform: scale(1.02);
-        }
-        .btn-modul-danger {
-            background: #dc2626;
-            color: white;
-        }
-        .btn-modul-danger:hover {
-            background: #b91c1c;
             transform: scale(1.02);
         }
 
@@ -264,6 +267,35 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
         }
+        .popup-content .popup-pdf-preview {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 2rem;
+            min-height: 250px;
+        }
+        .popup-content .popup-pdf-preview .pdf-icon {
+            font-size: 5rem;
+        }
+        .popup-content .popup-pdf-preview .pdf-info {
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .popup-content .popup-pdf-preview .pdf-info .pdf-name {
+            font-weight: 600;
+            color: #1a5f7a;
+        }
+        .popup-content .popup-pdf-preview .pdf-info .pdf-size {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
         .popup-content h3 {
             color: #1a5f7a;
             margin-bottom: 0.5rem;
@@ -304,11 +336,8 @@
             .modul-hero h1 {
                 font-size: 1.2rem;
             }
-            .preview-image {
+            .preview-card {
                 height: 140px;
-            }
-            .preview-image .preview-icon {
-                font-size: 2rem;
             }
         }
     </style>
@@ -351,7 +380,6 @@
                 <div class="card-body">
                     <p>Apa Itu Pemasaran Digital? Tonton video pendek ini untuk memahami asasnya.</p>
                     
-                    <!-- Embedded Video -->
                     <div class="video-wrapper">
                         <iframe 
                             src="https://www.youtube.com/embed/QQ-YyOb3LNM" 
@@ -378,11 +406,12 @@
                 <div class="card-body">
                     <p>Strategi Media Sosial Untuk Kedai Kecil - ringkasan visual yang mudah difahami.</p>
                     
-                    <!-- Preview Image dengan fail sebenar -->
-                    <div class="preview-image" onclick="openPopup('infografik')">
-                        <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik Strategi Media Sosial" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <!-- Preview Card -->
+                    <div class="preview-card" onclick="openPopup('infografik')">
+                        <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik" onerror="this.style.display='none';this.parentElement.querySelector('.preview-icon').style.display='block';this.parentElement.querySelector('.preview-label').style.display='block'">
                         <span class="preview-icon" style="display:none;">📊</span>
                         <span class="preview-label" style="display:none;">Klik untuk Pratinjau</span>
+                        <span class="preview-badge">PNG</span>
                     </div>
                     
                     <div class="btn-group">
@@ -405,10 +434,11 @@
                 <div class="card-body">
                     <p>Langkah pertama mulakan pemasaran digital - panduan step-by-step dalam PDF.</p>
                     
-                    <!-- Preview Image untuk PDF -->
-                    <div class="preview-image" onclick="openPopup('panduan')">
-                        <span class="preview-icon">📖</span>
+                    <!-- Preview Card untuk PDF -->
+                    <div class="preview-card" onclick="openPopup('panduan')">
+                        <span class="preview-icon">📄</span>
                         <span class="preview-label">Klik untuk Pratinjau</span>
+                        <span class="preview-badge">PDF</span>
                     </div>
                     
                     <div class="btn-group">
@@ -457,10 +487,10 @@
                 html = `
                     <h3>🖼️ Strategi Media Sosial Untuk Kedai Kecil</h3>
                     <p class="popup-desc">Infografik ringkasan strategi media sosial yang sesuai untuk perniagaan kecil.</p>
-                    <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik Strategi Media Sosial" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
+                    <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
                     <div class="popup-actions">
                         <a href="uploads/strategi_media_sosial_kedaikecil.png" download class="btn-modul btn-modul-success">
-                            📥 Muat Turun PDF
+                            📥 Muat Turun (PNG)
                         </a>
                         <button class="btn-modul btn-modul-outline" onclick="closePopup()">Tutup</button>
                     </div>
@@ -468,11 +498,13 @@
             } else if (type === 'panduan') {
                 html = `
                     <h3>📷 Panduan Langkah Pertama Pemasaran Digital</h3>
-                    <p class="popup-desc">Panduan bergambar langkah-demi-langkah untuk memulakan pemasaran digital.</p>
-                    <img src="uploads/Panduan_Mula_Pemasaran_Digital.pdf" alt="Panduan Bergambar" class="popup-image" style="background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:3rem;color:#1a5f7a;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-                    <div style="display:none;text-align:center;padding:3rem;background:#f8fafc;border-radius:12px;margin-bottom:1rem;">
-                        <span style="font-size:4rem;">📖</span>
-                        <p style="margin-top:0.5rem;color:#475569;">PDF Panduan tersedia untuk dimuat turun</p>
+                    <p class="popup-desc">Panduan bergambar langkah-demi-langkah dalam format PDF untuk memulakan pemasaran digital.</p>
+                    <div class="popup-pdf-preview">
+                        <div class="pdf-icon">📄</div>
+                        <div class="pdf-info">
+                            <div class="pdf-name">Panduan_Mula_Pemasaran_Digital.pdf</div>
+                            <div class="pdf-size">📎 Fail PDF • Sedia untuk dimuat turun</div>
+                        </div>
                     </div>
                     <div class="popup-actions">
                         <a href="uploads/Panduan_Mula_Pemasaran_Digital.pdf" download class="btn-modul btn-modul-warning">
