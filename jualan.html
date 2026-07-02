@@ -7,6 +7,114 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* Item Row Labels */
+        .item-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .item-row .item-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .item-row .item-field label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .item-row .item-field input,
+        .item-row .item-field select {
+            padding: 0.4rem 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            width: 100%;
+        }
+        .item-row .item-field input:focus,
+        .item-row .item-field select:focus {
+            outline: none;
+            border-color: #1a5f7a;
+            box-shadow: 0 0 0 2px rgba(26, 95, 122, 0.1);
+        }
+        .item-row .item-field.item-name {
+            flex: 2;
+            min-width: 120px;
+        }
+        .item-row .item-field.item-qty {
+            flex: 0.6;
+            min-width: 60px;
+        }
+        .item-row .item-field.item-price {
+            flex: 0.8;
+            min-width: 80px;
+        }
+        .item-row .item-field.item-subtotal {
+            flex: 0.8;
+            min-width: 80px;
+            text-align: center;
+            font-weight: 700;
+            color: #1a5f7a;
+            background: #e0f2fe;
+            padding: 0.35rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .item-row .item-field.item-action {
+            flex: 0.4;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .item-row .item-field.item-action button {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .item-row .item-field.item-action button:hover {
+            background: #fecaca;
+        }
+
+        /* Subtotal display in item row */
+        .item-subtotal-text {
+            font-weight: 700;
+            color: #1a5f7a;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .item-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .item-row .item-field {
+                width: 100%;
+            }
+            .item-row .item-field.item-subtotal {
+                min-height: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -54,6 +162,7 @@
                     </div>
                 </div>
 
+                <!-- Item List Container -->
                 <div class="items-header">
                     <span>🛒 Senarai Item</span>
                     <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
