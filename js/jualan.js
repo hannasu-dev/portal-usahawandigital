@@ -3,16 +3,47 @@
 // =========================================
 const KATEGORI_PERNIAGAAN = {
     fnb: {
-        jualan: [{ value: "Kek & Pastri", label: "🍰 Kek & Pastri" }, { value: "Minuman", label: "🥤 Minuman" }, { value: "Makanan Utama", label: "🍝 Makanan Utama" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
-        belanja: [{ value: "Bahan Mentah", label: "🥛 Bahan Mentah" }, { value: "Pembungkusan", label: "📦 Pembungkusan" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Utiliti", label: "⚡ Utiliti" }, { value: "Pemasaran", label: "📣 Pemasaran" }]
+        jualan: [
+            { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
+            { value: "Minuman", label: "🥤 Minuman" },
+            { value: "Makanan Utama", label: "🍝 Makanan Utama" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Bahan Mentah", label: "🥛 Bahan Mentah" },
+            { value: "Pembungkusan", label: "📦 Pembungkusan" },
+            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
+            { value: "Utiliti", label: "⚡ Utiliti" },
+            { value: "Pemasaran", label: "📣 Pemasaran" }
+        ]
     },
     retail: {
-        jualan: [{ value: "Pakaian Wanita", label: "👗 Pakaian Wanita" }, { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" }, { value: "Aksesori", label: "💍 Aksesori" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
-        belanja: [{ value: "Belian Stok", label: "📦 Belian Stok" }, { value: "Logistik", label: "🚚 Logistik" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Pemasaran", label: "📣 Pemasaran" }]
+        jualan: [
+            { value: "Pakaian Wanita", label: "👗 Pakaian Wanita" },
+            { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" },
+            { value: "Aksesori", label: "💍 Aksesori" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Belian Stok", label: "📦 Belian Stok" },
+            { value: "Logistik", label: "🚚 Logistik" },
+            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
+            { value: "Pemasaran", label: "📣 Pemasaran" }
+        ]
     },
     servis: {
-        jualan: [{ value: "Servis Utama", label: "✂️ Servis Utama" }, { value: "Rawatan", label: "💆 Rawatan" }, { value: "Produk Tambahan", label: "🧴 Produk Tambahan" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
-        belanja: [{ value: "Alatan Servis", label: "🛠️ Alatan Servis" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Utiliti", label: "⚡ Utiliti" }, { value: "Lesen/Perisian", label: "💻 Lesen/Perisian" }]
+        jualan: [
+            { value: "Servis Utama", label: "✂️ Servis Utama" },
+            { value: "Rawatan", label: "💆 Rawatan" },
+            { value: "Produk Tambahan", label: "🧴 Produk Tambahan" },
+            { value: "Lain-lain", label: "📝 Lain-lain" }
+        ],
+        belanja: [
+            { value: "Alatan Servis", label: "🛠️ Alatan Servis" },
+            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
+            { value: "Utiliti", label: "⚡ Utiliti" },
+            { value: "Lesen/Perisian", label: "💻 Lesen/Perisian" }
+        ]
     }
 };
 const DEFAULT_KATEGORI = 'fnb';
@@ -22,7 +53,7 @@ let currentRecords = [], currentFilter = 'semua', salesChart = null, itemCounter
 function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
 // =========================================
-// LOAD & SAVE PRODUCTS
+// LOAD USER PRODUCTS FROM DATABASE
 // =========================================
 async function loadUserProducts() {
     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -35,12 +66,17 @@ async function loadUserProducts() {
     } catch (error) { console.error('Error loading products:', error); return []; }
 }
 
+// =========================================
+// SAVE PRODUCT TO DATABASE (JUALAN ONLY)
+// =========================================
 async function saveProductToDatabase(productName, productPrice, productCategory) {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return null;
     try {
-        const { data: existing } = await supabaseClient.from('products').select('id, name').eq('user_id', user.id).ilike('name', productName).maybeSingle();
+        // Check if product exists
+        const { data: existing } = await supabaseClient.from('products').select('id').eq('user_id', user.id).ilike('name', productName).maybeSingle();
         if (existing) return existing;
+        // Insert new product
         const { data, error } = await supabaseClient.from('products').insert([{ user_id: user.id, name: productName, price: productPrice || 0, category: productCategory || 'Lain-lain', business_type: currentUserBusinessType }]).select();
         if (error) throw error;
         await loadUserProducts();
@@ -85,20 +121,23 @@ function setupJenisTransaksiListener() {
 }
 
 // =========================================
-// ITEM MANAGEMENT - FIXED
+// ITEM MANAGEMENT - FIXED & SIMPLIFIED
 // =========================================
 function getProductDropdownHtml() {
     const isBelanja = document.getElementById('jenis').value === 'belanja';
+    
+    // BELANJA: manual input only (NO database save)
     if (isBelanja) {
         return `<div class="item-field item-name"><label>📝 Nama Item</label><input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;"></div>`;
     }
+    
+    // JUALAN: dropdown + manual option (WITH database save)
     let html = `<div class="item-field item-name"><label>📝 Nama Produk</label><select class="item-product-select" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;"><option value="">-- Pilih Produk --</option>`;
     userProducts.forEach(p => { html += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`; });
     html += `<option value="other">✏️ Tambah Manual (Produk Baru)</option></select></div>`;
     return html;
 }
 
-// MAIN FUNCTION - addItemRow (FIXED)
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
     if (!itemsList) return;
@@ -166,8 +205,6 @@ function addItemRow() {
                         });
                     }
                 });
-                
-                // Recalculate when manual input changes
                 newInput.addEventListener('input', calculateRow);
             } else if (this.value) {
                 price.value = parseFloat(selected.getAttribute('data-price')) || 0;
@@ -176,7 +213,7 @@ function addItemRow() {
         });
     }
     
-    // For BELANJA manual input - no save to database
+    // For BELANJA manual input - NO database save
     if (manualInput && isBelanja) {
         manualInput.addEventListener('input', calculateRow);
         manualInput.addEventListener('blur', function() {
@@ -188,7 +225,7 @@ function addItemRow() {
         });
     }
     
-    // Add manual input listener for JUALAN "other" case if it exists
+    // For JUALAN manual input (when "other" was selected)
     const manualInputJualan = row.querySelector('.item-name-manual');
     if (manualInputJualan && !isBelanja) {
         manualInputJualan.addEventListener('input', calculateRow);
@@ -222,13 +259,16 @@ function getItemsData() {
         let name = '';
         const select = row.querySelector('.item-product-select');
         const manual = row.querySelector('.item-name-manual');
+        
         if (select && select.value && select.value !== 'other') {
             name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
         } else if (manual) {
             name = manual.value.trim();
         }
+        
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
         }
@@ -249,6 +289,7 @@ function refreshAllItemRows() {
         const manual = nameField.querySelector('input.item-name-manual');
         
         if (isBelanja) {
+            // BELANJA: manual input only
             if (select && !manual) {
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
@@ -267,6 +308,7 @@ function refreshAllItemRows() {
                 });
             }
         } else {
+            // JUALAN: dropdown + manual option
             if (manual && !select) {
                 const newSelect = document.createElement('select');
                 newSelect.className = 'item-product-select';
