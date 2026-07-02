@@ -1,6 +1,4 @@
-// =========================================
 // KATEGORI PERNIAGAAN
-// =========================================
 const KATEGORI_PERNIAGAAN = {
     fnb: {
         jualan: [
@@ -54,7 +52,7 @@ let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
 let currentUserBusinessType = 'fnb';
-let userProducts = [];
+let userProducts = []; // Store user's products from database
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -63,12 +61,11 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// =========================================
-// LOAD USER PRODUCTS
-// =========================================
+// Load user's products from database
 async function loadUserProducts() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return [];
+    
     try {
         const { data, error } = await supabaseClient
             .from('products')
@@ -84,9 +81,22 @@ async function loadUserProducts() {
     }
 }
 
-// =========================================
-// RENDER KATEGORI
-// =========================================
+// Get product dropdown HTML
+function getProductDropdownHtml(selectedValue = '') {
+    let html = '<select class="item-product-select" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">';
+    html += '<option value="">-- Pilih Produk --</option>';
+    if (userProducts.length > 0) {
+        userProducts.forEach(product => {
+            const selected = selectedValue === product.name ? 'selected' : '';
+            html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}" ${selected}>${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
+        });
+    }
+    html += '<option value="other">+ Tambah Produk Baru (Manual)</option>';
+    html += '</select>';
+    return html;
+}
+
+// Render kategori dinamik
 function renderDynamicCategories(jenisPerniagaan) {
     let businessData = KATEGORI_PERNIAGAAN[jenisPerniagaan] || KATEGORI_PERNIAGAAN[DEFAULT_KATEGORI];
     currentUserBusinessType = jenisPerniagaan;
@@ -129,61 +139,68 @@ async function getUserBusinessType() {
 function setupJenisTransaksiListener() {
     const jenisSelect = document.getElementById('jenis');
     if (jenisSelect) {
-        jenisSelect.addEventListener('change', () => {
-            renderDynamicCategories(currentUserBusinessType);
-            refreshAllItemRows();
-        });
+        jenisSelect.addEventListener('change', () => renderDynamicCategories(currentUserBusinessType));
     }
 }
 
 // =========================================
-// SAVE PRODUCT TO DATABASE (JUALAN ONLY)
+// ITEM MANAGEMENT with Product Dropdown
 // =========================================
-async function saveProductToDatabase(productName, productPrice, productCategory) {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) return null;
-    try {
-        const { data: existing } = await supabaseClient
-            .from('products')
-            .select('id')
-            .eq('user_id', user.id)
-            .ilike('name', productName)
-            .maybeSingle();
-        if (existing) return existing;
-        const { data, error } = await supabaseClient
-            .from('products')
-            .insert([{
-                user_id: user.id,
-                name: productName,
-                price: productPrice || 0,
-                category: productCategory || 'Lain-lain',
-                business_type: currentUserBusinessType
-            }])
-            .select();
-        if (error) throw error;
-        await loadUserProducts();
-        return data ? data[0] : null;
-    } catch (error) {
-        console.error('Error saving product:', error);
-        return null;
-    }
+function addItemRow() {
+    const itemsList = document.getElementById('itemsList');
+    if (!itemsList) return;
+    const itemId = Date.now() + itemCounter++;
+    const itemRow = document.createElement('div');
+    itemRow.className = 'item-row';
+    itemRow.id = `item-${itemId}`;
+    itemRow.innerHTML = `
+        ${getProductDropdownHtml()}
+        <input type="number" class="item-qty" value="1" min="1" step="1" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
+        <input type="number" class="item-price" value="0" min="0" step="0.01" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
+        <span class="item-subtotal">RM 0.00</span>
+        <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
+    `;
+    
+    const productSelect = itemRow.querySelector('.item-product-select');
+    const qtyInput = itemRow.querySelector('.item-qty');
+    const priceInput = itemRow.querySelector('.item-price');
+    
+    productSelect.addEventListener('change', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        if (selectedOption.value === 'other') {
+            // Manual entry - clear and let user type
+            priceInput.value = '';
+            priceInput.placeholder = 'Masukkan harga';
+            productSelect.style.border = '1px solid #f59e0b';
+        } else if (selectedOption.value) {
+            const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            priceInput.value = productPrice;
+            productSelect.style.border = '1px solid #cbd5e1';
+        }
+        calculateItemSubtotal(itemId);
+    });
+    
+    qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
+    priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
+    
+    itemsList.appendChild(itemRow);
+    calculateTotalAmount();
 }
 
-// =========================================
-// CALCULATE FUNCTIONS - SIMPLIFIED
-// =========================================
-function calculateRowSubtotal(row) {
-    const qtyInput = row.querySelector('.item-qty');
-    const priceInput = row.querySelector('.item-price');
-    const subtotalSpan = row.querySelector('.item-subtotal-text');
-    
-    if (!qtyInput || !priceInput || !subtotalSpan) return 0;
-    
-    const qty = parseFloat(qtyInput.value) || 0;
-    const price = parseFloat(priceInput.value) || 0;
+function removeItemRow(itemId) {
+    const row = document.getElementById(`item-${itemId}`);
+    if (row) row.remove();
+    calculateTotalAmount();
+}
+
+function calculateItemSubtotal(itemId) {
+    const row = document.getElementById(`item-${itemId}`);
+    if (!row) return;
+    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
     const subtotal = qty * price;
-    subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-    return subtotal;
+    row.querySelector('.item-subtotal').textContent = `RM ${subtotal.toFixed(2)}`;
+    calculateTotalAmount();
 }
 
 function calculateTotalAmount() {
@@ -198,223 +215,24 @@ function calculateTotalAmount() {
     return total;
 }
 
-// =========================================
-// ATTACH EVENTS TO A ROW (FIXED - USE DIRECT REFERENCES)
-// =========================================
-function attachRowEvents(row) {
-    const qtyInput = row.querySelector('.item-qty');
-    const priceInput = row.querySelector('.item-price');
-    const select = row.querySelector('.item-product-select');
-    const manualInput = row.querySelector('.item-name-manual');
-    const rowId = row.id;
-    
-    // Function to update this row's subtotal and total
-    const updateRowAndTotal = function() {
-        calculateRowSubtotal(row);
-        calculateTotalAmount();
-    };
-    
-    // QTY input event
-    if (qtyInput) {
-        qtyInput.addEventListener('input', updateRowAndTotal);
-        qtyInput.addEventListener('change', updateRowAndTotal);
-    }
-    
-    // PRICE input event
-    if (priceInput) {
-        priceInput.addEventListener('input', updateRowAndTotal);
-        priceInput.addEventListener('change', updateRowAndTotal);
-    }
-    
-    // Dropdown select event (JUALAN)
-    if (select) {
-        select.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const priceInputElem = this.closest('.item-row').querySelector('.item-price');
-            
-            if (this.value === 'other') {
-                // Replace select with manual input
-                const nameField = this.closest('.item-field');
-                const newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.className = 'item-name-manual';
-                newInput.placeholder = 'cth: Kek Red Velvet';
-                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
-                this.replaceWith(newInput);
-                if (priceInputElem) {
-                    priceInputElem.value = '';
-                    priceInputElem.placeholder = '0.00';
-                }
-                
-                // Auto-save on blur
-                newInput.addEventListener('blur', function() {
-                    const name = this.value.trim();
-                    if (name) {
-                        const row = this.closest('.item-row');
-                        const p = parseFloat(row.querySelector('.item-price').value) || 0;
-                        const cat = document.getElementById('kategori').value || 'Lain-lain';
-                        saveProductToDatabase(name, p, cat).then(() => {
-                            loadUserProducts();
-                            this.style.borderColor = '#16a34a';
-                            setTimeout(() => { this.style.borderColor = '#cbd5e1'; }, 2000);
-                        });
-                    }
-                });
-                
-                // Add input event to new manual input
-                newInput.addEventListener('input', updateRowAndTotal);
-                
-            } else if (this.value && priceInputElem) {
-                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-                priceInputElem.value = price;
-            }
-            
-            updateRowAndTotal();
-        });
-    }
-    
-    // Manual input event (BELANJA or JUALAN manual)
-    if (manualInput) {
-        manualInput.addEventListener('input', updateRowAndTotal);
-        manualInput.addEventListener('change', updateRowAndTotal);
-    }
-}
-
-// =========================================
-// ITEM MANAGEMENT
-// =========================================
-function addItemRow() {
-    const itemsList = document.getElementById('itemsList');
-    if (!itemsList) return;
-    const itemId = Date.now() + itemCounter++;
-    const isBelanja = document.getElementById('jenis').value === 'belanja';
-    
-    const row = document.createElement('div');
-    row.className = 'item-row';
-    row.id = `item-${itemId}`;
-    
-    let nameHtml = '';
-    if (isBelanja) {
-        nameHtml = `
-            <div class="item-field item-name">
-                <label>📝 Nama Item</label>
-                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
-            </div>
-        `;
-    } else {
-        let optionsHtml = '<option value="">-- Pilih Produk --</option>';
-        userProducts.forEach(p => {
-            optionsHtml += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
-        });
-        optionsHtml += '<option value="other">✏️ Tambah Manual</option>';
-        nameHtml = `
-            <div class="item-field item-name">
-                <label>📝 Nama Produk</label>
-                <select class="item-product-select" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
-                    ${optionsHtml}
-                </select>
-            </div>
-        `;
-    }
-    
-    row.innerHTML = `
-        ${nameHtml}
-        <div class="item-field item-qty">
-            <label>🔢 Kuantiti</label>
-            <input type="number" class="item-qty" value="1" min="1" step="1" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
-        </div>
-        <div class="item-field item-price">
-            <label>💰 Harga (RM)</label>
-            <input type="number" class="item-price" value="0" min="0" step="0.01" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
-        </div>
-        <div class="item-field item-subtotal">
-            <label>💵 Jumlah</label>
-            <span class="item-subtotal-text">RM 0.00</span>
-        </div>
-        <div class="item-field item-action">
-            <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
-        </div>
-    `;
-    
-    // Attach events AFTER row is fully in DOM
-    itemsList.appendChild(row);
-    
-    // Now attach events
-    attachRowEvents(row);
-    calculateRowSubtotal(row);
-    calculateTotalAmount();
-}
-
-function removeItemRow(itemId) {
-    const row = document.getElementById(`item-${itemId}`);
-    if (row) row.remove();
-    calculateTotalAmount();
-}
-
-// =========================================
-// GET ITEMS DATA
-// =========================================
 function getItemsData() {
     const items = [];
     document.querySelectorAll('.item-row').forEach(row => {
+        const productSelect = row.querySelector('.item-product-select');
         let name = '';
-        const select = row.querySelector('.item-product-select');
-        const manual = row.querySelector('.item-name-manual');
-        
-        if (select && select.value && select.value !== 'other') {
-            name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
-        } else if (manual) {
-            name = manual.value.trim();
+        if (productSelect && productSelect.value && productSelect.value !== 'other') {
+            name = productSelect.options[productSelect.selectedIndex]?.text.split(' -')[0] || '';
+        } else {
+            const manualInput = row.querySelector('.item-name-manual');
+            if (manualInput) name = manualInput.value.trim();
         }
-        
-        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        
-        if (name && qty > 0 && price > 0) {
-            items.push({ name, quantity: qty, price, subtotal: qty * price });
+        if (name && quantity > 0 && price > 0) {
+            items.push({ name, quantity, price, subtotal: quantity * price });
         }
     });
     return items;
-}
-
-// =========================================
-// REFRESH ALL ITEM ROWS
-// =========================================
-function refreshAllItemRows() {
-    const rows = document.querySelectorAll('.item-row');
-    rows.forEach(row => {
-        const isBelanja = document.getElementById('jenis').value === 'belanja';
-        const nameField = row.querySelector('.item-field.item-name');
-        if (!nameField) return;
-        const select = nameField.querySelector('.item-product-select');
-        const manual = nameField.querySelector('.item-name-manual');
-        
-        if (isBelanja) {
-            if (select && !manual) {
-                const newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.className = 'item-name-manual';
-                newInput.placeholder = 'cth: Beli Stok, Sewa';
-                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
-                select.replaceWith(newInput);
-                attachRowEvents(row);
-            }
-        } else {
-            if (manual && !select) {
-                const newSelect = document.createElement('select');
-                newSelect.className = 'item-product-select';
-                newSelect.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
-                let html = '<option value="">-- Pilih Produk --</option>';
-                userProducts.forEach(p => {
-                    html += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
-                });
-                html += '<option value="other">✏️ Tambah Manual</option>';
-                newSelect.innerHTML = html;
-                manual.replaceWith(newSelect);
-                attachRowEvents(row);
-            }
-        }
-    });
 }
 
 // =========================================
@@ -491,7 +309,6 @@ if (jualanForm) {
             setTimeout(() => msgDiv.style.display = 'none', 3000);
             await loadRecords();
         } catch (error) {
-            console.error('Submit error:', error);
             const msgDiv = document.getElementById('formMessage');
             msgDiv.style.display = 'block';
             msgDiv.className = 'message-box error';
@@ -524,7 +341,6 @@ async function loadRecords() {
         loadDailySummary();
         loadMonthlySummary();
     } catch (error) {
-        console.error('Load records error:', error);
         rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod</p>';
     }
 }
@@ -631,7 +447,6 @@ async function loadDailySummary() {
         });
         container.innerHTML = html;
     } catch (error) {
-        console.error('Daily summary error:', error);
         container.innerHTML = '<p class="error-text">❌ Error loading data</p>';
     }
 }
@@ -678,7 +493,6 @@ async function loadMonthlySummary() {
         });
         container.innerHTML = html;
     } catch (error) {
-        console.error('Monthly summary error:', error);
         container.innerHTML = '<p class="error-text">❌ Error loading data</p>';
     }
 }
@@ -784,3 +598,5 @@ function setupTabs() {
         });
     });
 }
+
+
