@@ -1296,7 +1296,7 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER - STICKY BOTTOM
+   GLOBAL - FORCE FOOTER TO BOTTOM
    ========================================================================== */
 html {
     height: 100%;
@@ -1306,15 +1306,18 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
-/* Main container for each page */
-.dashboard-container,
-.modul-container,
-.container {
-    flex: 1;
+/* Main container for dashboard */
+.dashboard-container {
+    flex: 1 0 auto;
 }
 
+/* ==========================================================================
+   FOOTER - STICKY BOTTOM
+   ========================================================================== */
 footer {
     background: #1e293b;
     color: #94a3b8;
