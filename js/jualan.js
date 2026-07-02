@@ -191,17 +191,17 @@ function setupJenisTransaksiListener() {
 function getProductDropdownHtml(selectedValue = '') {
     const isBelanja = document.getElementById('jenis').value === 'belanja';
     
-    // For BELANJA: only manual input (no dropdown)
+    // For BELANJA: only manual input (no dropdown, NO SAVE to database)
     if (isBelanja) {
         return `
             <div class="item-field item-name">
                 <label>📝 Nama Item</label>
-                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa, Utiliti" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
             </div>
         `;
     }
     
-    // For JUALAN: dropdown + manual option
+    // For JUALAN: dropdown + manual option (WITH SAVE to database)
     let html = `
         <div class="item-field item-name">
             <label>📝 Nama Produk</label>
@@ -236,7 +236,7 @@ function addItemRow() {
         ? `
             <div class="item-field item-name">
                 <label>📝 Nama Item</label>
-                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa, Utiliti" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
             </div>
         `
         : getProductDropdownHtml();
@@ -260,7 +260,7 @@ function addItemRow() {
         </div>
     `;
     
-    // Event listeners for dropdown (only for JUALAN)
+    // Event listeners for dropdown (ONLY for JUALAN - with SAVE)
     const productSelect = itemRow.querySelector('.item-product-select');
     if (productSelect) {
         productSelect.addEventListener('change', function() {
@@ -285,13 +285,14 @@ function addItemRow() {
                 priceInput.value = '';
                 priceInput.placeholder = '0.00';
                 
-                // Auto-save to database when user finishes typing
+                // Auto-save to database when user finishes typing (ONLY FOR JUALAN)
                 newInput.addEventListener('blur', function() {
                     const name = this.value.trim();
                     if (name) {
                         const row = this.closest('.item-row');
                         const price = parseFloat(row.querySelector('.item-price').value) || 0;
                         const category = document.getElementById('kategori').value || 'Lain-lain';
+                        // SAVE to database - because this is a PRODUCT being sold
                         saveProductToDatabase(name, price, category).then(() => {
                             loadUserProducts();
                             this.style.borderColor = '#16a34a';
@@ -315,22 +316,17 @@ function addItemRow() {
     qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     
-    // For manual name in BELANJA - auto-save
+    // For BELANJA manual name - DO NOT SAVE to database
+    // Just use it for the record, no database save
     const manualNameInput = itemRow.querySelector('.item-name-manual');
     if (manualNameInput && isBelanja) {
+        // No save - just use for display
         manualNameInput.addEventListener('blur', function() {
-            const name = this.value.trim();
-            if (name) {
-                const row = this.closest('.item-row');
-                const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                const category = document.getElementById('kategori').value || 'Lain-lain';
-                saveProductToDatabase(name, price, category).then(() => {
-                    loadUserProducts();
-                    this.style.borderColor = '#16a34a';
-                    setTimeout(() => {
-                        this.style.borderColor = '#cbd5e1';
-                    }, 2000);
-                });
+            // Just validate that it's not empty, but don't save
+            if (this.value.trim()) {
+                this.style.borderColor = '#cbd5e1';
+            } else {
+                this.style.borderColor = '#dc2626';
             }
         });
     }
@@ -348,7 +344,7 @@ function addItemRow() {
     calculateTotalAmount();
 }
 
-// Update refreshAllItemRows function to maintain labels
+// Update refreshAllItemRows function
 function refreshAllItemRows() {
     const rows = document.querySelectorAll('.item-row');
     rows.forEach(row => {
@@ -360,33 +356,26 @@ function refreshAllItemRows() {
         const manualInput = nameField.querySelector('input.item-name-manual');
         
         if (isBelanja) {
-            // Should be manual input
+            // Should be manual input (NO SAVE to database)
             if (select && !manualInput) {
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
                 newInput.className = 'item-name-manual';
-                newInput.placeholder = 'cth: Beli Stok, Sewa';
+                newInput.placeholder = 'cth: Beli Stok, Sewa, Utiliti';
                 newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
                 select.replaceWith(newInput);
                 
+                // No save - just validation
                 newInput.addEventListener('blur', function() {
-                    const name = this.value.trim();
-                    if (name) {
-                        const row = this.closest('.item-row');
-                        const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                        const category = document.getElementById('kategori').value || 'Lain-lain';
-                        saveProductToDatabase(name, price, category).then(() => {
-                            loadUserProducts();
-                            this.style.borderColor = '#16a34a';
-                            setTimeout(() => {
-                                this.style.borderColor = '#cbd5e1';
-                            }, 2000);
-                        });
+                    if (this.value.trim()) {
+                        this.style.borderColor = '#cbd5e1';
+                    } else {
+                        this.style.borderColor = '#dc2626';
                     }
                 });
             }
         } else {
-            // Should be dropdown
+            // Should be dropdown (WITH SAVE to database)
             if (manualInput && !select) {
                 const newSelect = document.createElement('select');
                 newSelect.className = 'item-product-select';
@@ -417,6 +406,7 @@ function refreshAllItemRows() {
                         priceInput.value = '';
                         priceInput.placeholder = '0.00';
                         
+                        // SAVE to database - this is a product being sold
                         newInput.addEventListener('blur', function() {
                             const name = this.value.trim();
                             if (name) {
