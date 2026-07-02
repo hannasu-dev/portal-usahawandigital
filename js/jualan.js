@@ -170,15 +170,19 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 }
 
 // =========================================
-// CALCULATE FUNCTIONS
+// CALCULATE FUNCTIONS - SIMPLIFIED
 // =========================================
-function calculateItemSubtotal(row) {
-    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-    const price = parseFloat(row.querySelector('.item-price').value) || 0;
-    const subtotal = qty * price;
+function calculateRowSubtotal(row) {
+    const qtyInput = row.querySelector('.item-qty');
+    const priceInput = row.querySelector('.item-price');
     const subtotalSpan = row.querySelector('.item-subtotal-text');
-    if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-    calculateTotalAmount();
+    
+    if (!qtyInput || !priceInput || !subtotalSpan) return 0;
+    
+    const qty = parseFloat(qtyInput.value) || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const subtotal = qty * price;
+    subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
     return subtotal;
 }
 
@@ -194,23 +198,40 @@ function calculateTotalAmount() {
     return total;
 }
 
+// =========================================
+// ATTACH EVENTS TO A ROW (FIXED - USE DIRECT REFERENCES)
+// =========================================
 function attachRowEvents(row) {
-    const qty = row.querySelector('.item-qty');
-    const price = row.querySelector('.item-price');
+    const qtyInput = row.querySelector('.item-qty');
+    const priceInput = row.querySelector('.item-price');
     const select = row.querySelector('.item-product-select');
     const manualInput = row.querySelector('.item-name-manual');
+    const rowId = row.id;
     
-    // Function to recalculate this row
-    const recalc = () => calculateItemSubtotal(row);
+    // Function to update this row's subtotal and total
+    const updateRowAndTotal = function() {
+        calculateRowSubtotal(row);
+        calculateTotalAmount();
+    };
     
-    // QTY and PRICE events
-    qty.addEventListener('input', recalc);
-    price.addEventListener('input', recalc);
+    // QTY input event
+    if (qtyInput) {
+        qtyInput.addEventListener('input', updateRowAndTotal);
+        qtyInput.addEventListener('change', updateRowAndTotal);
+    }
     
-    // Dropdown event (JUALAN)
+    // PRICE input event
+    if (priceInput) {
+        priceInput.addEventListener('input', updateRowAndTotal);
+        priceInput.addEventListener('change', updateRowAndTotal);
+    }
+    
+    // Dropdown select event (JUALAN)
     if (select) {
         select.addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
+            const selectedOption = this.options[this.selectedIndex];
+            const priceInputElem = this.closest('.item-row').querySelector('.item-price');
+            
             if (this.value === 'other') {
                 // Replace select with manual input
                 const nameField = this.closest('.item-field');
@@ -220,8 +241,10 @@ function attachRowEvents(row) {
                 newInput.placeholder = 'cth: Kek Red Velvet';
                 newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
                 this.replaceWith(newInput);
-                price.value = '';
-                price.placeholder = '0.00';
+                if (priceInputElem) {
+                    priceInputElem.value = '';
+                    priceInputElem.placeholder = '0.00';
+                }
                 
                 // Auto-save on blur
                 newInput.addEventListener('blur', function() {
@@ -238,18 +261,22 @@ function attachRowEvents(row) {
                     }
                 });
                 
-                // Add recalc to new input
-                newInput.addEventListener('input', recalc);
-            } else if (this.value) {
-                price.value = parseFloat(selected.getAttribute('data-price')) || 0;
+                // Add input event to new manual input
+                newInput.addEventListener('input', updateRowAndTotal);
+                
+            } else if (this.value && priceInputElem) {
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                priceInputElem.value = price;
             }
-            recalc();
+            
+            updateRowAndTotal();
         });
     }
     
-    // Manual input (BELANJA or JUALAN manual)
+    // Manual input event (BELANJA or JUALAN manual)
     if (manualInput) {
-        manualInput.addEventListener('input', recalc);
+        manualInput.addEventListener('input', updateRowAndTotal);
+        manualInput.addEventListener('change', updateRowAndTotal);
     }
 }
 
@@ -309,10 +336,12 @@ function addItemRow() {
         </div>
     `;
     
-    // Attach all event listeners
-    attachRowEvents(row);
-    
+    // Attach events AFTER row is fully in DOM
     itemsList.appendChild(row);
+    
+    // Now attach events
+    attachRowEvents(row);
+    calculateRowSubtotal(row);
     calculateTotalAmount();
 }
 
