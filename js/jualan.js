@@ -1,4 +1,6 @@
+// =========================================
 // KATEGORI PERNIAGAAN
+// =========================================
 const KATEGORI_PERNIAGAAN = {
     fnb: {
         jualan: [
@@ -52,8 +54,11 @@ let currentFilter = 'semua';
 let salesChart = null;
 let itemCounter = 0;
 let currentUserBusinessType = 'fnb';
-let userProducts = []; // Store user's products from database
+let userProducts = [];
 
+// =========================================
+// HELPER FUNCTIONS
+// =========================================
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -61,11 +66,12 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Load user's products from database
+// =========================================
+// LOAD USER PRODUCTS FROM DATABASE
+// =========================================
 async function loadUserProducts() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return [];
-    
     try {
         const { data, error } = await supabaseClient
             .from('products')
@@ -81,22 +87,54 @@ async function loadUserProducts() {
     }
 }
 
-// Get product dropdown HTML
-function getProductDropdownHtml(selectedValue = '') {
-    let html = '<select class="item-product-select" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">';
-    html += '<option value="">-- Pilih Produk --</option>';
-    if (userProducts.length > 0) {
-        userProducts.forEach(product => {
-            const selected = selectedValue === product.name ? 'selected' : '';
-            html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}" ${selected}>${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
-        });
+// =========================================
+// SAVE PRODUCT TO SUPABASE (Manual Entry)
+// =========================================
+async function saveProductToDatabase(productName, productPrice, productCategory) {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return null;
+    
+    try {
+        // Check if product already exists
+        const { data: existing } = await supabaseClient
+            .from('products')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('name', productName)
+            .maybeSingle();
+        
+        if (existing) {
+            // Product exists, return it
+            return existing;
+        }
+        
+        // Insert new product
+        const { data, error } = await supabaseClient
+            .from('products')
+            .insert([{
+                user_id: user.id,
+                name: productName,
+                price: productPrice || 0,
+                category: productCategory || 'Lain-lain',
+                business_type: currentUserBusinessType,
+                created_at: new Date().toISOString()
+            }])
+            .select();
+        
+        if (error) throw error;
+        
+        // Refresh product list
+        await loadUserProducts();
+        return data ? data[0] : null;
+    } catch (error) {
+        console.error('Error saving product:', error);
+        return null;
     }
-    html += '<option value="other">+ Tambah Produk Baru (Manual)</option>';
-    html += '</select>';
-    return html;
 }
 
-// Render kategori dinamik
+// =========================================
+// RENDER KATEGORI DINAMIK
+// =========================================
 function renderDynamicCategories(jenisPerniagaan) {
     let businessData = KATEGORI_PERNIAGAAN[jenisPerniagaan] || KATEGORI_PERNIAGAAN[DEFAULT_KATEGORI];
     currentUserBusinessType = jenisPerniagaan;
@@ -139,52 +177,173 @@ async function getUserBusinessType() {
 function setupJenisTransaksiListener() {
     const jenisSelect = document.getElementById('jenis');
     if (jenisSelect) {
-        jenisSelect.addEventListener('change', () => renderDynamicCategories(currentUserBusinessType));
+        jenisSelect.addEventListener('change', () => {
+            renderDynamicCategories(currentUserBusinessType);
+            refreshAllItemRows();
+        });
     }
 }
 
 // =========================================
-// ITEM MANAGEMENT with Product Dropdown
+// ITEM MANAGEMENT - DROPDOWN + MANUAL
 // =========================================
+function getProductDropdownHtml(selectedValue = '') {
+    const isBelanja = document.getElementById('jenis').value === 'belanja';
+    
+    // For BELANJA: only manual input (no dropdown)
+    if (isBelanja) {
+        return `<input type="text" class="item-name-manual" placeholder="Nama item (cth: Beli Stok)" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">`;
+    }
+    
+    // For JUALAN: dropdown + manual option
+    let html = `<select class="item-product-select" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">`;
+    html += '<option value="">-- Pilih Produk --</option>';
+    if (userProducts.length > 0) {
+        userProducts.forEach(product => {
+            const selected = selectedValue === product.name ? 'selected' : '';
+            html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}" ${selected}>${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
+        });
+    }
+    html += '<option value="other">✏️ Tambah Manual (Produk Baru)</option>';
+    html += '</select>';
+    return html;
+}
+
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
     if (!itemsList) return;
     const itemId = Date.now() + itemCounter++;
+    const isBelanja = document.getElementById('jenis').value === 'belanja';
+    
     const itemRow = document.createElement('div');
     itemRow.className = 'item-row';
     itemRow.id = `item-${itemId}`;
+    
+    let nameInputHtml = isBelanja 
+        ? `<input type="text" class="item-name-manual" placeholder="Nama item (cth: Beli Stok)" style="flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">`
+        : getProductDropdownHtml();
+    
     itemRow.innerHTML = `
-        ${getProductDropdownHtml()}
+        ${nameInputHtml}
         <input type="number" class="item-qty" value="1" min="1" step="1" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
         <input type="number" class="item-price" value="0" min="0" step="0.01" style="flex:0.8; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;">
         <span class="item-subtotal">RM 0.00</span>
         <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
     `;
     
+    // Event listeners for dropdown (only for JUALAN)
     const productSelect = itemRow.querySelector('.item-product-select');
+    if (productSelect) {
+        productSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const priceInput = this.closest('.item-row').querySelector('.item-price');
+            
+            if (this.value === 'other') {
+                // Manual entry - show input field
+                const row = this.closest('.item-row');
+                const nameCol = row.querySelector('.item-name-col');
+                if (!nameCol) {
+                    // Replace select with input
+                    const newInput = document.createElement('input');
+                    newInput.type = 'text';
+                    newInput.className = 'item-name-manual';
+                    newInput.placeholder = 'Nama produk baru';
+                    newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #f59e0b;';
+                    this.replaceWith(newInput);
+                }
+                priceInput.value = '';
+                priceInput.placeholder = 'Masukkan harga';
+            } else if (this.value) {
+                const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                priceInput.value = productPrice;
+            }
+            calculateItemSubtotal(itemId);
+        });
+    }
+    
+    // Manual input event listeners
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
-    
-    productSelect.addEventListener('change', () => {
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        if (selectedOption.value === 'other') {
-            // Manual entry - clear and let user type
-            priceInput.value = '';
-            priceInput.placeholder = 'Masukkan harga';
-            productSelect.style.border = '1px solid #f59e0b';
-        } else if (selectedOption.value) {
-            const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-            priceInput.value = productPrice;
-            productSelect.style.border = '1px solid #cbd5e1';
-        }
-        calculateItemSubtotal(itemId);
-    });
-    
     qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     
+    // For manual name, auto-save when user finishes typing
+    const manualNameInput = itemRow.querySelector('.item-name-manual');
+    if (manualNameInput) {
+        manualNameInput.addEventListener('blur', function() {
+            const name = this.value.trim();
+            if (name) {
+                const row = this.closest('.item-row');
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const category = document.getElementById('kategori').value || 'Lain-lain';
+                // Save to database (async, but don't block user)
+                saveProductToDatabase(name, price, category).then(() => {
+                    // Refresh product list silently
+                    loadUserProducts();
+                });
+            }
+        });
+    }
+    
     itemsList.appendChild(itemRow);
     calculateTotalAmount();
+}
+
+function refreshAllItemRows() {
+    // Refresh all item rows to update dropdown/manual based on transaction type
+    const rows = document.querySelectorAll('.item-row');
+    rows.forEach(row => {
+        const isBelanja = document.getElementById('jenis').value === 'belanja';
+        const select = row.querySelector('.item-product-select');
+        const manualInput = row.querySelector('.item-name-manual');
+        
+        if (isBelanja) {
+            // Should be manual input
+            if (select && !manualInput) {
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'item-name-manual';
+                newInput.placeholder = 'Nama item (cth: Beli Stok)';
+                newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;';
+                select.replaceWith(newInput);
+            }
+        } else {
+            // Should be dropdown
+            if (manualInput && !select) {
+                const newSelect = document.createElement('select');
+                newSelect.className = 'item-product-select';
+                newSelect.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;';
+                // Populate dropdown
+                let html = '<option value="">-- Pilih Produk --</option>';
+                userProducts.forEach(product => {
+                    html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}">${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
+                });
+                html += '<option value="other">✏️ Tambah Manual (Produk Baru)</option>';
+                newSelect.innerHTML = html;
+                manualInput.replaceWith(newSelect);
+                
+                // Add event listener to new select
+                newSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const priceInput = this.closest('.item-row').querySelector('.item-price');
+                    if (this.value === 'other') {
+                        const row = this.closest('.item-row');
+                        const newInput = document.createElement('input');
+                        newInput.type = 'text';
+                        newInput.className = 'item-name-manual';
+                        newInput.placeholder = 'Nama produk baru';
+                        newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #f59e0b;';
+                        this.replaceWith(newInput);
+                        priceInput.value = '';
+                        priceInput.placeholder = 'Masukkan harga';
+                    } else if (this.value) {
+                        priceInput.value = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                    }
+                    calculateItemSubtotal(row.id);
+                });
+            }
+        }
+    });
 }
 
 function removeItemRow(itemId) {
@@ -218,16 +377,23 @@ function calculateTotalAmount() {
 function getItemsData() {
     const items = [];
     document.querySelectorAll('.item-row').forEach(row => {
-        const productSelect = row.querySelector('.item-product-select');
         let name = '';
-        if (productSelect && productSelect.value && productSelect.value !== 'other') {
-            name = productSelect.options[productSelect.selectedIndex]?.text.split(' -')[0] || '';
+        const select = row.querySelector('.item-product-select');
+        const manualInput = row.querySelector('.item-name-manual');
+        
+        if (select && select.value && select.value !== 'other') {
+            name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
+        } else if (manualInput) {
+            name = manualInput.value.trim();
         } else {
-            const manualInput = row.querySelector('.item-name-manual');
-            if (manualInput) name = manualInput.value.trim();
+            // Fallback - try to get from any input
+            const nameInput = row.querySelector('input[type="text"]');
+            if (nameInput) name = nameInput.value.trim();
         }
+        
         const quantity = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        
         if (name && quantity > 0 && price > 0) {
             items.push({ name, quantity, price, subtotal: quantity * price });
         }
@@ -295,6 +461,7 @@ if (jualanForm) {
             
             if (error) throw error;
             
+            // Reset form
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             document.getElementById('itemsList').innerHTML = '';
