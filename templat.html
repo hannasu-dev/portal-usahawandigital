@@ -39,8 +39,44 @@
         .templat-card:hover { transform: translateY(-5px); }
         
         .templat-icon { font-size: 3rem; margin-bottom: 15px; }
-        .templat-card h3 { color: #1a5f7a; margin-bottom: 10px; }
-        .templat-card p { color: #64748b; font-size: 0.9rem; margin-bottom: 20px; }
+        .templat-card h3 { color: #1a5f7a; margin-bottom: 10px; font-size: 1.1rem; }
+        .templat-card p { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+        
+        .templat-card .btn-outline {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #1a5f7a;
+            color: #1a5f7a;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .templat-card .btn-outline:hover {
+            background: #1a5f7a;
+            color: white;
+        }
+        
+        .templat-card .btn-canva {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #00c4cc;
+            color: #00c4cc;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .templat-card .btn-canva:hover {
+            background: #00c4cc;
+            color: white;
+        }
         
         .templat-note {
             margin-top: 40px;
@@ -48,6 +84,38 @@
             background: #f0f7ff;
             border-left: 4px solid #1a5f7a;
             border-radius: 4px;
+        }
+        
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: #1a5f7a;
+            margin-top: 2.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .section-subtitle .badge-new {
+            background: #16a34a;
+            color: white;
+            font-size: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .canva-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .canva-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -72,50 +140,101 @@
             <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
         </div>
 
-        <h2>📄 Templat Perniagaan Percuma</h2>
-        <p class="section-desc">Muat turun dan guna terus untuk perniagaan anda. Format Word, Excel, dan PDF sedia guna.</p>
+        <h2>📄 Templat & Alatan Perniagaan</h2>
+        <p class="section-desc">Muat turun template siap guna atau gunakan alatan untuk membantu perniagaan anda.</p>
 
+        <!-- ===== SECTION 1: TEMPLAT UTAMA ===== -->
         <div class="templat-grid">
+            <!-- Invois -->
             <div class="templat-card">
                 <div class="templat-icon">📊</div>
-                <h3>Template Invois Mudah</h3>
-                <p>Format jadual ringkas untuk rekod jualan harian.</p>
-                <button class="btn-outline" onclick="downloadTemplate('invois')">📥 Muat Turun (PDF)</button>
+                <h3>Template Invois Automatik</h3>
+                <p>Excel dengan formula auto kira jumlah, cukai dan jumlah besar.</p>
+                <button class="btn-outline" onclick="downloadTemplate('invois')">📥 Muat Turun (Excel)</button>
             </div>
 
+            <!-- Quotation -->
             <div class="templat-card">
                 <div class="templat-icon">💰</div>
-                <h3>Sebut Harga (Quotation)</h3>
-                <p>Template profesional untuk hantar sebut harga kepada pelanggan.</p>
-                <button class="btn-outline" onclick="downloadTemplate('quotation')">📥 Muat Turun (PDF)</button>
+                <h3>Template Sebut Harga</h3>
+                <p>Excel profesional untuk hantar sebut harga kepada pelanggan.</p>
+                <button class="btn-outline" onclick="downloadTemplate('quotation')">📥 Muat Turun (Excel)</button>
             </div>
 
+            <!-- Caption Media Sosial -->
             <div class="templat-card">
                 <div class="templat-icon">📱</div>
                 <h3>Caption Media Sosial</h3>
                 <p>10 template caption untuk Instagram, Facebook & WhatsApp Business.</p>
-                <button class="btn-outline" onclick="downloadTemplate('caption')">📥 Muat Turun (PDF)</button>
+                <button class="btn-outline" onclick="downloadTemplate('caption')">📥 Muat Turun (Word)</button>
             </div>
 
+            <!-- Senarai Semak Stok -->
             <div class="templat-card">
                 <div class="templat-icon">📋</div>
                 <h3>Senarai Semak Stok</h3>
-                <p>Template untuk rekod masuk keluar stok barang.</p>
+                <p>Excel untuk rekod masuk keluar stok barang.</p>
                 <button class="btn-outline" onclick="downloadTemplate('stok')">📥 Muat Turun (Excel)</button>
             </div>
 
+            <!-- Perancang Bulanan -->
             <div class="templat-card">
                 <div class="templat-icon">📅</div>
                 <h3>Perancang Bulanan Bisnes</h3>
-                <p>Template untuk rancang tugasan & target jualan bulanan.</p>
-                <button class="btn-outline" onclick="downloadTemplate('perancang')">📥 Muat Turun (PDF)</button>
+                <p>Excel untuk rancang tugasan & target jualan bulanan.</p>
+                <button class="btn-outline" onclick="downloadTemplate('perancang')">📥 Muat Turun (Excel)</button>
             </div>
 
+            <!-- Email Promosi -->
             <div class="templat-card">
                 <div class="templat-icon">📧</div>
                 <h3>Email Promosi (Copy Paste)</h3>
                 <p>5 template email untuk hantar kepada pelanggan lama & baru.</p>
                 <button class="btn-outline" onclick="downloadTemplate('email')">📥 Muat Turun (Word)</button>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 2: ALATAN PERNIAGAAN ===== -->
+        <h3 class="section-subtitle">🧮 Alatan Perniagaan <span class="badge-new">BARU</span></h3>
+        <p class="section-desc" style="text-align:left; margin-bottom:1.5rem;">Kira kos dan rancang perniagaan anda dengan lebih efektif.</p>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:2rem;">
+            <!-- Kalkulator Kos Bahan Mentah -->
+            <div class="templat-card">
+                <div class="templat-icon">🧮</div>
+                <h3>Kalkulator Kos Bahan Mentah</h3>
+                <p>Excel dengan formula auto kira:<br>• Kos bahan mentah<br>• Kos overhed (sewa, gaji, utiliti)<br>• Harga jualan cadangan<br>• Margin keuntungan</p>
+                <button class="btn-outline" onclick="downloadTemplate('kalkulator')">📥 Muat Turun (Excel)</button>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 3: CANVA TEMPLATES ===== -->
+        <h3 class="section-subtitle">🎨 Reka Bentuk Canva <span class="badge-new">BARU</span></h3>
+        <p class="section-desc" style="text-align:left; margin-bottom:1.5rem;">Guna template Canva siap sedia untuk reka bentuk media sosial perniagaan anda.</p>
+
+        <div class="canva-grid">
+            <!-- Canva 1: Promosi Jualan -->
+            <div class="templat-card">
+                <div class="templat-icon">🛍️</div>
+                <h3>Promosi Jualan</h3>
+                <p>Template untuk promosi jualan, flash sale atau diskaun istimewa.</p>
+                <a href="https://canva.link/3jwl0d8sfskhltz" class="btn-canva" target="_blank">🎨 Reka di Canva</a>
+            </div>
+
+            <!-- Canva 2: Testimoni Pelanggan -->
+            <div class="templat-card">
+                <div class="templat-icon">⭐</div>
+                <h3>Testimoni Pelanggan</h3>
+                <p>Template untuk paparkan ulasan dan testimoni pelanggan dengan visual menarik.</p>
+                <a href="https://canva.link/smqmabi5ly09z1a" class="btn-canva" target="_blank">🎨 Reka di Canva</a>
+            </div>
+
+            <!-- Canva 3: Pengenalan Produk -->
+            <div class="templat-card">
+                <div class="templat-icon">📦</div>
+                <h3>Pengenalan Produk</h3>
+                <p>Template untuk perkenalkan produk baru, spesifikasi dan kelebihan.</p>
+                <a href="https://canva.link/gtbtn40yyzk9mhv" class="btn-canva" target="_blank">🎨 Reka di Canva</a>
             </div>
         </div>
 
@@ -141,28 +260,32 @@
         
         switch(type) {
             case 'invois':
-                fileUrl = 'uploads/templateinvoice.pdf';
-                fileName = 'Template_Invois_UsahawanDigital.pdf';
+                fileUrl = 'uploads/templat_invois_automatik.xlsx';
+                fileName = 'Template_Invois_Automatik_UsahawanDigital.xlsx';
                 break;
             case 'quotation':
-                fileUrl = 'uploads/templatequotation.pdf';
-                fileName = 'Template_Sebut_Harga_UsahawanDigital.pdf';
+                fileUrl = 'uploads/templat_sebut_harga.xlsx';
+                fileName = 'Template_Sebut_Harga_UsahawanDigital.xlsx';
+                break;
+            case 'caption':
+                fileUrl = 'uploads/templat_caption_media_sosial.docx';
+                fileName = 'Template_Caption_Media_Sosial.docx';
                 break;
             case 'stok':
                 fileUrl = 'uploads/template_senarai_semak_stok.xlsx';
                 fileName = 'Template_Senarai_Semak_Stok.xlsx';
                 break;
-            case 'caption':
-                fileUrl = 'uploads/template_captionmediasosial.pdf';
-                fileName = 'Template_Caption_Media_Sosial.pdf';
-                break;
             case 'perancang':
-                fileUrl = 'uploads/Template_Perancangan_Bulanan_Bisnes.pdf';
-                fileName = 'Template_Perancangan_Bulanan_Bisnes.pdf';
+                fileUrl = 'uploads/templat_perancang_bulanan.xlsx';
+                fileName = 'Template_Perancang_Bulanan_UsahawanDigital.xlsx';
                 break;
             case 'email':
                 fileUrl = 'uploads/Templat_Emel_Promosi_Bisnes.docx';
                 fileName = 'Templat_Emel_Promosi_Bisnes.docx';
+                break;
+            case 'kalkulator':
+                fileUrl = 'uploads/kalkulator_kos_bahan_mentah.xlsx';
+                fileName = 'Kalkulator_Kos_Bahan_Mentah_UsahawanDigital.xlsx';
                 break;
             default:
                 alert('Template sedang dalam pembinaan.');
@@ -177,9 +300,8 @@
         link.click();
         document.body.removeChild(link);
         
-        // Success message
         alert(`✅ ${fileName} berjaya dimuat turun!`);
     }
-</script>
+    </script>
 </body>
 </html>
