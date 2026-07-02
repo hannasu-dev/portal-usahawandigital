@@ -6,43 +6,573 @@
     <title>Touch n Go eWallet - UsahawanDigital</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== MODUL PAGE STYLES ===== */
+        .modul-detail-container {
+            padding: 2rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .modul-hero {
+            background: linear-gradient(135deg, #1a5f7a 0%, #2c7da0 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        .modul-hero h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .modul-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Content Grid */
+        .modul-content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card Styles */
+        .modul-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .modul-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .modul-card .card-header {
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border-bottom: 2px solid #f0f7ff;
+        }
+        .modul-card .card-header .icon {
+            font-size: 1.8rem;
+        }
+        .modul-card .card-header h3 {
+            font-size: 1rem;
+            color: #1a5f7a;
+            margin: 0;
+        }
+        .modul-card .card-body {
+            padding: 1.2rem;
+            flex: 1;
+        }
+        .modul-card .card-body p {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 1rem;
+        }
+
+        /* Video */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #1e293b;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Preview Card - UNTUK INFOGRAFIK & PDF */
+        .preview-card {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            position: relative;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .preview-card:hover {
+            border-color: #1a5f7a;
+            box-shadow: 0 4px 12px rgba(26, 95, 122, 0.15);
+            transform: scale(1.01);
+        }
+
+        .preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-card .preview-icon {
+            font-size: 3.5rem;
+            opacity: 0.8;
+        }
+        .preview-card .preview-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1a5f7a;
+            background: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            margin-top: 0.3rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .preview-card .preview-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(26, 95, 122, 0.9);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Buttons */
+        .btn-modul {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-modul-primary {
+            background: #1a5f7a;
+            color: white;
+        }
+        .btn-modul-primary:hover {
+            background: #0e4a62;
+            transform: scale(1.02);
+        }
+        .btn-modul-outline {
+            background: transparent;
+            color: #1a5f7a;
+            border: 2px solid #1a5f7a;
+        }
+        .btn-modul-outline:hover {
+            background: #1a5f7a;
+            color: white;
+        }
+        .btn-modul-success {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-modul-success:hover {
+            background: #15803d;
+            transform: scale(1.02);
+        }
+        .btn-modul-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-modul-warning:hover {
+            background: #d97706;
+            transform: scale(1.02);
+        }
+        .btn-modul-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-modul-danger:hover {
+            background: #b91c1c;
+            transform: scale(1.02);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Popup Modal */
+        .popup-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .popup-modal.active {
+            display: flex;
+        }
+        .popup-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: popupFadeIn 0.3s;
+        }
+        @keyframes popupFadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .popup-close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .popup-close:hover {
+            color: #1a5f7a;
+        }
+        .popup-content .popup-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* PDF Preview in Popup - WITH ACTUAL PREVIEW */
+        .popup-pdf-container {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .popup-pdf-container .pdf-iframe-wrapper {
+            position: relative;
+            padding-bottom: 75%;
+            height: 0;
+            overflow: hidden;
+        }
+        .popup-pdf-container .pdf-iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .popup-pdf-container .pdf-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 2rem;
+            min-height: 250px;
+            text-align: center;
+        }
+        .popup-pdf-container .pdf-fallback .pdf-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+        .popup-pdf-container .pdf-fallback .pdf-name {
+            font-weight: 600;
+            color: #1a5f7a;
+        }
+        .popup-pdf-container .pdf-fallback .pdf-size {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .popup-content h3 {
+            color: #1a5f7a;
+            margin-bottom: 0.5rem;
+        }
+        .popup-content .popup-desc {
+            color: #475569;
+            margin-bottom: 1rem;
+        }
+        .popup-content .popup-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .popup-content .popup-actions .btn-modul {
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .modul-content-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .modul-hero h1 {
+                font-size: 1.5rem;
+            }
+            .popup-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            .popup-content .popup-actions {
+                flex-direction: column;
+            }
+        }
+        @media (max-width: 600px) {
+            .modul-hero {
+                padding: 1.5rem 1rem;
+            }
+            .modul-hero h1 {
+                font-size: 1.2rem;
+            }
+            .preview-card {
+                height: 140px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
-            <div class="nav-links"><a href="index.html">Utama</a><a href="modul.html">Modul</a><a href="templat.html">Templat</a><a href="dashboard.html">Dashboard</a></div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="modul.html">Modul</a>
+                <a href="jualan.html">Rekod Jualan</a>
+                <a href="templat.html">Templat</a>
+                <a href="#" id="logoutBtn">Log Keluar</a>
+            </div>
         </div>
     </nav>
+
     <div class="container modul-detail-container">
-        <div class="back-button-container"><a href="modul.html" class="back-btn">Kembali ke Modul</a></div>
-        <h2>📱 Touch n Go eWallet</h2>
-        <p class="section-desc">Pelajari cara menggunakan Touch n Go eWallet untuk urusan jualan harian.</p>
-        <div class="modul-detail-grid">
-            <div class="detail-card">
-                <div class="detail-badge">📹 Video Pendek</div>
-                <h3>Cara Guna Touch n Go eWallet Untuk Jualan</h3>
-                <div class="video-preview"><img src="https://placehold.co/600x340/1a5f7a/white?text=Video+TNG+eWallet" alt="Preview"></div>
-                <a href="https://youtu.be/ZcOJJY-wHxA" target="_blank" class="video-link">▶ Tonton Video (YouTube)</a>
-                <p class="detail-desc">Lengkap dari muat turun aplikasi hingga terima bayaran.</p>
+        <!-- Back Button -->
+        <a href="modul.html" class="back-btn" style="display:inline-flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem;text-decoration:none;color:#1a5f7a;font-weight:500;">
+            ← Kembali ke Modul
+        </a>
+
+        <!-- Hero -->
+        <div class="modul-hero">
+            <h1>📱 Touch n Go eWallet</h1>
+            <p>Pelajari cara menggunakan Touch n Go eWallet untuk urusan jualan harian.</p>
+        </div>
+
+        <!-- 3 Column Grid -->
+        <div class="modul-content-grid">
+
+            <!-- ========== CARD 1: VIDEO ========== -->
+            <div class="modul-card">
+                <div class="card-header">
+                    <span class="icon">📹</span>
+                    <h3>Video Pendek</h3>
+                </div>
+                <div class="card-body">
+                    <p>Cara Guna Touch n Go eWallet </p>
+                    
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https://www.youtube.com/watch?v=Dm4Izo6ZuoM" 
+                            title="Cara guna TNG eWallet untuk pembayaran melalui Scan QR Code DuitNow"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    
+                    <div class="btn-group" style="margin-top: 0.8rem;">
+                        <a href="https://www.youtube.com/watch?v=Dm4Izo6ZuoM" target="_blank" class="btn-modul btn-modul-primary">
+                            ▶ Tonton Video (YouTube)
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="detail-card">
-                <div class="detail-badge">🖼️ Infografik</div>
-                <h3>Kelebihan TNG eWallet Untuk Peniaga</h3>
-                <img src="uploads/kelebihan_tng_ewallet_kepada_peniaga.png" alt="Infografik" class="infografik-img" onerror="this.src='https://placehold.co/600x400/2c7da0/white?text=Infografik+Kelebihan+TNG+eWallet'">
-                <a href="uploads/kelebihan_tng_ewallet_kepada_peniaga.png" download class="download-link">📥 Muat Turun Infografik (PNG)</a>
+
+            <!-- ========== CARD 2: INFOGRAFIK ========== -->
+            <div class="modul-card">
+                <div class="card-header">
+                    <span class="icon">🖼️</span>
+                    <h3>Infografik</h3>
+                </div>
+                <div class="card-body">
+                    <p>Kelebihan TNG eWallet Untuk Peniaga</p>
+                    
+                    <!-- Preview Card -->
+                    <div class="preview-card" onclick="openPopup('infografik')">
+                        <img src="uploads/kelebihan_tng_ewallet_kepada_peniaga.png" alt="Infografik" onerror="this.style.display='none';this.parentElement.querySelector('.preview-icon').style.display='block';this.parentElement.querySelector('.preview-label').style.display='block'">
+                        <span class="preview-icon" style="display:none;">📊</span>
+                        <span class="preview-label" style="display:none;">Klik untuk Pratinjau</span>
+                        <span class="preview-badge">PNG</span>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-modul btn-modul-success" onclick="openPopup('infografik')">
+                            👁️ Pratinjau & Muat Turun
+                        </button>
+                        <a href="uploads/kelebihan_tng_ewallet_kepada_peniaga.png" download class="btn-modul btn-modul-outline">
+                            📥 Muat Turun Terus (PNG)
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="detail-card">
-                <div class="detail-badge">📷 Panduan Bergambar (PDF)</div>
-                <h3>Panduan Setup TNG eWallet untuk Bisnes</h3>
-                <p class="detail-desc">Panduan langkah-demi-langkah dalam format PDF untuk setup akaun TNG eWallet Business.</p>
-                <a href="uploads/Panduan_Setup_TnG_eWallet_Business.pdf" download class="download-link">📥 Muat Turun PDF Panduan</a>
+
+            <!-- ========== CARD 3: PANDUAN BERGAMBAR ========== -->
+            <div class="modul-card">
+                <div class="card-header">
+                    <span class="icon">📷</span>
+                    <h3>Panduan PDF</h3>
+                </div>
+                <div class="card-body">
+                    <p>Panduan langkah-demi-langkah dalam format PDF untuk setup akaun TNG eWallet Business.</p>
+                    
+                    <!-- Preview Card untuk PDF - ADA PREVIEW THUMBNAIL -->
+                    <div class="preview-card" onclick="openPopup('panduan')">
+                        <!-- Cuba papar thumbnail PDF (cover pertama) -->
+                        <img src="uploads/Panduan_Setup_TnG_eWallet_Business.pdf" alt="Preview Panduan PDF" onerror="this.style.display='none';this.parentElement.querySelector('.preview-icon').style.display='block';this.parentElement.querySelector('.preview-label').style.display='block'">
+                        <span class="preview-icon" style="display:none;">📄</span>
+                        <span class="preview-label" style="display:none;">Klik untuk Pratinjau</span>
+                        <span class="preview-badge">PDF</span>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-modul btn-modul-warning" onclick="openPopup('panduan')">
+                            👁️ Pratinjau & Muat Turun
+                        </button>
+                        <a href="uploads/Panduan_Setup_TnG_eWallet_Business.pdf" download class="btn-modul btn-modul-outline">
+                            📥 Muat Turun Terus (PDF)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end grid -->
+    </div>
+
+    <!-- ========== POPUP MODAL ========== -->
+    <div id="popupModal" class="popup-modal">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">&times;</button>
+            
+            <div id="popupContent">
+                <!-- Dynamic content will be inserted here -->
             </div>
         </div>
     </div>
-    <footer><div class="container"><p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p></div></footer>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+        // ===== POPUP FUNCTIONS =====
+        function openPopup(type) {
+            const modal = document.getElementById('popupModal');
+            const content = document.getElementById('popupContent');
+            
+            let html = '';
+            
+            if (type === 'infografik') {
+                html = `
+                    <h3>🖼️ Strategi Media Sosial Untuk Kedai Kecil</h3>
+                    <p class="popup-desc">Infografik ringkasan strategi media sosial yang sesuai untuk perniagaan kecil.</p>
+                    <img src="uploads/strategi_media_sosial_kedaikecil.png" alt="Infografik" class="popup-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23f0f7ff%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%22300%22 y=%22200%22 text-anchor=%22middle%22 font-size=%2230%22 fill=%22%231a5f7a%22 font-family=%22Arial%22%3E📊 Infografik%3C/text%3E%3C/svg%3E'">
+                    <div class="popup-actions">
+                        <a href="uploads/strategi_media_sosial_kedaikecil.png" download class="btn-modul btn-modul-success">
+                            📥 Muat Turun (PNG)
+                        </a>
+                        <button class="btn-modul btn-modul-outline" onclick="closePopup()">Tutup</button>
+                    </div>
+                `;
+            } else if (type === 'panduan') {
+                html = `
+                    <h3>📷 Panduan Langkah Pertama Pemasaran Digital</h3>
+                    <p class="popup-desc">Panduan bergambar langkah-demi-langkah dalam format PDF untuk memulakan pemasaran digital.</p>
+                    
+                    <!-- PDF Preview with iframe -->
+                    <div class="popup-pdf-container">
+                        <div class="pdf-iframe-wrapper">
+                            <iframe src="uploads/Panduan_Mula_Pemasaran_Digital.pdf#page=1&toolbar=0" title="Preview PDF"></iframe>
+                        </div>
+                        <div style="padding:0.5rem 1rem;background:#f1f5f9;font-size:0.75rem;color:#64748b;display:flex;justify-content:space-between;align-items:center;">
+                            <span>📄 Panduan_Mula_Pemasaran_Digital.pdf</span>
+                            <span>📎 Muat turun untuk baca penuh</span>
+                        </div>
+                    </div>
+                    
+                    <div class="popup-actions">
+                        <a href="uploads/Panduan_Mula_Pemasaran_Digital.pdf" download class="btn-modul btn-modul-warning">
+                            📥 Muat Turun PDF Panduan
+                        </a>
+                        <button class="btn-modul btn-modul-outline" onclick="closePopup()">Tutup</button>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup() {
+            const modal = document.getElementById('popupModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close popup when clicking outside content
+        document.getElementById('popupModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // Close popup with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
+    </script>
 </body>
 </html>
+
+
