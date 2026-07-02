@@ -3,47 +3,16 @@
 // =========================================
 const KATEGORI_PERNIAGAAN = {
     fnb: {
-        jualan: [
-            { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
-            { value: "Minuman", label: "🥤 Minuman" },
-            { value: "Makanan Utama", label: "🍝 Makanan Utama" },
-            { value: "Lain-lain", label: "📝 Lain-lain" }
-        ],
-        belanja: [
-            { value: "Bahan Mentah", label: "🥛 Bahan Mentah" },
-            { value: "Pembungkusan", label: "📦 Pembungkusan" },
-            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
-            { value: "Utiliti", label: "⚡ Utiliti" },
-            { value: "Pemasaran", label: "📣 Pemasaran" }
-        ]
+        jualan: [{ value: "Kek & Pastri", label: "🍰 Kek & Pastri" }, { value: "Minuman", label: "🥤 Minuman" }, { value: "Makanan Utama", label: "🍝 Makanan Utama" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
+        belanja: [{ value: "Bahan Mentah", label: "🥛 Bahan Mentah" }, { value: "Pembungkusan", label: "📦 Pembungkusan" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Utiliti", label: "⚡ Utiliti" }, { value: "Pemasaran", label: "📣 Pemasaran" }]
     },
     retail: {
-        jualan: [
-            { value: "Pakaian Wanita", label: "👗 Pakaian Wanita" },
-            { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" },
-            { value: "Aksesori", label: "💍 Aksesori" },
-            { value: "Lain-lain", label: "📝 Lain-lain" }
-        ],
-        belanja: [
-            { value: "Belian Stok", label: "📦 Belian Stok" },
-            { value: "Logistik", label: "🚚 Logistik" },
-            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
-            { value: "Pemasaran", label: "📣 Pemasaran" }
-        ]
+        jualan: [{ value: "Pakaian Wanita", label: "👗 Pakaian Wanita" }, { value: "Pakaian Lelaki", label: "👕 Pakaian Lelaki" }, { value: "Aksesori", label: "💍 Aksesori" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
+        belanja: [{ value: "Belian Stok", label: "📦 Belian Stok" }, { value: "Logistik", label: "🚚 Logistik" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Pemasaran", label: "📣 Pemasaran" }]
     },
     servis: {
-        jualan: [
-            { value: "Servis Utama", label: "✂️ Servis Utama" },
-            { value: "Rawatan", label: "💆 Rawatan" },
-            { value: "Produk Tambahan", label: "🧴 Produk Tambahan" },
-            { value: "Lain-lain", label: "📝 Lain-lain" }
-        ],
-        belanja: [
-            { value: "Alatan Servis", label: "🛠️ Alatan Servis" },
-            { value: "Kos Operasi", label: "🏢 Kos Operasi" },
-            { value: "Utiliti", label: "⚡ Utiliti" },
-            { value: "Lesen/Perisian", label: "💻 Lesen/Perisian" }
-        ]
+        jualan: [{ value: "Servis Utama", label: "✂️ Servis Utama" }, { value: "Rawatan", label: "💆 Rawatan" }, { value: "Produk Tambahan", label: "🧴 Produk Tambahan" }, { value: "Lain-lain", label: "📝 Lain-lain" }],
+        belanja: [{ value: "Alatan Servis", label: "🛠️ Alatan Servis" }, { value: "Kos Operasi", label: "🏢 Kos Operasi" }, { value: "Utiliti", label: "⚡ Utiliti" }, { value: "Lesen/Perisian", label: "💻 Lesen/Perisian" }]
     }
 };
 const DEFAULT_KATEGORI = 'fnb';
@@ -73,10 +42,8 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return null;
     try {
-        // Check if product exists
         const { data: existing } = await supabaseClient.from('products').select('id').eq('user_id', user.id).ilike('name', productName).maybeSingle();
         if (existing) return existing;
-        // Insert new product
         const { data, error } = await supabaseClient.from('products').insert([{ user_id: user.id, name: productName, price: productPrice || 0, category: productCategory || 'Lain-lain', business_type: currentUserBusinessType }]).select();
         if (error) throw error;
         await loadUserProducts();
@@ -121,20 +88,18 @@ function setupJenisTransaksiListener() {
 }
 
 // =========================================
-// ITEM MANAGEMENT - FIXED & SIMPLIFIED
+// ITEM MANAGEMENT - SIMPLIFIED & FIXED
 // =========================================
 function getProductDropdownHtml() {
     const isBelanja = document.getElementById('jenis').value === 'belanja';
     
-    // BELANJA: manual input only (NO database save)
     if (isBelanja) {
         return `<div class="item-field item-name"><label>📝 Nama Item</label><input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;"></div>`;
     }
     
-    // JUALAN: dropdown + manual option (WITH database save)
     let html = `<div class="item-field item-name"><label>📝 Nama Produk</label><select class="item-product-select" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;"><option value="">-- Pilih Produk --</option>`;
     userProducts.forEach(p => { html += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`; });
-    html += `<option value="other">✏️ Tambah Manual (Produk Baru)</option></select></div>`;
+    html += `<option value="other">✏️ Tambah Manual</option></select></div>`;
     return html;
 }
 
@@ -156,13 +121,13 @@ function addItemRow() {
         <div class="item-field item-action"><button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button></div>
     `;
     
-    // === ATTACH EVENT LISTENERS ===
+    // === EVENT LISTENERS ===
     const qty = row.querySelector('.item-qty');
     const price = row.querySelector('.item-price');
     const select = row.querySelector('.item-product-select');
     const manualInput = row.querySelector('.item-name-manual');
     
-    // Calculate function for this row
+    // Calculate function
     const calculateRow = () => {
         const q = parseFloat(qty.value) || 0;
         const p = parseFloat(price.value) || 0;
@@ -175,7 +140,7 @@ function addItemRow() {
     qty.addEventListener('input', calculateRow);
     price.addEventListener('input', calculateRow);
     
-    // Handle dropdown selection (JUALAN only)
+    // Handle dropdown selection
     if (select) {
         select.addEventListener('change', function() {
             const selected = this.options[this.selectedIndex];
@@ -191,7 +156,9 @@ function addItemRow() {
                 price.value = '';
                 price.placeholder = '0.00';
                 
-                // Auto-save when blur (JUALAN only)
+                newInput.addEventListener('input', calculateRow);
+                
+                // Auto-save to database (only for JUALAN)
                 newInput.addEventListener('blur', function() {
                     const name = this.value.trim();
                     if (name) {
@@ -205,7 +172,6 @@ function addItemRow() {
                         });
                     }
                 });
-                newInput.addEventListener('input', calculateRow);
             } else if (this.value) {
                 price.value = parseFloat(selected.getAttribute('data-price')) || 0;
             }
@@ -213,19 +179,12 @@ function addItemRow() {
         });
     }
     
-    // For BELANJA manual input - NO database save
+    // BELANJA manual input - NO save to database
     if (manualInput && isBelanja) {
         manualInput.addEventListener('input', calculateRow);
-        manualInput.addEventListener('blur', function() {
-            if (this.value.trim()) {
-                this.style.borderColor = '#cbd5e1';
-            } else {
-                this.style.borderColor = '#dc2626';
-            }
-        });
     }
     
-    // For JUALAN manual input (when "other" was selected)
+    // JUALAN manual input - if it exists (from "other" selection)
     const manualInputJualan = row.querySelector('.item-name-manual');
     if (manualInputJualan && !isBelanja) {
         manualInputJualan.addEventListener('input', calculateRow);
@@ -260,6 +219,7 @@ function getItemsData() {
         const select = row.querySelector('.item-product-select');
         const manual = row.querySelector('.item-name-manual');
         
+        // Get name from dropdown or manual input
         if (select && select.value && select.value !== 'other') {
             name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
         } else if (manual) {
@@ -269,6 +229,7 @@ function getItemsData() {
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         
+        // Only add item if name exists and qty/price > 0
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
         }
@@ -277,7 +238,7 @@ function getItemsData() {
 }
 
 // =========================================
-// REFRESH ALL ITEM ROWS (when jenis changes)
+// REFRESH ALL ITEM ROWS
 // =========================================
 function refreshAllItemRows() {
     const rows = document.querySelectorAll('.item-row');
@@ -289,7 +250,7 @@ function refreshAllItemRows() {
         const manual = nameField.querySelector('input.item-name-manual');
         
         if (isBelanja) {
-            // BELANJA: manual input only
+            // BELANJA: manual input
             if (select && !manual) {
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
@@ -297,6 +258,8 @@ function refreshAllItemRows() {
                 newInput.placeholder = 'cth: Beli Stok, Sewa';
                 newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
                 select.replaceWith(newInput);
+                
+                // Add calculate event
                 newInput.addEventListener('input', () => {
                     const row = newInput.closest('.item-row');
                     const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
@@ -308,21 +271,23 @@ function refreshAllItemRows() {
                 });
             }
         } else {
-            // JUALAN: dropdown + manual option
+            // JUALAN: dropdown
             if (manual && !select) {
                 const newSelect = document.createElement('select');
                 newSelect.className = 'item-product-select';
                 newSelect.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
                 let html = '<option value="">-- Pilih Produk --</option>';
                 userProducts.forEach(p => { html += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`; });
-                html += '<option value="other">✏️ Tambah Manual (Produk Baru)</option>';
+                html += '<option value="other">✏️ Tambah Manual</option>';
                 newSelect.innerHTML = html;
                 manual.replaceWith(newSelect);
+                
                 newSelect.addEventListener('change', function() {
                     const selected = this.options[this.selectedIndex];
                     const priceInput = this.closest('.item-row').querySelector('.item-price');
+                    const row = this.closest('.item-row');
+                    
                     if (this.value === 'other') {
-                        const nameField = this.closest('.item-field');
                         const newInput = document.createElement('input');
                         newInput.type = 'text';
                         newInput.className = 'item-name-manual';
@@ -331,6 +296,17 @@ function refreshAllItemRows() {
                         this.replaceWith(newInput);
                         priceInput.value = '';
                         priceInput.placeholder = '0.00';
+                        
+                        newInput.addEventListener('input', () => {
+                            const row = newInput.closest('.item-row');
+                            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                            const subtotal = qty * price;
+                            const subtotalSpan = row.querySelector('.item-subtotal-text');
+                            if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
+                            calculateTotalAmount();
+                        });
+                        
                         newInput.addEventListener('blur', function() {
                             const name = this.value.trim();
                             if (name) {
@@ -344,19 +320,11 @@ function refreshAllItemRows() {
                                 });
                             }
                         });
-                        newInput.addEventListener('input', () => {
-                            const row = newInput.closest('.item-row');
-                            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                            const subtotal = qty * price;
-                            const subtotalSpan = row.querySelector('.item-subtotal-text');
-                            if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-                            calculateTotalAmount();
-                        });
                     } else if (this.value) {
                         priceInput.value = parseFloat(selected.getAttribute('data-price')) || 0;
                     }
-                    const row = this.closest('.item-row');
+                    
+                    // Recalculate
                     const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
                     const price = parseFloat(row.querySelector('.item-price').value) || 0;
                     const subtotal = qty * price;
@@ -392,11 +360,18 @@ if (jualanForm) {
         e.preventDefault();
         const user = await checkAuth();
         if (!user) { alert('Sila log masuk'); window.location.href = 'login.html'; return; }
+        
         const tarikh = document.getElementById('tarikh').value;
         const jenis = document.getElementById('jenis').value;
         const kategori = document.getElementById('kategori').value;
         const items = getItemsData();
         const total = calculateTotalAmount();
+        
+        console.log('DEBUG - tarikh:', tarikh);
+        console.log('DEBUG - jenis:', jenis);
+        console.log('DEBUG - kategori:', kategori);
+        console.log('DEBUG - items:', items);
+        console.log('DEBUG - total:', total);
         
         if (!tarikh) { alert('Pilih tarikh'); return; }
         if (!kategori) { alert('Pilih kategori'); return; }
@@ -408,14 +383,26 @@ if (jualanForm) {
         submitBtn.textContent = 'Menyimpan...';
         
         try {
-            const { error } = await supabaseClient.from('jualan_records').insert([{ user_id: user.id, tarikh, jenis, kategori, jumlah: total, items, created_at: new Date().toISOString() }]);
+            const { error } = await supabaseClient.from('jualan_records').insert([{ 
+                user_id: user.id, 
+                tarikh, 
+                jenis, 
+                kategori, 
+                jumlah: total, 
+                items, 
+                created_at: new Date().toISOString() 
+            }]);
+            
             if (error) throw error;
+            
+            // Reset form
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             document.getElementById('itemsList').innerHTML = '';
             itemCounter = 0;
             addItemRow();
             renderDynamicCategories(currentUserBusinessType);
+            
             const msgDiv = document.getElementById('formMessage');
             msgDiv.style.display = 'block';
             msgDiv.className = 'message-box success';
@@ -423,6 +410,7 @@ if (jualanForm) {
             setTimeout(() => msgDiv.style.display = 'none', 3000);
             await loadRecords();
         } catch (error) {
+            console.error('Submit error:', error);
             const msgDiv = document.getElementById('formMessage');
             msgDiv.style.display = 'block';
             msgDiv.className = 'message-box error';
@@ -451,6 +439,7 @@ async function loadRecords() {
         loadDailySummary();
         loadMonthlySummary();
     } catch (error) {
+        console.error('Load records error:', error);
         rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod</p>';
     }
 }
@@ -518,7 +507,7 @@ async function loadDailySummary() {
         let html = '';
         dailyArray.forEach(day => { html += `<div class="summary-item"><span class="summary-date">📅 ${day.date}</span><div class="summary-numbers"><span class="jualan">💰 RM ${day.jualan.toFixed(2)}</span><span class="belanja">📉 RM ${day.belanja.toFixed(2)}</span><span class="${day.untung >= 0 ? 'jualan' : 'belanja'}">🎯 RM ${day.untung.toFixed(2)}</span></div></div>`; });
         container.innerHTML = html;
-    } catch (error) { container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
+    } catch (error) { console.error('Daily summary error:', error); container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
 }
 
 async function loadMonthlySummary() {
@@ -543,7 +532,7 @@ async function loadMonthlySummary() {
         let html = '';
         monthlyArray.forEach(month => { html += `<div class="summary-item"><span class="summary-date">📊 ${month.name}</span><div class="summary-numbers"><span class="jualan">💰 RM ${month.jualan.toFixed(2)}</span><span class="belanja">📉 RM ${month.belanja.toFixed(2)}</span><span class="${month.untung >= 0 ? 'jualan' : 'belanja'}">🎯 RM ${month.untung.toFixed(2)}</span></div></div>`; });
         container.innerHTML = html;
-    } catch (error) { container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
+    } catch (error) { console.error('Monthly summary error:', error); container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
 }
 
 // =========================================
