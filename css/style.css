@@ -1147,7 +1147,7 @@ footer {
 }
 
 /* ==========================================================================
-   FUNGSI UTAMA: KOTAK SKROL PRODUK (MANDIRI & SEBARIS)
+   KOTAK SKROL PRODUK (JIMAT RUANG SEPERTI JUALAN.HTML)
    ========================================================================== */
 .profile-products-section {
     margin: 1.5rem 0;
@@ -1178,6 +1178,11 @@ footer {
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.75rem;
+    transition: background 0.2s;
+}
+
+.btn-add-product:hover {
+    background: #0e4a62;
 }
 
 .form-note {
@@ -1186,7 +1191,7 @@ footer {
     margin-bottom: 0.8rem;
 }
 
-/* KOTAK SKROL BARU (JIMAT RUANG SEPERTI JUALAN.HTML) */
+/* ===== SCROLLABLE PRODUCTS LIST ===== */
 .modal-scroll-box {
     width: 100%;
     max-height: 200px !important;
@@ -1198,7 +1203,7 @@ footer {
     margin-top: 5px;
 }
 
-/* Gaya Rekabentuk Scrollbar */
+/* Styling Scrollbar */
 .modal-scroll-box::-webkit-scrollbar {
     width: 6px;
 }
@@ -1217,7 +1222,7 @@ footer {
     gap: 6px;
 }
 
-/* Susunan Item Secara Menyeluruh (Horizontal Alignment) */
+/* ===== PRODUCT ITEM CARD ===== */
 .modal-product-row {
     display: flex;
     justify-content: space-between;
@@ -1232,6 +1237,7 @@ footer {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex: 1;
 }
 
 .p-icon {
@@ -1258,6 +1264,7 @@ footer {
 .product-actions-right {
     display: flex;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .btn-action-edit, .btn-action-delete {
@@ -1289,22 +1296,7 @@ footer {
     background: #fecaca;
 }
 
-.delete-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.btn-danger {
-    background: #dc2626;
-    color: white;
-    border: none;
-    padding: 0.5rem 1.2rem;
-    border-radius: 30px;
-    cursor: pointer;
-}
-
+/* ===== EMPTY STATE ===== */
 .empty-state, .loading-state {
     text-align: center;
     padding: 1.5rem;
@@ -1313,6 +1305,23 @@ footer {
     background: white;
     border: 1px dashed #cbd5e1;
     border-radius: 8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .modal-product-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .product-details-left {
+        flex-wrap: wrap;
+    }
+    
+    .product-actions-right {
+        justify-content: flex-end;
+    }
 }
 
 /* ==========================================================================
