@@ -170,7 +170,91 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 }
 
 // =========================================
-// ITEM MANAGEMENT - SIMPLIFIED
+// CALCULATE FUNCTIONS
+// =========================================
+function calculateItemSubtotal(row) {
+    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+    const subtotal = qty * price;
+    const subtotalSpan = row.querySelector('.item-subtotal-text');
+    if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
+    calculateTotalAmount();
+    return subtotal;
+}
+
+function calculateTotalAmount() {
+    let total = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        total += qty * price;
+    });
+    const totalDisplay = document.getElementById('totalAmountDisplay');
+    if (totalDisplay) totalDisplay.textContent = `RM ${total.toFixed(2)}`;
+    return total;
+}
+
+function attachRowEvents(row) {
+    const qty = row.querySelector('.item-qty');
+    const price = row.querySelector('.item-price');
+    const select = row.querySelector('.item-product-select');
+    const manualInput = row.querySelector('.item-name-manual');
+    
+    // Function to recalculate this row
+    const recalc = () => calculateItemSubtotal(row);
+    
+    // QTY and PRICE events
+    qty.addEventListener('input', recalc);
+    price.addEventListener('input', recalc);
+    
+    // Dropdown event (JUALAN)
+    if (select) {
+        select.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (this.value === 'other') {
+                // Replace select with manual input
+                const nameField = this.closest('.item-field');
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'item-name-manual';
+                newInput.placeholder = 'cth: Kek Red Velvet';
+                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
+                this.replaceWith(newInput);
+                price.value = '';
+                price.placeholder = '0.00';
+                
+                // Auto-save on blur
+                newInput.addEventListener('blur', function() {
+                    const name = this.value.trim();
+                    if (name) {
+                        const row = this.closest('.item-row');
+                        const p = parseFloat(row.querySelector('.item-price').value) || 0;
+                        const cat = document.getElementById('kategori').value || 'Lain-lain';
+                        saveProductToDatabase(name, p, cat).then(() => {
+                            loadUserProducts();
+                            this.style.borderColor = '#16a34a';
+                            setTimeout(() => { this.style.borderColor = '#cbd5e1'; }, 2000);
+                        });
+                    }
+                });
+                
+                // Add recalc to new input
+                newInput.addEventListener('input', recalc);
+            } else if (this.value) {
+                price.value = parseFloat(selected.getAttribute('data-price')) || 0;
+            }
+            recalc();
+        });
+    }
+    
+    // Manual input (BELANJA or JUALAN manual)
+    if (manualInput) {
+        manualInput.addEventListener('input', recalc);
+    }
+}
+
+// =========================================
+// ITEM MANAGEMENT
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
@@ -181,11 +265,9 @@ function addItemRow() {
     const row = document.createElement('div');
     row.className = 'item-row';
     row.id = `item-${itemId}`;
-    row.dataset.itemId = itemId;
     
     let nameHtml = '';
     if (isBelanja) {
-        // BELANJA: manual input only
         nameHtml = `
             <div class="item-field item-name">
                 <label>📝 Nama Item</label>
@@ -193,7 +275,6 @@ function addItemRow() {
             </div>
         `;
     } else {
-        // JUALAN: dropdown + manual option
         let optionsHtml = '<option value="">-- Pilih Produk --</option>';
         userProducts.forEach(p => {
             optionsHtml += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
@@ -221,79 +302,15 @@ function addItemRow() {
         </div>
         <div class="item-field item-subtotal">
             <label>💵 Jumlah</label>
-            <span class="item-subtotal-text" id="subtotal-${itemId}">RM 0.00</span>
+            <span class="item-subtotal-text">RM 0.00</span>
         </div>
         <div class="item-field item-action">
             <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
         </div>
     `;
     
-    // === ATTACH EVENT LISTENERS ===
-    const qty = row.querySelector('.item-qty');
-    const price = row.querySelector('.item-price');
-    const select = row.querySelector('.item-product-select');
-    const manualInput = row.querySelector('.item-name-manual');
-    
-    // Calculate function
-    const calculateRow = () => {
-        const q = parseFloat(qty.value) || 0;
-        const p = parseFloat(price.value) || 0;
-        const subtotal = q * p;
-        const subtotalSpan = document.getElementById(`subtotal-${itemId}`);
-        if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-        calculateTotalAmount();
-    };
-    
-    qty.addEventListener('input', calculateRow);
-    price.addEventListener('input', calculateRow);
-    
-    // Handle dropdown selection (JUALAN only)
-    if (select) {
-        select.addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
-            if (this.value === 'other') {
-                // Replace select with manual input
-                const nameField = this.closest('.item-field');
-                const newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.className = 'item-name-manual';
-                newInput.placeholder = 'cth: Kek Red Velvet';
-                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
-                this.replaceWith(newInput);
-                price.value = '';
-                price.placeholder = '0.00';
-                newInput.addEventListener('input', calculateRow);
-                // Auto-save to database (only for JUALAN)
-                newInput.addEventListener('blur', function() {
-                    const name = this.value.trim();
-                    if (name) {
-                        const row = this.closest('.item-row');
-                        const p = parseFloat(row.querySelector('.item-price').value) || 0;
-                        const cat = document.getElementById('kategori').value || 'Lain-lain';
-                        saveProductToDatabase(name, p, cat).then(() => {
-                            loadUserProducts();
-                            this.style.borderColor = '#16a34a';
-                            setTimeout(() => { this.style.borderColor = '#cbd5e1'; }, 2000);
-                        });
-                    }
-                });
-            } else if (this.value) {
-                price.value = parseFloat(selected.getAttribute('data-price')) || 0;
-            }
-            calculateRow();
-        });
-    }
-    
-    // BELANJA manual input - NO save
-    if (manualInput && isBelanja) {
-        manualInput.addEventListener('input', calculateRow);
-    }
-    
-    // JUALAN manual input (when "other" was selected)
-    const manualInputJualan = row.querySelector('.item-name-manual');
-    if (manualInputJualan && !isBelanja) {
-        manualInputJualan.addEventListener('input', calculateRow);
-    }
+    // Attach all event listeners
+    attachRowEvents(row);
     
     itemsList.appendChild(row);
     calculateTotalAmount();
@@ -305,56 +322,29 @@ function removeItemRow(itemId) {
     calculateTotalAmount();
 }
 
-function calculateTotalAmount() {
-    let total = 0;
-    document.querySelectorAll('.item-row').forEach(row => {
-        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-        const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        total += qty * price;
-    });
-    const totalDisplay = document.getElementById('totalAmountDisplay');
-    if (totalDisplay) totalDisplay.textContent = `RM ${total.toFixed(2)}`;
-    return total;
-}
-
 // =========================================
-// GET ITEMS DATA - FIXED!
+// GET ITEMS DATA
 // =========================================
 function getItemsData() {
     const items = [];
     document.querySelectorAll('.item-row').forEach(row => {
         let name = '';
-        
-        // Try to get name from dropdown
         const select = row.querySelector('.item-product-select');
+        const manual = row.querySelector('.item-name-manual');
+        
         if (select && select.value && select.value !== 'other') {
             name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
-        }
-        
-        // If no name from dropdown, try manual input
-        if (!name) {
-            const manual = row.querySelector('.item-name-manual');
-            if (manual) {
-                name = manual.value.trim();
-            }
-        }
-        
-        // Fallback: try any text input
-        if (!name) {
-            const textInput = row.querySelector('input[type="text"]');
-            if (textInput) name = textInput.value.trim();
+        } else if (manual) {
+            name = manual.value.trim();
         }
         
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         
-        console.log('DEBUG - Row item:', { name, qty, price });
-        
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
         }
     });
-    console.log('DEBUG - Total items found:', items.length);
     return items;
 }
 
@@ -371,7 +361,6 @@ function refreshAllItemRows() {
         const manual = nameField.querySelector('.item-name-manual');
         
         if (isBelanja) {
-            // BELANJA: manual input
             if (select && !manual) {
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
@@ -379,20 +368,9 @@ function refreshAllItemRows() {
                 newInput.placeholder = 'cth: Beli Stok, Sewa';
                 newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
                 select.replaceWith(newInput);
-                
-                // Recalculate on input
-                newInput.addEventListener('input', () => {
-                    const row = newInput.closest('.item-row');
-                    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                    const subtotal = qty * price;
-                    const subtotalSpan = row.querySelector('.item-subtotal-text');
-                    if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-                    calculateTotalAmount();
-                });
+                attachRowEvents(row);
             }
         } else {
-            // JUALAN: dropdown
             if (manual && !select) {
                 const newSelect = document.createElement('select');
                 newSelect.className = 'item-product-select';
@@ -404,56 +382,7 @@ function refreshAllItemRows() {
                 html += '<option value="other">✏️ Tambah Manual</option>';
                 newSelect.innerHTML = html;
                 manual.replaceWith(newSelect);
-                
-                newSelect.addEventListener('change', function() {
-                    const selected = this.options[this.selectedIndex];
-                    const priceInput = this.closest('.item-row').querySelector('.item-price');
-                    const row = this.closest('.item-row');
-                    
-                    if (this.value === 'other') {
-                        const newInput = document.createElement('input');
-                        newInput.type = 'text';
-                        newInput.className = 'item-name-manual';
-                        newInput.placeholder = 'cth: Kek Red Velvet';
-                        newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
-                        this.replaceWith(newInput);
-                        priceInput.value = '';
-                        priceInput.placeholder = '0.00';
-                        
-                        newInput.addEventListener('input', () => {
-                            const row = newInput.closest('.item-row');
-                            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                            const subtotal = qty * price;
-                            const subtotalSpan = row.querySelector('.item-subtotal-text');
-                            if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-                            calculateTotalAmount();
-                        });
-                        
-                        newInput.addEventListener('blur', function() {
-                            const name = this.value.trim();
-                            if (name) {
-                                const row = this.closest('.item-row');
-                                const p = parseFloat(row.querySelector('.item-price').value) || 0;
-                                const cat = document.getElementById('kategori').value || 'Lain-lain';
-                                saveProductToDatabase(name, p, cat).then(() => {
-                                    loadUserProducts();
-                                    this.style.borderColor = '#16a34a';
-                                    setTimeout(() => { this.style.borderColor = '#cbd5e1'; }, 2000);
-                                });
-                            }
-                        });
-                    } else if (this.value) {
-                        priceInput.value = parseFloat(selected.getAttribute('data-price')) || 0;
-                    }
-                    
-                    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                    const subtotal = qty * price;
-                    const subtotalSpan = row.querySelector('.item-subtotal-text');
-                    if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
-                    calculateTotalAmount();
-                });
+                attachRowEvents(row);
             }
         }
     });
@@ -494,9 +423,6 @@ if (jualanForm) {
         const kategori = document.getElementById('kategori').value;
         const items = getItemsData();
         const total = calculateTotalAmount();
-        
-        console.log('DEBUG - Final items:', items);
-        console.log('DEBUG - Final total:', total);
         
         if (!tarikh) { alert('Pilih tarikh'); return; }
         if (!kategori) { alert('Pilih kategori'); return; }
