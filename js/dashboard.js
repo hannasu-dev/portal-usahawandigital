@@ -1,7 +1,9 @@
+// Global variables
 let currentBusinessType = 'fnb';
 let currentProducts = [];
 let productToDelete = null;
 
+// Load data on page load
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await checkAuth();
     if (!user) {
@@ -13,7 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 });
 
-// Load User Profile
+// =========================================
+// PROFILE FUNCTIONS
+// =========================================
 async function loadUserProfile(userId) {
     try {
         const { data: profile, error } = await supabaseClient
@@ -31,7 +35,7 @@ async function loadUserProfile(userId) {
             currentBusinessType = businessType;
             localStorage.setItem('userBusinessType', businessType);
             
-            const typeMap = { 'fnb': '🍔 F&B (Makanan & Minuman)', 'retail': '👗 Retail / Butik', 'servis': '✂️ Perkhidmatan / Servis' };
+            const typeMap = { 'fnb': '🍔 F&B', 'retail': '👗 Retail', 'servis': '✂️ Servis' };
             document.getElementById('businessTypeDisplay').textContent = `📋 Jenis Bisnes: ${typeMap[businessType]}`;
         }
     } catch (error) {
@@ -39,13 +43,15 @@ async function loadUserProfile(userId) {
     }
 }
 
-// Load Products
+// =========================================
+// PRODUCTS FUNCTIONS (Dalam Modal - Scrollable)
+// =========================================
 async function loadProducts() {
     const user = await checkAuth();
     if (!user) return;
     
     const container = document.getElementById('productsListInModal');
-    container.innerHTML = '<p class="loading-text">📂 Loading produk...</p>';
+    container.innerHTML = '<div class="loading-state">📂 Loading produk...</div>';
     
     try {
         const { data, error } = await supabaseClient
@@ -54,37 +60,39 @@ async function loadProducts() {
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
         if (error) throw error;
+        
         currentProducts = data || [];
         displayProductsInModal(currentProducts);
     } catch (error) {
-        container.innerHTML = '<p class="error-text">❌ Ralat memuatkan produk</p>';
+        container.innerHTML = '<div class="empty-state">❌ Ralat memuatkan produk</div>';
     }
 }
 
 function displayProductsInModal(products) {
     const container = document.getElementById('productsListInModal');
     if (products.length === 0) {
-        container.innerHTML = '<p class="empty-text">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</p>';
+        container.innerHTML = '<div class="empty-state">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</div>';
         return;
     }
     
-    let html = '<div class="products-list-container">';
+    let html = '';
     products.forEach(product => {
         html += `
-            <div class="product-item-modal">
-                <div class="product-info-modal">
-                    <span class="product-name-modal">📦 ${escapeHtml(product.name)}</span>
-                    <span class="product-price-modal">RM ${product.price.toFixed(2)}</span>
-                    <span class="product-category-modal">${escapeHtml(product.category)}</span>
+            <div class="modal-product-row">
+                <div class="product-details-left">
+                    <span class="p-icon">📦</span>
+                    <div class="p-texts">
+                        <span class="p-name">${escapeHtml(product.name)}</span>
+                        <span class="p-meta">RM ${product.price.toFixed(2)} · ${escapeHtml(product.category)}</span>
+                    </div>
                 </div>
-                <div class="product-actions-modal">
-                    <button class="btn-edit-product-modal" onclick="editProduct('${product.id}')">✏️ Edit</button>
-                    <button class="btn-delete-product-modal" onclick="confirmDeleteProduct('${product.id}')">🗑️ Padam</button>
+                <div class="product-actions-right">
+                    <button class="btn-action-edit" onclick="editProduct('${product.id}')" title="Edit">✏️</button>
+                    <button class="btn-action-delete" onclick="confirmDeleteProduct('${product.id}')" title="Padam">🗑️</button>
                 </div>
             </div>
         `;
     });
-    html += '</div>';
     container.innerHTML = html;
 }
 
@@ -95,7 +103,9 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Event Listeners
+// =========================================
+// MODAL CONTROLS
+// =========================================
 function setupEventListeners() {
     const editBtn = document.getElementById('editProfileBtn');
     if (editBtn) editBtn.addEventListener('click', () => openProfileModal());
@@ -119,7 +129,6 @@ function setupEventListeners() {
     if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', () => deleteProduct());
 }
 
-// Profile Modal
 async function openProfileModal() {
     const user = await checkAuth();
     if (!user) return;
@@ -135,7 +144,9 @@ async function openProfileModal() {
         document.getElementById('editBusinessName').value = profile.business_name || '';
         document.getElementById('editBusinessType').value = profile.business_type || profile.jenis_perniagaan || 'fnb';
         
-        await loadProducts(); // Refresh products list
+        // Load products for display
+        await loadProducts();
+        
         document.getElementById('profileModal').style.display = 'block';
     } catch (error) {
         alert('Error loading profile');
@@ -161,18 +172,14 @@ async function updateProfile() {
     try {
         const { error } = await supabaseClient
             .from('profiles')
-            .update({
-                business_name: businessName,
-                business_type: businessType,
-                jenis_perniagaan: businessType
-            })
+            .update({ business_name: businessName, business_type: businessType, jenis_perniagaan: businessType })
             .eq('id', user.id);
         if (error) throw error;
         
         localStorage.setItem('userBusinessType', businessType);
         currentBusinessType = businessType;
         
-        const typeMap = { 'fnb': '🍔 F&B (Makanan & Minuman)', 'retail': '👗 Retail / Butik', 'servis': '✂️ Perkhidmatan / Servis' };
+        const typeMap = { 'fnb': '🍔 F&B', 'retail': '👗 Retail', 'servis': '✂️ Servis' };
         document.getElementById('businessNameDisplay').textContent = `🏪 Perniagaan: ${businessName || 'Belum ditetapkan'}`;
         document.getElementById('businessTypeDisplay').textContent = `📋 Jenis Bisnes: ${typeMap[businessType]}`;
         
@@ -180,10 +187,7 @@ async function updateProfile() {
         messageDiv.className = 'message-box success';
         messageDiv.innerHTML = '✅ Profil berjaya dikemas kini!';
         
-        setTimeout(() => {
-            closeProfileModal();
-            messageDiv.style.display = 'none';
-        }, 1500);
+        setTimeout(() => closeProfileModal(), 1500);
     } catch (error) {
         messageDiv.style.display = 'block';
         messageDiv.className = 'message-box error';
@@ -193,7 +197,9 @@ async function updateProfile() {
     }
 }
 
-// Product Category Dropdown
+// =========================================
+// PRODUCT CRUD
+// =========================================
 function populateCategoryDropdown(select, businessType) {
     const categories = {
         fnb: [
@@ -225,7 +231,6 @@ function populateCategoryDropdown(select, businessType) {
     });
 }
 
-// Product CRUD
 function openProductModal(productId = null) {
     const modal = document.getElementById('productModal');
     const title = document.getElementById('productModalTitle');
@@ -269,7 +274,7 @@ async function saveProduct() {
     if (!name || isNaN(price) || price <= 0 || !category) {
         messageDiv.style.display = 'block';
         messageDiv.className = 'message-box error';
-        messageDiv.innerHTML = '❌ Sila lengkapkan semua maklumat';
+        messageDiv.innerHTML = '❌ Sila lengkapkan semua maklumat.';
         return;
     }
     
@@ -296,7 +301,7 @@ async function saveProduct() {
         
         setTimeout(() => {
             closeProductModal();
-            loadProducts();
+            loadProducts(); // Refresh product list in modal
         }, 1500);
     } catch (error) {
         messageDiv.className = 'message-box error';
