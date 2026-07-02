@@ -95,14 +95,15 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
     if (!user) return null;
     
     try {
-        // Check if product already exists
-        const { data: existing } = await supabaseClient
+        // Check if product already exists (case insensitive)
+        const { data: existing, error: checkError } = await supabaseClient
             .from('products')
-            .select('id')
+            .select('id, name')
             .eq('user_id', user.id)
-            .eq('name', productName)
+            .ilike('name', productName)
             .maybeSingle();
         
+        if (checkError && checkError.code !== 'PGRST116') throw checkError;
         if (existing) {
             // Product exists, return it
             return existing;
@@ -241,18 +242,33 @@ function addItemRow() {
             if (this.value === 'other') {
                 // Manual entry - show input field
                 const row = this.closest('.item-row');
-                const nameCol = row.querySelector('.item-name-col');
-                if (!nameCol) {
-                    // Replace select with input
-                    const newInput = document.createElement('input');
-                    newInput.type = 'text';
-                    newInput.className = 'item-name-manual';
-                    newInput.placeholder = 'Nama produk baru';
-                    newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #f59e0b;';
-                    this.replaceWith(newInput);
-                }
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'item-name-manual';
+                newInput.placeholder = 'Nama produk baru (cth: Kek Red Velvet)';
+                newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #f59e0b;';
+                this.replaceWith(newInput);
                 priceInput.value = '';
                 priceInput.placeholder = 'Masukkan harga';
+                
+                // Auto-save to database when user finishes typing
+                newInput.addEventListener('blur', function() {
+                    const name = this.value.trim();
+                    if (name) {
+                        const row = this.closest('.item-row');
+                        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                        const category = document.getElementById('kategori').value || 'Lain-lain';
+                        saveProductToDatabase(name, price, category).then(() => {
+                            // Refresh product list silently
+                            loadUserProducts();
+                            // Show a subtle indicator that product was saved
+                            this.style.borderColor = '#16a34a';
+                            setTimeout(() => {
+                                this.style.borderColor = '#cbd5e1';
+                            }, 2000);
+                        });
+                    }
+                });
             } else if (this.value) {
                 const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
                 priceInput.value = productPrice;
@@ -261,25 +277,27 @@ function addItemRow() {
         });
     }
     
-    // Manual input event listeners
+    // Manual input event listeners for QTY and PRICE
     const qtyInput = itemRow.querySelector('.item-qty');
     const priceInput = itemRow.querySelector('.item-price');
     qtyInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     priceInput.addEventListener('input', () => calculateItemSubtotal(itemId));
     
-    // For manual name, auto-save when user finishes typing
+    // For manual name in BELANJA - auto-save
     const manualNameInput = itemRow.querySelector('.item-name-manual');
-    if (manualNameInput) {
+    if (manualNameInput && isBelanja) {
         manualNameInput.addEventListener('blur', function() {
             const name = this.value.trim();
             if (name) {
                 const row = this.closest('.item-row');
                 const price = parseFloat(row.querySelector('.item-price').value) || 0;
                 const category = document.getElementById('kategori').value || 'Lain-lain';
-                // Save to database (async, but don't block user)
                 saveProductToDatabase(name, price, category).then(() => {
-                    // Refresh product list silently
                     loadUserProducts();
+                    this.style.borderColor = '#16a34a';
+                    setTimeout(() => {
+                        this.style.borderColor = '#cbd5e1';
+                    }, 2000);
                 });
             }
         });
@@ -306,6 +324,23 @@ function refreshAllItemRows() {
                 newInput.placeholder = 'Nama item (cth: Beli Stok)';
                 newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;';
                 select.replaceWith(newInput);
+                
+                // Add auto-save for new manual input
+                newInput.addEventListener('blur', function() {
+                    const name = this.value.trim();
+                    if (name) {
+                        const row = this.closest('.item-row');
+                        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                        const category = document.getElementById('kategori').value || 'Lain-lain';
+                        saveProductToDatabase(name, price, category).then(() => {
+                            loadUserProducts();
+                            this.style.borderColor = '#16a34a';
+                            setTimeout(() => {
+                                this.style.borderColor = '#cbd5e1';
+                            }, 2000);
+                        });
+                    }
+                });
             }
         } else {
             // Should be dropdown
@@ -315,9 +350,11 @@ function refreshAllItemRows() {
                 newSelect.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1;';
                 // Populate dropdown
                 let html = '<option value="">-- Pilih Produk --</option>';
-                userProducts.forEach(product => {
-                    html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}">${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
-                });
+                if (userProducts.length > 0) {
+                    userProducts.forEach(product => {
+                        html += `<option value="${escapeHtml(product.name)}" data-price="${product.price}">${escapeHtml(product.name)} - RM ${product.price.toFixed(2)}</option>`;
+                    });
+                }
                 html += '<option value="other">✏️ Tambah Manual (Produk Baru)</option>';
                 newSelect.innerHTML = html;
                 manualInput.replaceWith(newSelect);
@@ -326,20 +363,38 @@ function refreshAllItemRows() {
                 newSelect.addEventListener('change', function() {
                     const selectedOption = this.options[this.selectedIndex];
                     const priceInput = this.closest('.item-row').querySelector('.item-price');
+                    const row = this.closest('.item-row');
+                    const rowId = row.id;
+                    
                     if (this.value === 'other') {
-                        const row = this.closest('.item-row');
                         const newInput = document.createElement('input');
                         newInput.type = 'text';
                         newInput.className = 'item-name-manual';
-                        newInput.placeholder = 'Nama produk baru';
+                        newInput.placeholder = 'Nama produk baru (cth: Kek Red Velvet)';
                         newInput.style.cssText = 'flex:2; padding:0.5rem; border-radius:6px; border:1px solid #f59e0b;';
                         this.replaceWith(newInput);
                         priceInput.value = '';
                         priceInput.placeholder = 'Masukkan harga';
+                        
+                        newInput.addEventListener('blur', function() {
+                            const name = this.value.trim();
+                            if (name) {
+                                const row = this.closest('.item-row');
+                                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                                const category = document.getElementById('kategori').value || 'Lain-lain';
+                                saveProductToDatabase(name, price, category).then(() => {
+                                    loadUserProducts();
+                                    this.style.borderColor = '#16a34a';
+                                    setTimeout(() => {
+                                        this.style.borderColor = '#cbd5e1';
+                                    }, 2000);
+                                });
+                            }
+                        });
                     } else if (this.value) {
                         priceInput.value = parseFloat(selectedOption.getAttribute('data-price')) || 0;
                     }
-                    calculateItemSubtotal(row.id);
+                    calculateItemSubtotal(rowId);
                 });
             }
         }
