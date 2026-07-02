@@ -648,6 +648,52 @@ body {
     margin-bottom: 1rem;
 }
 
+/* ===== ITEM ROW HEADER ===== */
+.item-row-header {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 0.3rem;
+    background: #e2e8f0;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.item-row-header .header-name {
+    flex: 2.5;
+    min-width: 150px;
+    padding-left: 0.3rem;
+}
+
+.item-row-header .header-qty {
+    flex: 0.6;
+    min-width: 60px;
+    text-align: center;
+}
+
+.item-row-header .header-price {
+    flex: 0.8;
+    min-width: 80px;
+    text-align: center;
+}
+
+.item-row-header .header-subtotal {
+    flex: 0.8;
+    min-width: 70px;
+    text-align: center;
+}
+
+.item-row-header .header-action {
+    flex: 0.3;
+    min-width: 35px;
+    text-align: center;
+}
+
 /* ===== ITEM ROW - FIXED LAYOUT ===== */
 .item-row {
     display: flex;
@@ -723,6 +769,10 @@ body {
 
 /* ===== RESPONSIVE ITEM ROW ===== */
 @media (max-width: 768px) {
+    .item-row-header {
+        display: none;
+    }
+    
     .item-row {
         flex-direction: column;
         align-items: stretch;
@@ -1021,7 +1071,30 @@ body {
 }
 
 /* ==========================================================================
-    BASE MODAL WINDOW STYLES
+   FORGOT PASSWORD & FOOTER
+   ========================================================================== */
+.forgot-password {
+    text-align: right;
+    margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+    color: #1a5f7a;
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+footer {
+    background: #1e293b;
+    color: #94a3b8;
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+}
+
+/* ==========================================================================
+   BASE MODAL WINDOW STYLES
    ========================================================================== */
 .modal {
     display: none;
@@ -1116,8 +1189,8 @@ body {
 /* KOTAK SKROL BARU (JIMAT RUANG SEPERTI JUALAN.HTML) */
 .modal-scroll-box {
     width: 100%;
-    max-height: 200px !important;    /* Hadkan tinggi: muat dalam 3 produk sebelum skrol aktif */
-    overflow-y: scroll !important;   /* Paksa browser keluarkan skrol jika kandungan panjang */
+    max-height: 200px !important;
+    overflow-y: scroll !important;
     border: 1px solid #cbd5e1;
     border-radius: 12px;
     background: #f1f5f9;
@@ -1271,14 +1344,6 @@ body {
     
     .form-row {
         grid-template-columns: 1fr;
-    }
-    
-    .item-row {
-        flex-wrap: wrap;
-    }
-    
-    .item-row input {
-        flex: 1 1 auto !important;
     }
     
     .summary-cards {
