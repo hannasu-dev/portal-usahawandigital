@@ -3,6 +3,8 @@
 // =========================================
 
 const CACHE_NAME = 'usahawan-digital-v1';
+
+// Senarai fail yang perlu di-cache
 const ASSETS = [
     '/',
     '/index.html',
@@ -12,6 +14,7 @@ const ASSETS = [
     '/modul.html',
     '/jualan.html',
     '/templat.html',
+    '/profile-settings.html',
     '/css/style.css',
     '/js/supabase.js',
     '/js/auth.js',
@@ -19,13 +22,12 @@ const ASSETS = [
     '/js/jualan.js',
     '/js/main.js',
     '/manifest.json',
-    // Icons (jika ada)
     '/icons/icon-192.png',
     '/icons/icon-512.png'
 ];
 
 // =========================================
-// INSTALL - Cache all assets
+// INSTALL - Cache assets
 // =========================================
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -42,7 +44,7 @@ self.addEventListener('install', event => {
 });
 
 // =========================================
-// ACTIVATE - Clean up old caches
+// ACTIVATE - Clean old caches
 // =========================================
 self.addEventListener('activate', event => {
     event.waitUntil(
@@ -70,15 +72,11 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
-                // Return cached response if found
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                
-                // Otherwise fetch from network
                 return fetch(event.request)
                     .then(networkResponse => {
-                        // Cache the new response for future
                         return caches.open(CACHE_NAME)
                             .then(cache => {
                                 cache.put(event.request, networkResponse.clone());
@@ -86,12 +84,9 @@ self.addEventListener('fetch', event => {
                             });
                     })
                     .catch(() => {
-                        // Offline fallback - show a simple message
                         return new Response(
                             '<h1>Offline</h1><p>Sila sambung ke internet untuk mengakses portal ini.</p>',
-                            {
-                                headers: { 'Content-Type': 'text/html' }
-                            }
+                            { headers: { 'Content-Type': 'text/html' } }
                         );
                     });
             })
