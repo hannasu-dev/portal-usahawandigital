@@ -598,7 +598,7 @@ body {
 }
 
 /* ==========================================================================
-   JUALAN PAGE - ITEM ROW & RECORDS
+   JUALAN PAGE - ITEM ROW & RECORDS (FIXED LAYOUT)
    ========================================================================== */
 .form-card {
     background: white;
@@ -637,12 +637,18 @@ body {
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.8rem;
+    transition: background 0.2s;
+}
+
+.btn-add-item:hover {
+    background: #0e4a62;
 }
 
 .items-list {
     margin-bottom: 1rem;
 }
 
+/* ===== ITEM ROW - FIXED LAYOUT ===== */
 .item-row {
     display: flex;
     gap: 0.5rem;
@@ -651,32 +657,96 @@ body {
     padding: 0.5rem;
     border-radius: 8px;
     margin-bottom: 0.5rem;
+    flex-wrap: wrap;
 }
 
-.item-row input {
+/* Semua elemen dalam item-row guna flex-grow yang konsisten */
+.item-row .item-name-wrapper {
+    flex: 2.5;
+    min-width: 150px;
+}
+
+.item-row .item-product-select,
+.item-row .item-name-manual {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: white;
+}
+
+.item-row .item-qty {
+    flex: 0.6;
+    min-width: 60px;
     padding: 0.5rem;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 0.85rem;
 }
 
-.item-subtotal {
-    min-width: 70px;
-    text-align: center;
-    font-weight: 600;
-    color: #1a5f7a;
+.item-row .item-price {
+    flex: 0.8;
+    min-width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
     font-size: 0.85rem;
 }
 
-.btn-remove-item {
+.item-row .item-subtotal {
+    flex: 0.8;
+    min-width: 70px;
+    text-align: center;
+    font-weight: 700;
+    color: #1a5f7a;
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+}
+
+.item-row .btn-remove-item {
+    flex: 0.3;
+    min-width: 35px;
     background: #fee2e2;
     color: #dc2626;
     border: none;
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
 }
 
+.item-row .btn-remove-item:hover {
+    background: #fecaca;
+}
+
+/* ===== RESPONSIVE ITEM ROW ===== */
+@media (max-width: 768px) {
+    .item-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .item-row .item-name-wrapper,
+    .item-row .item-qty,
+    .item-row .item-price,
+    .item-row .item-subtotal,
+    .item-row .btn-remove-item {
+        flex: 1 1 100%;
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .item-row .item-subtotal {
+        text-align: center;
+        padding: 0.5rem;
+        background: #e0f2fe;
+        border-radius: 6px;
+    }
+}
+
+/* ===== ITEMS TOTAL ===== */
 .items-total {
     background: #e0f2fe;
     padding: 0.8rem 1rem;
@@ -695,6 +765,7 @@ body {
     color: #1a5f7a;
 }
 
+/* ===== REKOD LIST ===== */
 .rekod-header {
     display: flex;
     justify-content: space-between;
@@ -708,12 +779,13 @@ body {
     gap: 1rem;
 }
 
-.filter-section select, .filter-section button {
+.filter-section select,
+.filter-section button {
     padding: 0.4rem 0.8rem;
     border-radius: 8px;
 }
 
-/* Tab Navigation */
+/* ===== TAB NAVIGATION ===== */
 .tab-nav {
     display: flex;
     gap: 0.5rem;
@@ -745,7 +817,7 @@ body {
     display: block;
 }
 
-/* Scrollable Containers */
+/* ===== SCROLLABLE RECORDS ===== */
 .rekod-scroll-container {
     max-height: 400px;
     overflow-y: auto;
@@ -767,7 +839,7 @@ body {
     border-radius: 10px;
 }
 
-/* Rekod List */
+/* ===== REKOD LIST ITEMS ===== */
 .rekod-list {
     display: flex;
     flex-direction: column;
@@ -839,9 +911,14 @@ body {
     border-radius: 8px;
     cursor: pointer;
     color: #dc2626;
+    transition: background 0.2s;
 }
 
-/* Financial Summary Cards */
+.rekod-delete:hover {
+    background: #fecaca;
+}
+
+/* ===== FINANCIAL SUMMARY CARDS ===== */
 .summary-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -880,7 +957,7 @@ body {
     color: #1e293b;
 }
 
-/* Summary List Items */
+/* ===== SUMMARY LIST ITEMS ===== */
 .summary-list {
     display: flex;
     flex-direction: column;
@@ -920,7 +997,7 @@ body {
     font-size: 0.85rem;
 }
 
-/* Chart Container & States */
+/* ===== CHART ===== */
 .chart-container {
     background: white;
     padding: 1rem;
@@ -928,7 +1005,10 @@ body {
     margin: 1rem 0;
 }
 
-.loading-text, .empty-text, .error-text {
+/* ===== LOADING / EMPTY STATES ===== */
+.loading-text,
+.empty-text,
+.error-text {
     text-align: center;
     padding: 2rem;
     color: #64748b;
@@ -938,27 +1018,6 @@ body {
     text-align: center;
     color: #64748b;
     margin-bottom: 2rem;
-}
-
-/* Forgot password & Footer */
-.forgot-password {
-    text-align: right;
-    margin-bottom: 1.5rem;
-}
-
-.forgot-password a {
-    color: #1a5f7a;
-    text-decoration: none;
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-
-footer {
-    background: #1e293b;
-    color: #94a3b8;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
 }
 
 /* ==========================================================================
