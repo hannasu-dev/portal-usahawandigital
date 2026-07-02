@@ -1296,13 +1296,31 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER
+   FOOTER - STICKY TO BOTTOM
    ========================================================================== */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    flex: 1;
+}
+
 footer {
     background: #1e293b;
     color: #94a3b8;
     padding: 2.5rem 0;
-    margin-top: 3rem;
+    margin-top: auto;
+    width: 100%;
 }
 
 .footer-content {
