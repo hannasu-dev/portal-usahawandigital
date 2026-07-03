@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Templat Percuma - UsahawanDigital</title>
-        <!-- PWA MANIFEST & META TAGS -->
+    <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -258,8 +258,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
     <script>
+    // =========================================
+    // DOWNLOAD TEMPLATE FUNCTION
+    // =========================================
     function downloadTemplate(type) {
         let fileUrl = '';
         let fileName = '';
@@ -305,23 +307,24 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        document.body.removeChild(link);
         
         alert(`✅ ${fileName} berjaya dimuat turun!`);
     }
     </script>
     <!-- REGISTER SERVICE WORKER (PWA) -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('✅ Service Worker registered successfully');
-                })
-                .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
-                });
-        });
-    }
-</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registered successfully');
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
