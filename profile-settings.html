@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetapan Profil - UsahawanDigital</title>
-        <!-- PWA MANIFEST & META TAGS -->
+    <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -12,6 +12,146 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .profile-settings-container {
+            padding: 2rem 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .profile-settings-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .profile-settings-card h2 {
+            color: #1a5f7a;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .profile-products-section {
+            margin: 1.5rem 0;
+            padding: 1rem 0;
+            border-top: 2px solid #e2e8f0;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .products-header h3 {
+            color: #1a5f7a;
+            font-size: 1.1rem;
+        }
+        .btn-add-product {
+            background: #1a5f7a;
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-add-product:hover {
+            background: #0e4a62;
+        }
+        .products-list-settings {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 0.8rem;
+        }
+        .products-list-settings::-webkit-scrollbar {
+            width: 6px;
+        }
+        .products-list-settings::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .products-list-settings::-webkit-scrollbar-thumb {
+            background: #1a5f7a;
+            border-radius: 10px;
+        }
+        .products-grid-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .product-card-settings {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .product-card-settings:hover {
+            border-color: #1a5f7a;
+        }
+        .product-info-settings {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .product-price-settings {
+            color: #1a5f7a;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .product-category-settings {
+            background: #e2e8f0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #475569;
+        }
+        .product-actions-settings {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-edit-product, .btn-delete-product {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+        }
+        .btn-edit-product:hover { background: #e0f2fe; }
+        .btn-delete-product:hover { background: #fee2e2; }
+        .form-note {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-bottom: 0.8rem;
+        }
+        .no-products {
+            text-align: center;
+            padding: 1.5rem;
+            color: #64748b;
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+        }
+        .loading-text, .error-text {
+            text-align: center;
+            padding: 1.5rem;
+            color: #64748b;
+        }
+        @media (max-width: 768px) {
+            .product-card-settings {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .product-actions-settings {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -87,7 +227,7 @@
                         <option value="">Pilih kategori</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-primary btn-full">💾 Simpan Produk</button>
+                <button type="submit" class="btn-primary btn-full" id="saveProductBtn">💾 Simpan Produk</button>
             </form>
             <div id="productMessage" class="message-box" style="display:none;"></div>
         </div>
@@ -131,12 +271,21 @@
         async function loadProfile() {
             const user = await checkAuth();
             if (!user) return;
-            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-            if (profile) {
-                document.getElementById('businessName').value = profile.business_name || '';
-                let bt = profile.business_type || profile.jenis_perniagaan || 'fnb';
-                document.getElementById('businessType').value = bt;
-                currentBusinessType = bt;
+            try {
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+                if (error) throw error;
+                if (profile) {
+                    document.getElementById('businessName').value = profile.business_name || '';
+                    let bt = profile.business_type || profile.jenis_perniagaan || 'fnb';
+                    document.getElementById('businessType').value = bt;
+                    currentBusinessType = bt;
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
             }
         }
 
@@ -144,65 +293,152 @@
             const user = await checkAuth();
             if (!user) return;
             const container = document.getElementById('productsList');
-            container.innerHTML = '<p>📂 Loading...</p>';
-            const { data, error } = await supabaseClient.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-            if (error) { container.innerHTML = '<p>❌ Error loading</p>'; return; }
-            currentProducts = data || [];
-            displayProducts(currentProducts);
+            container.innerHTML = '<p class="loading-text">📂 Loading produk...</p>';
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                currentProducts = data || [];
+                displayProducts(currentProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                container.innerHTML = '<p class="error-text">❌ Ralat memuatkan produk</p>';
+            }
         }
 
         function displayProducts(products) {
             const container = document.getElementById('productsList');
-            if (products.length === 0) { container.innerHTML = '<p class="no-products">📭 Tiada produk. Klik "+ Tambah Produk"</p>'; return; }
+            if (products.length === 0) {
+                container.innerHTML = '<p class="no-products">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</p>';
+                return;
+            }
             let html = '<div class="products-grid-settings">';
             products.forEach(p => {
-                html += `<div class="product-card-settings"><div class="product-info-settings"><strong>📦 ${escapeHtml(p.name)}</strong><span class="product-price-settings">RM ${p.price.toFixed(2)}</span><span class="product-category-settings">📁 ${escapeHtml(p.category)}</span></div><div class="product-actions-settings"><button class="btn-edit-product" onclick="editProduct('${p.id}')">✏️</button><button class="btn-delete-product" onclick="confirmDeleteProduct('${p.id}')">🗑️</button></div></div>`;
+                html += `
+                    <div class="product-card-settings">
+                        <div class="product-info-settings">
+                            <strong>📦 ${escapeHtml(p.name)}</strong>
+                            <span class="product-price-settings">RM ${p.price.toFixed(2)}</span>
+                            <span class="product-category-settings">📁 ${escapeHtml(p.category)}</span>
+                        </div>
+                        <div class="product-actions-settings">
+                            <button class="btn-edit-product" onclick="editProduct('${p.id}')" title="Edit">✏️</button>
+                            <button class="btn-delete-product" onclick="confirmDeleteProduct('${p.id}')" title="Padam">🗑️</button>
+                        </div>
+                    </div>
+                `;
             });
             html += '</div>';
             container.innerHTML = html;
         }
 
-        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         function setupEventListeners() {
             document.getElementById('profileForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await updateProfile();
             });
+            
             document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
+            
             document.getElementById('productForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await saveProduct();
             });
+            
             document.getElementById('confirmDeleteBtn').addEventListener('click', () => deleteProduct());
         }
 
         async function updateProfile() {
             const user = await checkAuth();
             if (!user) return;
+            
             const businessName = document.getElementById('businessName').value;
             const businessType = document.getElementById('businessType').value;
             const btn = document.querySelector('#profileForm button[type="submit"]');
             const msgDiv = document.getElementById('profileMessage');
+            
             btn.disabled = true;
-            const { error } = await supabaseClient.from('profiles').update({ business_name: businessName, business_type: businessType, jenis_perniagaan: businessType }).eq('id', user.id);
-            if (error) { msgDiv.className = 'message-box error'; msgDiv.innerHTML = '❌ Error: ' + error.message; msgDiv.style.display = 'block'; }
-            else { msgDiv.className = 'message-box success'; msgDiv.innerHTML = '✅ Profil dikemas kini!'; msgDiv.style.display = 'block'; setTimeout(() => window.location.href = 'dashboard.html', 1500); }
-            btn.disabled = false;
+            btn.textContent = 'Menyimpan...';
+            msgDiv.style.display = 'none';
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .update({ 
+                        business_name: businessName, 
+                        business_type: businessType, 
+                        jenis_perniagaan: businessType 
+                    })
+                    .eq('id', user.id);
+                
+                if (error) throw error;
+                
+                msgDiv.className = 'message-box success';
+                msgDiv.innerHTML = '✅ Profil berjaya dikemas kini!';
+                msgDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } catch (error) {
+                msgDiv.className = 'message-box error';
+                msgDiv.innerHTML = '❌ Error: ' + error.message;
+                msgDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Simpan Perubahan';
+            }
         }
 
         function populateCategoryDropdown(select, type) {
-            const cats = { fnb: [{ value: "Kek & Pastri", label: "🍰 Kek & Pastri" }, { value: "Minuman", label: "🥤 Minuman" }, { value: "Makanan", label: "🍝 Makanan" }], retail: [{ value: "Pakaian", label: "👗 Pakaian" }, { value: "Aksesori", label: "💍 Aksesori" }], servis: [{ value: "Servis", label: "✂️ Servis" }, { value: "Rawatan", label: "💆 Rawatan" }] };
+            const cats = {
+                fnb: [
+                    { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
+                    { value: "Minuman", label: "🥤 Minuman" },
+                    { value: "Makanan", label: "🍝 Makanan" },
+                    { value: "Lain-lain", label: "📝 Lain-lain" }
+                ],
+                retail: [
+                    { value: "Pakaian", label: "👗 Pakaian" },
+                    { value: "Aksesori", label: "💍 Aksesori" },
+                    { value: "Lain-lain", label: "📝 Lain-lain" }
+                ],
+                servis: [
+                    { value: "Servis", label: "✂️ Servis" },
+                    { value: "Rawatan", label: "💆 Rawatan" },
+                    { value: "Lain-lain", label: "📝 Lain-lain" }
+                ]
+            };
             const list = cats[type] || cats.fnb;
-            select.innerHTML = '<option value="">Pilih kategori</option>';
-            list.forEach(c => { const opt = document.createElement('option'); opt.value = c.value; opt.textContent = c.label; select.appendChild(opt); });
+            select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            list.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.value;
+                opt.textContent = c.label;
+                select.appendChild(opt);
+            });
         }
 
         function openProductModal(productId = null) {
             const modal = document.getElementById('productModal');
             document.getElementById('productForm').reset();
             document.getElementById('editProductId').value = '';
+            document.getElementById('productMessage').style.display = 'none';
+            
             populateCategoryDropdown(document.getElementById('productCategory'), currentBusinessType);
+            
             if (productId) {
                 const p = currentProducts.find(p => p.id === productId);
                 if (p) {
@@ -212,60 +448,149 @@
                     document.getElementById('productPrice').value = p.price;
                     document.getElementById('productCategory').value = p.category;
                 }
-            } else { document.getElementById('productModalTitle').textContent = '➕ Tambah Produk'; }
+            } else {
+                document.getElementById('productModalTitle').textContent = '➕ Tambah Produk';
+            }
             modal.style.display = 'block';
         }
 
-        function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
 
         async function saveProduct() {
             const user = await checkAuth();
             if (!user) return;
+            
             const editId = document.getElementById('editProductId').value;
             const name = document.getElementById('productName').value.trim();
             const price = parseFloat(document.getElementById('productPrice').value);
             const category = document.getElementById('productCategory').value;
-            const btn = document.querySelector('#productForm button');
+            const btn = document.getElementById('saveProductBtn');
             const msgDiv = document.getElementById('productMessage');
-            if (!name || isNaN(price) || price <= 0 || !category) { msgDiv.className = 'message-box error'; msgDiv.innerHTML = '❌ Lengkapkan semua maklumat'; msgDiv.style.display = 'block'; return; }
-            btn.disabled = true;
-            if (editId) {
-                await supabaseClient.from('products').update({ name, price, category, updated_at: new Date().toISOString() }).eq('id', editId);
-                msgDiv.innerHTML = '✅ Produk dikemas kini!';
-            } else {
-                await supabaseClient.from('products').insert([{ user_id: user.id, name, price, category, business_type: currentBusinessType }]);
-                msgDiv.innerHTML = '✅ Produk ditambah!';
+            
+            if (!name || isNaN(price) || price <= 0 || !category) {
+                msgDiv.className = 'message-box error';
+                msgDiv.innerHTML = '❌ Sila lengkapkan semua maklumat';
+                msgDiv.style.display = 'block';
+                return;
             }
-            msgDiv.className = 'message-box success';
-            msgDiv.style.display = 'block';
-            setTimeout(() => { closeProductModal(); loadProducts(); }, 1500);
-            btn.disabled = false;
+            
+            btn.disabled = true;
+            btn.textContent = 'Menyimpan...';
+            msgDiv.style.display = 'none';
+            
+            try {
+                if (editId) {
+                    // Update existing product
+                    const { error } = await supabaseClient
+                        .from('products')
+                        .update({ 
+                            name, 
+                            price, 
+                            category, 
+                            updated_at: new Date().toISOString() 
+                        })
+                        .eq('id', editId);
+                    
+                    if (error) throw error;
+                    msgDiv.innerHTML = '✅ Produk berjaya dikemas kini!';
+                } else {
+                    // Insert new product
+                    const { error } = await supabaseClient
+                        .from('products')
+                        .insert([{ 
+                            user_id: user.id, 
+                            name, 
+                            price, 
+                            category, 
+                            business_type: currentBusinessType,
+                            created_at: new Date().toISOString()
+                        }]);
+                    
+                    if (error) throw error;
+                    msgDiv.innerHTML = '✅ Produk baru berjaya ditambah!';
+                }
+                
+                msgDiv.className = 'message-box success';
+                msgDiv.style.display = 'block';
+                
+                // Close modal and refresh list
+                setTimeout(() => {
+                    closeProductModal();
+                    loadProducts(); // Refresh the product list
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error saving product:', error);
+                msgDiv.className = 'message-box error';
+                msgDiv.innerHTML = '❌ Ralat: ' + error.message;
+                msgDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Simpan Produk';
+            }
         }
 
-        function editProduct(id) { openProductModal(id); }
-        function confirmDeleteProduct(id) { productToDelete = id; document.getElementById('deleteModal').style.display = 'block'; }
-        function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; productToDelete = null; }
+        function editProduct(id) {
+            openProductModal(id);
+        }
+
+        function confirmDeleteProduct(id) {
+            productToDelete = id;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            productToDelete = null;
+        }
+
         async function deleteProduct() {
             if (!productToDelete) return;
-            await supabaseClient.from('products').delete().eq('id', productToDelete);
-            closeDeleteModal();
-            loadProducts();
+            
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Memadam...';
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('products')
+                    .delete()
+                    .eq('id', productToDelete);
+                
+                if (error) throw error;
+                
+                closeDeleteModal();
+                await loadProducts();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('❌ Ralat memadam: ' + error.message);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Padam';
+            }
         }
-        window.onclick = (e) => { if (e.target === document.getElementById('productModal')) closeProductModal(); if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); };
+
+        // Close modals on outside click
+        window.onclick = function(e) {
+            if (e.target === document.getElementById('productModal')) closeProductModal();
+            if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
+        };
     </script>
     <!-- REGISTER SERVICE WORKER (PWA) -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('✅ Service Worker registered successfully');
-                })
-                .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
-                });
-        });
-    }
-</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registered successfully');
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
