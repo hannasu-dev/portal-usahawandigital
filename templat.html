@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Konsistensi dengan modul.html */
         .back-button-container { margin-bottom: 20px; }
         .back-btn { 
             text-decoration: none; 
@@ -268,24 +267,24 @@
         
         switch(type) {
             case 'invois':
-                fileUrl = 'uploads/templat_invois_automatik.xlsx';
-                fileName = 'Template_Invois_Automatik_UsahawanDigital.xlsx';
+                fileUrl = 'uploads/template_invois_automatik.xlsx';
+                fileName = 'template_invois_automatik.xlsx';
                 break;
             case 'quotation':
-                fileUrl = 'uploads/templat_sebut_harga.xlsx';
-                fileName = 'Template_Sebut_Harga_UsahawanDigital.xlsx';
+                fileUrl = 'uploads/template_sebut_harga.xlsx';
+                fileName = 'template_sebut_harga.xlsx';
                 break;
             case 'caption':
                 fileUrl = 'uploads/templat_caption_media_sosial.docx';
-                fileName = 'Template_Caption_Media_Sosial.docx';
+                fileName = 'templat_caption_media_sosial.docx';
                 break;
             case 'stok':
                 fileUrl = 'uploads/template_senarai_semak_stok.xlsx';
-                fileName = 'Template_Senarai_Semak_Stok.xlsx';
+                fileName = 'template_senarai_semak_stok.xlsx';
                 break;
             case 'perancang':
                 fileUrl = 'uploads/templat_perancang_bulanan.xlsx';
-                fileName = 'Template_Perancang_Bulanan_UsahawanDigital.xlsx';
+                fileName = 'templat_perancang_bulanan.xlsx';
                 break;
             case 'email':
                 fileUrl = 'uploads/Templat_Emel_Promosi_Bisnes.docx';
@@ -293,7 +292,7 @@
                 break;
             case 'kalkulator':
                 fileUrl = 'uploads/kalkulator_kos_bahan_mentah.xlsx';
-                fileName = 'Kalkulator_Kos_Bahan_Mentah_UsahawanDigital.xlsx';
+                fileName = 'kalkulator_kos_bahan_mentah.xlsx';
                 break;
             default:
                 alert('Template sedang dalam pembinaan.');
@@ -306,7 +305,6 @@
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
         document.body.removeChild(link);
         
         alert(`✅ ${fileName} berjaya dimuat turun!`);
