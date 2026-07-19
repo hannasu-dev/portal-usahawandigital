@@ -89,21 +89,25 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 }
 
 // =========================================
-// CALCULATE FUNCTIONS
+// CALCULATE FUNCTIONS - FIXED QTY READING
 // =========================================
 function calculateRowSubtotal(row) {
-    const qtyInput = row.querySelector('.item-qty');
-    const priceInput = row.querySelector('.item-price');
+    // Get elements directly
+    const qtyInput = row.querySelector('input[type="number"].item-qty');
+    const priceInput = row.querySelector('input[type="number"].item-price');
     const subtotalSpan = row.querySelector('.item-subtotal-text');
     
-    if (!qtyInput || !priceInput || !subtotalSpan) return 0;
+    if (!qtyInput || !priceInput || !subtotalSpan) {
+        console.warn('⚠️ Missing elements in row:', row.id);
+        return 0;
+    }
     
     const qty = parseFloat(qtyInput.value) || 0;
     const price = parseFloat(priceInput.value) || 0;
     const subtotal = qty * price;
     subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
     
-    console.log('🧮 Calculate:', { qty, price, subtotal });
+    console.log('🧮 Calculate:', { qty, price, subtotal, rowId: row.id });
     
     return subtotal;
 }
@@ -111,9 +115,14 @@ function calculateRowSubtotal(row) {
 function calculateTotalAmount() {
     let total = 0;
     document.querySelectorAll('.item-row').forEach(row => {
-        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-        const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        total += qty * price;
+        const qtyInput = row.querySelector('input[type="number"].item-qty');
+        const priceInput = row.querySelector('input[type="number"].item-price');
+        
+        if (qtyInput && priceInput) {
+            const qty = parseFloat(qtyInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            total += qty * price;
+        }
     });
     const totalDisplay = document.getElementById('totalAmountDisplay');
     if (totalDisplay) totalDisplay.textContent = `RM ${total.toFixed(2)}`;
@@ -208,12 +217,11 @@ function attachRowEvents(row) {
         price.addEventListener('change', recalc);
     }
     
-    // DROPDOWN select event - FIXED!
+    // DROPDOWN select event
     if (select) {
         select.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const priceInput = this.closest('.item-row').querySelector('.item-price');
-            const rowElement = this.closest('.item-row');
             
             console.log('🔄 Dropdown changed:', this.value);
             
@@ -226,8 +234,10 @@ function attachRowEvents(row) {
                 newInput.placeholder = 'cth: Kek Red Velvet';
                 newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
                 this.replaceWith(newInput);
-                priceInput.value = '';
-                priceInput.placeholder = '0.00';
+                if (priceInput) {
+                    priceInput.value = '';
+                    priceInput.placeholder = '0.00';
+                }
                 
                 // Add recalc to new input
                 newInput.addEventListener('input', recalc);
@@ -254,11 +264,15 @@ function attachRowEvents(row) {
                 // Product selected - set price from data-price attribute
                 const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
                 console.log('💰 Product price:', productPrice);
-                priceInput.value = productPrice;
+                if (priceInput) {
+                    priceInput.value = productPrice;
+                }
                 recalc();
             } else {
                 // Empty selection - clear price
-                priceInput.value = 0;
+                if (priceInput) {
+                    priceInput.value = 0;
+                }
                 recalc();
             }
         });
@@ -319,7 +333,7 @@ function refreshAllItemRows() {
 }
 
 // =========================================
-// GET ITEMS DATA - FIXED!
+// GET ITEMS DATA
 // =========================================
 function getItemsData() {
     const items = [];
@@ -334,13 +348,13 @@ function getItemsData() {
             name = manual.value.trim();
         }
         
-        const qtyInput = row.querySelector('.item-qty');
-        const priceInput = row.querySelector('.item-price');
+        const qtyInput = row.querySelector('input[type="number"].item-qty');
+        const priceInput = row.querySelector('input[type="number"].item-price');
         
         const qty = parseFloat(qtyInput?.value) || 0;
         const price = parseFloat(priceInput?.value) || 0;
         
-        console.log('📦 Item found:', { name, qty, price });
+        console.log('📦 Item found:', { name, qty, price, rowId: row.id });
         
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
