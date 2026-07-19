@@ -66,104 +66,14 @@ async function getUserBusinessType() {
 }
 
 function setupJenisTransaksiListener() {
-    document.getElementById('jenis')?.addEventListener('change', () => { renderDynamicCategories(currentUserBusinessType); });
-}
-
-// =========================================
-// ADD ITEM ROW
-// =========================================
-function addItemRow() {
-    const itemsList = document.getElementById('itemsList');
-    if (!itemsList) return;
-    const itemId = Date.now() + itemCounter++;
-    const row = document.createElement('div');
-    row.className = 'item-row';
-    row.id = `item-${itemId}`;
-    
-    let optionsHtml = '<option value="">-- Pilih Produk --</option>';
-    userProducts.forEach(p => {
-        optionsHtml += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
-    });
-    optionsHtml += '<option value="other">✏️ Tambah Manual</option>';
-    
-    row.innerHTML = `
-        <div class="item-name-wrapper">
-            <select class="item-product-select">
-                ${optionsHtml}
-            </select>
-        </div>
-        <input type="number" class="item-qty" value="1" min="1" step="1">
-        <input type="number" class="item-price" value="0" min="0" step="0.01">
-        <span class="item-subtotal">RM 0.00</span>
-        <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
-    `;
-    
-    itemsList.appendChild(row);
-    calculateTotalAmount();
-    
-    // Attach events using delegation (handled below)
-}
-
-// =========================================
-// EVENT DELEGATION
-// =========================================
-function setupEventDelegation() {
-    const itemsList = document.getElementById('itemsList');
-    if (!itemsList) return;
-    
-    // Input events on qty and price
-    itemsList.addEventListener('input', function(e) {
-        const target = e.target;
-        const row = target.closest('.item-row');
-        if (!row) return;
-        if (target.classList.contains('item-qty') || target.classList.contains('item-price')) {
-            calculateRow(row);
-            calculateTotalAmount();
-        }
-    });
-    
-    // Change events on dropdown
-    itemsList.addEventListener('change', function(e) {
-        const target = e.target;
-        const row = target.closest('.item-row');
-        if (!row) return;
-        if (target.classList.contains('item-product-select')) {
-            const selectedOption = target.options[target.selectedIndex];
-            const priceInput = row.querySelector('.item-price');
-            if (target.value === 'other') {
-                const wrapper = row.querySelector('.item-name-wrapper');
-                const newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.className = 'item-name-manual';
-                newInput.placeholder = 'Nama produk baru';
-                target.replaceWith(newInput);
-                priceInput.value = '';
-                // Auto-save on blur
-                newInput.addEventListener('blur', function() {
-                    const name = this.value.trim();
-                    if (name) {
-                        const row = this.closest('.item-row');
-                        const p = parseFloat(row.querySelector('.item-price').value) || 0;
-                        const cat = document.getElementById('kategori').value || 'Lain-lain';
-                        saveProductToDatabase(name, p, cat);
-                    }
-                });
-                newInput.addEventListener('input', function() {
-                    const row = this.closest('.item-row');
-                    calculateRow(row);
-                    calculateTotalAmount();
-                });
-            } else if (target.value) {
-                priceInput.value = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-            }
-            calculateRow(row);
-            calculateTotalAmount();
-        }
+    document.getElementById('jenis')?.addEventListener('change', () => {
+        renderDynamicCategories(currentUserBusinessType);
+        refreshAllItemRows();
     });
 }
 
 // =========================================
-// SAVE PRODUCT
+// SAVE PRODUCT TO DATABASE (JUALAN ONLY)
 // =========================================
 async function saveProductToDatabase(productName, productPrice, productCategory) {
     const { data: { user } } = await supabaseClient.auth.getUser();
@@ -181,11 +91,11 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 // =========================================
 // CALCULATE FUNCTIONS
 // =========================================
-function calculateRow(row) {
+function calculateRowSubtotal(row) {
     const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
     const price = parseFloat(row.querySelector('.item-price').value) || 0;
     const subtotal = qty * price;
-    const subtotalSpan = row.querySelector('.item-subtotal');
+    const subtotalSpan = row.querySelector('.item-subtotal-text');
     if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
     return subtotal;
 }
@@ -202,10 +112,180 @@ function calculateTotalAmount() {
     return total;
 }
 
+// =========================================
+// ITEM MANAGEMENT
+// =========================================
+function addItemRow() {
+    const itemsList = document.getElementById('itemsList');
+    if (!itemsList) return;
+    const itemId = Date.now() + itemCounter++;
+    const isBelanja = document.getElementById('jenis').value === 'belanja';
+    
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.id = `item-${itemId}`;
+    
+    let nameHtml = '';
+    if (isBelanja) {
+        nameHtml = `
+            <div class="item-field item-name">
+                <label>📝 Nama Item</label>
+                <input type="text" class="item-name-manual" placeholder="cth: Beli Stok, Sewa" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+            </div>
+        `;
+    } else {
+        let optionsHtml = '<option value="">-- Pilih Produk --</option>';
+        userProducts.forEach(p => {
+            optionsHtml += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
+        });
+        optionsHtml += '<option value="other">✏️ Tambah Manual</option>';
+        nameHtml = `
+            <div class="item-field item-name">
+                <label>📝 Nama Produk</label>
+                <select class="item-product-select" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+                    ${optionsHtml}
+                </select>
+            </div>
+        `;
+    }
+    
+    row.innerHTML = `
+        ${nameHtml}
+        <div class="item-field item-qty">
+            <label>🔢 Kuantiti</label>
+            <input type="number" class="item-qty" value="1" min="1" step="1" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+        </div>
+        <div class="item-field item-price">
+            <label>💰 Harga (RM)</label>
+            <input type="number" class="item-price" value="0" min="0" step="0.01" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
+        </div>
+        <div class="item-field item-subtotal">
+            <label>💵 Jumlah</label>
+            <span class="item-subtotal-text">RM 0.00</span>
+        </div>
+        <div class="item-field item-action">
+            <button type="button" class="btn-remove-item" onclick="removeItemRow('${itemId}')">🗑️</button>
+        </div>
+    `;
+    
+    // Attach events
+    attachRowEvents(row);
+    
+    itemsList.appendChild(row);
+    calculateTotalAmount();
+}
+
+function attachRowEvents(row) {
+    const qty = row.querySelector('.item-qty');
+    const price = row.querySelector('.item-price');
+    const select = row.querySelector('.item-product-select');
+    const manual = row.querySelector('.item-name-manual');
+    const rowId = row.id;
+    
+    const recalc = () => {
+        calculateRowSubtotal(row);
+        calculateTotalAmount();
+    };
+    
+    if (qty) {
+        qty.addEventListener('input', recalc);
+        qty.addEventListener('change', recalc);
+    }
+    
+    if (price) {
+        price.addEventListener('input', recalc);
+        price.addEventListener('change', recalc);
+    }
+    
+    if (select) {
+        select.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            const priceInput = this.closest('.item-row').querySelector('.item-price');
+            
+            if (this.value === 'other') {
+                const nameField = this.closest('.item-field');
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'item-name-manual';
+                newInput.placeholder = 'cth: Kek Red Velvet';
+                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #f59e0b; border-radius:6px; font-size:0.85rem; width:100%;';
+                this.replaceWith(newInput);
+                priceInput.value = '';
+                priceInput.placeholder = '0.00';
+                
+                newInput.addEventListener('input', recalc);
+                
+                newInput.addEventListener('blur', function() {
+                    const name = this.value.trim();
+                    if (name) {
+                        const row = this.closest('.item-row');
+                        const p = parseFloat(row.querySelector('.item-price').value) || 0;
+                        const cat = document.getElementById('kategori').value || 'Lain-lain';
+                        saveProductToDatabase(name, p, cat).then(() => {
+                            loadUserProducts();
+                            this.style.borderColor = '#16a34a';
+                            setTimeout(() => { this.style.borderColor = '#cbd5e1'; }, 2000);
+                        });
+                    }
+                });
+            } else if (this.value) {
+                priceInput.value = parseFloat(selected.getAttribute('data-price')) || 0;
+            }
+            recalc();
+        });
+    }
+    
+    if (manual) {
+        manual.addEventListener('input', recalc);
+        manual.addEventListener('change', recalc);
+    }
+}
+
 function removeItemRow(itemId) {
     const row = document.getElementById(`item-${itemId}`);
     if (row) row.remove();
     calculateTotalAmount();
+}
+
+// =========================================
+// REFRESH ALL ITEM ROWS
+// =========================================
+function refreshAllItemRows() {
+    const rows = document.querySelectorAll('.item-row');
+    rows.forEach(row => {
+        const isBelanja = document.getElementById('jenis').value === 'belanja';
+        const nameField = row.querySelector('.item-field.item-name');
+        if (!nameField) return;
+        
+        const select = nameField.querySelector('.item-product-select');
+        const manual = nameField.querySelector('.item-name-manual');
+        
+        if (isBelanja) {
+            if (select && !manual) {
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'item-name-manual';
+                newInput.placeholder = 'cth: Beli Stok, Sewa';
+                newInput.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
+                select.replaceWith(newInput);
+                attachRowEvents(row);
+            }
+        } else {
+            if (manual && !select) {
+                const newSelect = document.createElement('select');
+                newSelect.className = 'item-product-select';
+                newSelect.style.cssText = 'padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;';
+                let html = '<option value="">-- Pilih Produk --</option>';
+                userProducts.forEach(p => {
+                    html += `<option value="${escapeHtml(p.name)}" data-price="${p.price}">${escapeHtml(p.name)} - RM ${p.price.toFixed(2)}</option>`;
+                });
+                html += '<option value="other">✏️ Tambah Manual</option>';
+                newSelect.innerHTML = html;
+                manual.replaceWith(newSelect);
+                attachRowEvents(row);
+            }
+        }
+    });
 }
 
 // =========================================
@@ -217,13 +297,16 @@ function getItemsData() {
         let name = '';
         const select = row.querySelector('.item-product-select');
         const manual = row.querySelector('.item-name-manual');
+        
         if (select && select.value && select.value !== 'other') {
             name = select.options[select.selectedIndex]?.text.split(' -')[0] || '';
         } else if (manual) {
             name = manual.value.trim();
         }
+        
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
         }
@@ -238,9 +321,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dateInput = document.getElementById('tarikh');
     if (dateInput) dateInput.valueAsDate = new Date();
     const user = await checkAuth();
-    if (!user) { window.location.href = 'login.html'; return; }
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
     await loadUserProducts();
-    setupEventDelegation();
     addItemRow();
     currentUserBusinessType = await getUserBusinessType();
     renderDynamicCategories(currentUserBusinessType);
@@ -254,28 +339,37 @@ if (jualanForm) {
     jualanForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const user = await checkAuth();
-        if (!user) { alert('Sila log masuk'); window.location.href = 'login.html'; return; }
+        if (!user) {
+            alert('Sila log masuk');
+            window.location.href = 'login.html';
+            return;
+        }
         const tarikh = document.getElementById('tarikh').value;
         const jenis = document.getElementById('jenis').value;
         const kategori = document.getElementById('kategori').value;
         const items = getItemsData();
         const total = calculateTotalAmount();
+        
         if (!tarikh) { alert('Pilih tarikh'); return; }
         if (!kategori) { alert('Pilih kategori'); return; }
         if (items.length === 0) { alert('Tambah sekurang-kurangnya satu item'); return; }
         if (total <= 0) { alert('Jumlah mesti lebih dari RM0'); return; }
+        
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Menyimpan...';
+        
         try {
             const { error } = await supabaseClient.from('jualan_records').insert([{ user_id: user.id, tarikh, jenis, kategori, jumlah: total, items, created_at: new Date().toISOString() }]);
             if (error) throw error;
+            
             document.getElementById('jualanForm').reset();
             document.getElementById('tarikh').valueAsDate = new Date();
             document.getElementById('itemsList').innerHTML = '';
             itemCounter = 0;
             addItemRow();
             renderDynamicCategories(currentUserBusinessType);
+            
             const msgDiv = document.getElementById('formMessage');
             msgDiv.style.display = 'block';
             msgDiv.className = 'message-box success';
@@ -297,7 +391,7 @@ if (jualanForm) {
 }
 
 // =========================================
-// LOAD & DISPLAY RECORDS (SAME AS BEFORE)
+// LOAD & DISPLAY RECORDS
 // =========================================
 async function loadRecords() {
     const user = await checkAuth();
@@ -311,7 +405,10 @@ async function loadRecords() {
         filterRecords();
         loadDailySummary();
         loadMonthlySummary();
-    } catch (error) { console.error('Load records error:', error); rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod</p>'; }
+    } catch (error) {
+        console.error('Load records error:', error);
+        rekodList.innerHTML = '<p class="error-text">❌ Ralat memuatkan rekod</p>';
+    }
 }
 
 function filterRecords() {
@@ -354,6 +451,9 @@ function updateSummary(records) {
     el.style.color = untung >= 0 ? '#16a34a' : '#dc2626';
 }
 
+// =========================================
+// DAILY & MONTHLY SUMMARY
+// =========================================
 async function loadDailySummary() {
     const user = await checkAuth();
     if (!user) return;
@@ -402,6 +502,9 @@ async function loadMonthlySummary() {
     } catch (error) { console.error('Monthly summary error:', error); container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
 }
 
+// =========================================
+// CHART
+// =========================================
 function prepareChartData(records) {
     const months = [], jualanMap = {}, belanjaMap = {};
     const now = new Date();
@@ -430,19 +533,40 @@ function updateChart(jualanData, belanjaData, labels) {
     salesChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Jualan (RM)', data: jualanData, backgroundColor: 'rgba(34,197,94,0.6)', borderColor: '#16a34a', borderWidth: 1 }, { label: 'Perbelanjaan (RM)', data: belanjaData, backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#dc2626', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } } });
 }
 
-async function deleteRecord(id) { if (!confirm('Padam rekod ini?')) return; const { error } = await supabaseClient.from('jualan_records').delete().eq('id', id); if (!error) loadRecords(); else alert('Error: ' + error.message); }
+// =========================================
+// DELETE & REPORT
+// =========================================
+async function deleteRecord(id) {
+    if (!confirm('Padam rekod ini?')) return;
+    try {
+        const { error } = await supabaseClient.from('jualan_records').delete().eq('id', id);
+        if (error) throw error;
+        await loadRecords(); // Refresh list after delete
+    } catch (error) {
+        console.error('Delete error:', error);
+        alert('❌ Ralat memadam rekod: ' + error.message);
+    }
+}
 
 async function generateReport() {
-    if (currentRecords.length === 0) { alert('Tiada rekod'); return; }
+    if (currentRecords.length === 0) {
+        alert('Tiada rekod');
+        return;
+    }
     let filtered = currentRecords;
     if (currentFilter !== 'semua') filtered = currentRecords.filter(r => r.jenis === currentFilter);
     let totalJualan = 0, totalBelanja = 0;
-    filtered.forEach(r => { if (r.jenis === 'jualan') totalJualan += r.jumlah || 0; else totalBelanja += r.jumlah || 0; });
+    filtered.forEach(r => {
+        if (r.jenis === 'jualan') totalJualan += r.jumlah || 0;
+        else totalBelanja += r.jumlah || 0;
+    });
     const keuntungan = totalJualan - totalBelanja;
     let rows = '';
     filtered.forEach(r => {
         if (r.items && r.items.length) {
-            r.items.forEach(item => { rows += `<tr><td>${r.tarikh}</td><td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td><td>${r.kategori}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price.toFixed(2)}</td><td>${item.subtotal.toFixed(2)}</td></tr>`; });
+            r.items.forEach(item => {
+                rows += `<tr><td>${r.tarikh}</td><td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td><td>${r.kategori}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price.toFixed(2)}</td><td>${item.subtotal.toFixed(2)}</td></tr>`;
+            });
         } else {
             rows += `<tr><td>${r.tarikh}</td><td>${r.jenis === 'jualan' ? 'Jualan' : 'Belanja'}</td><td>${r.kategori}</td><td colspan="4">Tiada detail</td></tr>`;
         }
