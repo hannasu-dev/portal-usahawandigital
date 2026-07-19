@@ -92,11 +92,19 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 // CALCULATE FUNCTIONS
 // =========================================
 function calculateRowSubtotal(row) {
-    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-    const price = parseFloat(row.querySelector('.item-price').value) || 0;
-    const subtotal = qty * price;
+    const qtyInput = row.querySelector('.item-qty');
+    const priceInput = row.querySelector('.item-price');
     const subtotalSpan = row.querySelector('.item-subtotal-text');
-    if (subtotalSpan) subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
+    
+    if (!qtyInput || !priceInput || !subtotalSpan) return 0;
+    
+    const qty = parseFloat(qtyInput.value) || 0;
+    const price = parseFloat(priceInput.value) || 0;
+    const subtotal = qty * price;
+    subtotalSpan.textContent = `RM ${subtotal.toFixed(2)}`;
+    
+    console.log('🧮 Calculate:', { qty, price, subtotal });
+    
     return subtotal;
 }
 
@@ -109,11 +117,12 @@ function calculateTotalAmount() {
     });
     const totalDisplay = document.getElementById('totalAmountDisplay');
     if (totalDisplay) totalDisplay.textContent = `RM ${total.toFixed(2)}`;
+    console.log('💰 Total amount:', total);
     return total;
 }
 
 // =========================================
-// ITEM MANAGEMENT - DROPDOWN FIXED
+// ITEM MANAGEMENT
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
@@ -310,7 +319,7 @@ function refreshAllItemRows() {
 }
 
 // =========================================
-// GET ITEMS DATA
+// GET ITEMS DATA - FIXED!
 // =========================================
 function getItemsData() {
     const items = [];
@@ -325,8 +334,11 @@ function getItemsData() {
             name = manual.value.trim();
         }
         
-        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const qtyInput = row.querySelector('.item-qty');
+        const priceInput = row.querySelector('.item-price');
+        
+        const qty = parseFloat(qtyInput?.value) || 0;
+        const price = parseFloat(priceInput?.value) || 0;
         
         console.log('📦 Item found:', { name, qty, price });
         
