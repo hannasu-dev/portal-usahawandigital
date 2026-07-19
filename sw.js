@@ -2,9 +2,7 @@
 // SERVICE WORKER - UsahawanDigital PWA
 // =========================================
 
-const CACHE_NAME = 'usahawan-digital-v1';
-
-// Senarai fail yang perlu di-cache
+const CACHE_NAME = 'usahawan-digital-v2';
 const ASSETS = [
     '/',
     '/index.html',
@@ -66,28 +64,52 @@ self.addEventListener('activate', event => {
 });
 
 // =========================================
-// FETCH - Serve from cache, fallback to network
+// FETCH - HANYA CACHE GET REQUEST SAHAJA!
 // =========================================
 self.addEventListener('fetch', event => {
+    const request = event.request;
+    const url = new URL(request.url);
+    
+    // HANYA cache request GET
+    // JANGAN cache POST, PUT, PATCH, DELETE
+    if (request.method !== 'GET') {
+        // Biarkan request POST/PUT/PATCH/DELETE terus ke network
+        return;
+    }
+    
+    // JANGAN cache Supabase API requests (supabase.co)
+    if (url.hostname.includes('supabase.co')) {
+        // Biarkan request ke Supabase terus ke network
+        return;
+    }
+    
     event.respondWith(
-        caches.match(event.request)
+        caches.match(request)
             .then(cachedResponse => {
                 if (cachedResponse) {
                     return cachedResponse;
                 }
-                return fetch(event.request)
+                return fetch(request)
                     .then(networkResponse => {
-                        return caches.open(CACHE_NAME)
-                            .then(cache => {
-                                cache.put(event.request, networkResponse.clone());
-                                return networkResponse;
-                            });
+                        // Hanya cache response yang berjaya (status 200)
+                        if (networkResponse.status === 200) {
+                            return caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    cache.put(request, networkResponse.clone());
+                                    return networkResponse;
+                                });
+                        }
+                        return networkResponse;
                     })
                     .catch(() => {
-                        return new Response(
-                            '<h1>Offline</h1><p>Sila sambung ke internet untuk mengakses portal ini.</p>',
-                            { headers: { 'Content-Type': 'text/html' } }
-                        );
+                        // Offline fallback
+                        if (url.pathname.endsWith('.html')) {
+                            return new Response(
+                                '<h1>Offline</h1><p>Sila sambung ke internet untuk mengakses portal ini.</p>',
+                                { headers: { 'Content-Type': 'text/html' } }
+                            );
+                        }
+                        return new Response('Offline', { status: 503 });
                     });
             })
     );
