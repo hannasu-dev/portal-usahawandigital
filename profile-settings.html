@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetapan Profil - UsahawanDigital</title>
-    <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -350,7 +349,7 @@
         }
 
         // =========================================
-        // SAVE PRODUCT - FORCE REFRESH
+        // SAVE PRODUCT - FORCE RELOAD PAGE
         // =========================================
         async function saveProduct() {
             const user = await checkAuth();
@@ -405,11 +404,11 @@
                 msgDiv.className = 'message-box success';
                 msgDiv.style.display = 'block';
                 
-                // Close modal and refresh list
+                // Force reload page after 1.5 seconds
                 setTimeout(() => {
                     closeProductModal();
-                    loadProducts(); // Refresh product list
-                }, 1000);
+                    location.reload(); // RELOAD PAGE - PASTI UPDATE!
+                }, 1500);
                 
             } catch (error) {
                 console.error('Error saving product:', error);
@@ -443,7 +442,7 @@
         }
 
         // =========================================
-        // DELETE PRODUCT - FORCE REFRESH
+        // DELETE PRODUCT - FORCE RELOAD PAGE
         // =========================================
         async function deleteProduct() {
             if (!productToDelete) return;
@@ -461,8 +460,8 @@
                 if (error) throw error;
                 
                 closeDeleteModal();
-                await loadProducts(); // Refresh product list
                 alert('✅ Produk berjaya dipadam!');
+                location.reload(); // RELOAD PAGE - PASTI UPDATE!
                 
             } catch (error) {
                 console.error('Error deleting product:', error);
