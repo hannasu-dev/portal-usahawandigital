@@ -113,7 +113,7 @@ function calculateTotalAmount() {
 }
 
 // =========================================
-// ITEM MANAGEMENT
+// ITEM MANAGEMENT - DROPDOWN FIXED
 // =========================================
 function addItemRow() {
     const itemsList = document.getElementById('itemsList');
@@ -180,29 +180,36 @@ function attachRowEvents(row) {
     const price = row.querySelector('.item-price');
     const select = row.querySelector('.item-product-select');
     const manual = row.querySelector('.item-name-manual');
-    const rowId = row.id;
     
-    const recalc = () => {
+    // Function to recalculate this row and total
+    const recalc = function() {
         calculateRowSubtotal(row);
         calculateTotalAmount();
     };
     
+    // QTY input events
     if (qty) {
         qty.addEventListener('input', recalc);
         qty.addEventListener('change', recalc);
     }
     
+    // PRICE input events
     if (price) {
         price.addEventListener('input', recalc);
         price.addEventListener('change', recalc);
     }
     
+    // DROPDOWN select event - FIXED!
     if (select) {
         select.addEventListener('change', function() {
-            const selected = this.options[this.selectedIndex];
+            const selectedOption = this.options[this.selectedIndex];
             const priceInput = this.closest('.item-row').querySelector('.item-price');
+            const rowElement = this.closest('.item-row');
+            
+            console.log('🔄 Dropdown changed:', this.value);
             
             if (this.value === 'other') {
+                // Manual entry - replace select with input
                 const nameField = this.closest('.item-field');
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
@@ -213,8 +220,11 @@ function attachRowEvents(row) {
                 priceInput.value = '';
                 priceInput.placeholder = '0.00';
                 
+                // Add recalc to new input
                 newInput.addEventListener('input', recalc);
+                newInput.addEventListener('change', recalc);
                 
+                // Auto-save to database
                 newInput.addEventListener('blur', function() {
                     const name = this.value.trim();
                     if (name) {
@@ -228,13 +238,24 @@ function attachRowEvents(row) {
                         });
                     }
                 });
+                
+                recalc();
+                
             } else if (this.value) {
-                priceInput.value = parseFloat(selected.getAttribute('data-price')) || 0;
+                // Product selected - set price from data-price attribute
+                const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                console.log('💰 Product price:', productPrice);
+                priceInput.value = productPrice;
+                recalc();
+            } else {
+                // Empty selection - clear price
+                priceInput.value = 0;
+                recalc();
             }
-            recalc();
         });
     }
     
+    // Manual input events (for BELANJA or JUALAN manual)
     if (manual) {
         manual.addEventListener('input', recalc);
         manual.addEventListener('change', recalc);
@@ -307,10 +328,13 @@ function getItemsData() {
         const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
         
+        console.log('📦 Item found:', { name, qty, price });
+        
         if (name && qty > 0 && price > 0) {
             items.push({ name, quantity: qty, price, subtotal: qty * price });
         }
     });
+    console.log('📋 Total items:', items.length);
     return items;
 }
 
@@ -350,6 +374,8 @@ if (jualanForm) {
         const items = getItemsData();
         const total = calculateTotalAmount();
         
+        console.log('📝 Form submit:', { tarikh, jenis, kategori, items, total });
+        
         if (!tarikh) { alert('Pilih tarikh'); return; }
         if (!kategori) { alert('Pilih kategori'); return; }
         if (items.length === 0) { alert('Tambah sekurang-kurangnya satu item'); return; }
@@ -360,7 +386,16 @@ if (jualanForm) {
         submitBtn.textContent = 'Menyimpan...';
         
         try {
-            const { error } = await supabaseClient.from('jualan_records').insert([{ user_id: user.id, tarikh, jenis, kategori, jumlah: total, items, created_at: new Date().toISOString() }]);
+            const { error } = await supabaseClient.from('jualan_records').insert([{ 
+                user_id: user.id, 
+                tarikh, 
+                jenis, 
+                kategori, 
+                jumlah: total, 
+                items, 
+                created_at: new Date().toISOString() 
+            }]);
+            
             if (error) throw error;
             
             document.getElementById('jualanForm').reset();
@@ -374,8 +409,12 @@ if (jualanForm) {
             msgDiv.style.display = 'block';
             msgDiv.className = 'message-box success';
             msgDiv.innerHTML = '✅ Rekod berjaya disimpan!';
-            setTimeout(() => msgDiv.style.display = 'none', 3000);
-            await loadRecords();
+            
+            setTimeout(() => {
+                loadRecords();
+                msgDiv.style.display = 'none';
+            }, 1000);
+            
         } catch (error) {
             console.error('Submit error:', error);
             const msgDiv = document.getElementById('formMessage');
@@ -451,9 +490,6 @@ function updateSummary(records) {
     el.style.color = untung >= 0 ? '#16a34a' : '#dc2626';
 }
 
-// =========================================
-// DAILY & MONTHLY SUMMARY
-// =========================================
 async function loadDailySummary() {
     const user = await checkAuth();
     if (!user) return;
@@ -502,9 +538,6 @@ async function loadMonthlySummary() {
     } catch (error) { console.error('Monthly summary error:', error); container.innerHTML = '<p class="error-text">❌ Error loading data</p>'; }
 }
 
-// =========================================
-// CHART
-// =========================================
 function prepareChartData(records) {
     const months = [], jualanMap = {}, belanjaMap = {};
     const now = new Date();
@@ -533,15 +566,13 @@ function updateChart(jualanData, belanjaData, labels) {
     salesChart = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Jualan (RM)', data: jualanData, backgroundColor: 'rgba(34,197,94,0.6)', borderColor: '#16a34a', borderWidth: 1 }, { label: 'Perbelanjaan (RM)', data: belanjaData, backgroundColor: 'rgba(239,68,68,0.6)', borderColor: '#dc2626', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } } });
 }
 
-// =========================================
-// DELETE & REPORT
-// =========================================
 async function deleteRecord(id) {
     if (!confirm('Padam rekod ini?')) return;
     try {
         const { error } = await supabaseClient.from('jualan_records').delete().eq('id', id);
         if (error) throw error;
-        await loadRecords(); // Refresh list after delete
+        await loadRecords();
+        alert('✅ Rekod berjaya dipadam!');
     } catch (error) {
         console.error('Delete error:', error);
         alert('❌ Ralat memadam rekod: ' + error.message);
