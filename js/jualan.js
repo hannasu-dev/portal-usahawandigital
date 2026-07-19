@@ -92,8 +92,9 @@ async function saveProductToDatabase(productName, productPrice, productCategory)
 // CALCULATE FUNCTIONS - FIXED QTY READING
 // =========================================
 function calculateRowSubtotal(row) {
-    const qtyInput = row.querySelector('input[type="number"].item-qty');
-    const priceInput = row.querySelector('input[type="number"].item-price');
+    // Cari input dengan class item-qty (bukan div)
+    const qtyInput = row.querySelector('input.item-qty');
+    const priceInput = row.querySelector('input.item-price');
     const subtotalSpan = row.querySelector('.item-subtotal-text');
     
     if (!qtyInput || !priceInput || !subtotalSpan) {
@@ -114,8 +115,8 @@ function calculateRowSubtotal(row) {
 function calculateTotalAmount() {
     let total = 0;
     document.querySelectorAll('.item-row').forEach(row => {
-        const qtyInput = row.querySelector('input[type="number"].item-qty');
-        const priceInput = row.querySelector('input[type="number"].item-price');
+        const qtyInput = row.querySelector('input.item-qty');
+        const priceInput = row.querySelector('input.item-price');
         
         if (qtyInput && priceInput) {
             const qty = parseFloat(qtyInput.value) || 0;
@@ -168,11 +169,11 @@ function addItemRow() {
     
     row.innerHTML = `
         ${nameHtml}
-        <div class="item-field item-field-qty">
+        <div class="item-field item-qty">
             <label>🔢 Kuantiti</label>
             <input type="number" class="item-qty" value="1" min="1" step="1" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
         </div>
-        <div class="item-field item-field-price">
+        <div class="item-field item-price">
             <label>💰 Harga (RM)</label>
             <input type="number" class="item-price" value="0" min="0" step="0.01" style="padding:0.4rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; width:100%;">
         </div>
@@ -185,7 +186,9 @@ function addItemRow() {
         </div>
     `;
     
+    // Attach events
     attachRowEvents(row);
+    
     itemsList.appendChild(row);
     calculateTotalAmount();
 }
@@ -196,21 +199,25 @@ function attachRowEvents(row) {
     const select = row.querySelector('.item-product-select');
     const manual = row.querySelector('.item-name-manual');
     
+    // Function to recalculate this row and total
     const recalc = function() {
         calculateRowSubtotal(row);
         calculateTotalAmount();
     };
     
+    // QTY input events
     if (qty) {
         qty.addEventListener('input', recalc);
         qty.addEventListener('change', recalc);
     }
     
+    // PRICE input events
     if (price) {
         price.addEventListener('input', recalc);
         price.addEventListener('change', recalc);
     }
     
+    // DROPDOWN select event
     if (select) {
         select.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
@@ -219,6 +226,7 @@ function attachRowEvents(row) {
             console.log('🔄 Dropdown changed:', this.value);
             
             if (this.value === 'other') {
+                // Manual entry - replace select with input
                 const nameField = this.closest('.item-field');
                 const newInput = document.createElement('input');
                 newInput.type = 'text';
@@ -231,9 +239,11 @@ function attachRowEvents(row) {
                     priceInput.placeholder = '0.00';
                 }
                 
+                // Add recalc to new input
                 newInput.addEventListener('input', recalc);
                 newInput.addEventListener('change', recalc);
                 
+                // Auto-save to database
                 newInput.addEventListener('blur', function() {
                     const name = this.value.trim();
                     if (name) {
@@ -251,6 +261,7 @@ function attachRowEvents(row) {
                 recalc();
                 
             } else if (this.value) {
+                // Product selected - set price from data-price attribute
                 const productPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
                 console.log('💰 Product price:', productPrice);
                 if (priceInput) {
@@ -258,6 +269,7 @@ function attachRowEvents(row) {
                 }
                 recalc();
             } else {
+                // Empty selection - clear price
                 if (priceInput) {
                     priceInput.value = 0;
                 }
@@ -266,6 +278,7 @@ function attachRowEvents(row) {
         });
     }
     
+    // Manual input events (for BELANJA or JUALAN manual)
     if (manual) {
         manual.addEventListener('input', recalc);
         manual.addEventListener('change', recalc);
@@ -335,8 +348,9 @@ function getItemsData() {
             name = manual.value.trim();
         }
         
-        const qtyInput = row.querySelector('input[type="number"].item-qty');
-        const priceInput = row.querySelector('input[type="number"].item-price');
+        // Cari input dengan class item-qty (bukan div)
+        const qtyInput = row.querySelector('input.item-qty');
+        const priceInput = row.querySelector('input.item-price');
         
         const qty = parseFloat(qtyInput?.value) || 0;
         const price = parseFloat(priceInput?.value) || 0;
