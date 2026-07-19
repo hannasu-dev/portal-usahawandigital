@@ -349,6 +349,9 @@
             document.getElementById('productModal').style.display = 'none';
         }
 
+        // =========================================
+        // SAVE PRODUCT - FORCE REFRESH
+        // =========================================
         async function saveProduct() {
             const user = await checkAuth();
             if (!user) return;
@@ -373,7 +376,6 @@
             
             try {
                 if (editId) {
-                    // Update existing product
                     const { error } = await supabaseClient
                         .from('products')
                         .update({ 
@@ -383,11 +385,9 @@
                             updated_at: new Date().toISOString() 
                         })
                         .eq('id', editId);
-                    
                     if (error) throw error;
-                    msgDiv.innerHTML = '✅ Produk berjaya dikemas kini!';
+                    msgDiv.innerHTML = '✅ Produk dikemas kini!';
                 } else {
-                    // Insert new product
                     const { error } = await supabaseClient
                         .from('products')
                         .insert([{ 
@@ -398,9 +398,8 @@
                             business_type: currentBusinessType,
                             created_at: new Date().toISOString()
                         }]);
-                    
                     if (error) throw error;
-                    msgDiv.innerHTML = '✅ Produk baru berjaya ditambah!';
+                    msgDiv.innerHTML = '✅ Produk ditambah!';
                 }
                 
                 msgDiv.className = 'message-box success';
@@ -409,7 +408,7 @@
                 // Close modal and refresh list
                 setTimeout(() => {
                     closeProductModal();
-                    loadProducts(); // Refresh the product list
+                    loadProducts(); // Refresh product list
                 }, 1000);
                 
             } catch (error) {
@@ -423,10 +422,16 @@
             }
         }
 
+        // =========================================
+        // EDIT PRODUCT
+        // =========================================
         function editProduct(id) {
             openProductModal(id);
         }
 
+        // =========================================
+        // CONFIRM DELETE PRODUCT
+        // =========================================
         function confirmDeleteProduct(id) {
             productToDelete = id;
             document.getElementById('deleteModal').style.display = 'block';
@@ -437,6 +442,9 @@
             productToDelete = null;
         }
 
+        // =========================================
+        // DELETE PRODUCT - FORCE REFRESH
+        // =========================================
         async function deleteProduct() {
             if (!productToDelete) return;
             
@@ -453,7 +461,9 @@
                 if (error) throw error;
                 
                 closeDeleteModal();
-                await loadProducts();
+                await loadProducts(); // Refresh product list
+                alert('✅ Produk berjaya dipadam!');
+                
             } catch (error) {
                 console.error('Error deleting product:', error);
                 alert('❌ Ralat memadam: ' + error.message);
