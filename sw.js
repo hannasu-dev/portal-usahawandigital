@@ -2,7 +2,7 @@
 // SERVICE WORKER - UsahawanDigital PWA
 // =========================================
 
-const CACHE_NAME = 'usahawan-digital-v2';
+const CACHE_NAME = 'usahawan-digital-v3';
 const ASSETS = [
     '/',
     '/index.html',
