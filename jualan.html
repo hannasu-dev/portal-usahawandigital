@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekod Jualan - UsahawanDigital</title>
-        <!-- PWA MANIFEST & META TAGS -->
+    <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -13,6 +13,31 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* Item Row Styles */
+        .item-row { display: flex; gap: 0.5rem; align-items: center; background: #f8fafc; padding: 0.5rem; border-radius: 8px; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .item-row .item-field { display: flex; flex-direction: column; gap: 0.15rem; }
+        .item-row .item-field label { font-size: 0.6rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; }
+        .item-row .item-field input, .item-row .item-field select { padding: 0.4rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; background: white; width: 100%; }
+        .item-row .item-field input:focus, .item-row .item-field select:focus { outline: none; border-color: #1a5f7a; box-shadow: 0 0 0 2px rgba(26, 95, 122, 0.1); }
+        .item-row .item-field.item-name { flex: 2; min-width: 120px; }
+        .item-row .item-field.item-qty { flex: 0.6; min-width: 60px; }
+        .item-row .item-field.item-price { flex: 0.8; min-width: 80px; }
+        .item-row .item-field.item-subtotal { flex: 0.8; min-width: 80px; text-align: center; font-weight: 700; color: #1a5f7a; background: #e0f2fe; padding: 0.35rem 0.5rem; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; height: 100%; }
+        .item-row .item-field.item-action { flex: 0.4; min-width: 40px; display: flex; align-items: center; justify-content: center; }
+        .item-row .item-field.item-action button { background: #fee2e2; color: #dc2626; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.2s; width: 100%; }
+        .item-row .item-field.item-action button:hover { background: #fecaca; }
+        .item-subtotal-text { font-weight: 700; color: #1a5f7a; font-size: 0.85rem; }
+        .item-row-header { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0.5rem; margin-bottom: 0.3rem; background: #e2e8f0; border-radius: 8px; font-weight: 600; font-size: 0.7rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .item-row-header .header-name { flex: 2; min-width: 150px; padding-left: 0.3rem; }
+        .item-row-header .header-qty { flex: 0.6; min-width: 60px; text-align: center; }
+        .item-row-header .header-price { flex: 0.8; min-width: 80px; text-align: center; }
+        .item-row-header .header-subtotal { flex: 0.8; min-width: 70px; text-align: center; }
+        .item-row-header .header-action { flex: 0.3; min-width: 35px; text-align: center; }
+        @media (max-width: 768px) { .item-row-header { display: none; } .item-row { flex-direction: column; align-items: stretch; } .item-row .item-field { width: 100%; } .item-row .item-field.item-subtotal { min-height: 40px; } }
+        .back-btn { text-decoration: none; color: #1a5f7a; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .back-btn:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -20,11 +45,9 @@
             <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
-                <a href="modul.html">Modul</a>
-                <a href="jualan.html" class="active">Rekod Jualan</a>
-                <a href="templat.html">Templat</a>
                 <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
@@ -60,13 +83,11 @@
                     </div>
                 </div>
 
-                <!-- Item List Container dengan Dropdown Produk -->
                 <div class="items-header">
                     <span>🛒 Senarai Item</span>
                     <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
                 </div>
-                
-                <!-- HEADER ROW - Labels untuk column -->
+
                 <div class="item-row-header">
                     <span class="header-name">📝 Nama Produk</span>
                     <span class="header-qty">🔢 Kuantiti</span>
@@ -74,7 +95,7 @@
                     <span class="header-subtotal">💵 Jumlah</span>
                     <span class="header-action">⚙️</span>
                 </div>
-                
+
                 <div id="itemsList" class="items-list"></div>
 
                 <div class="items-total">
@@ -167,7 +188,16 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital | Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🇲🇾 Usahawan<span>Digital</span></h3>
+                    <p>Memperkasakan Usahawan Mikro Malaysia</p>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 Portal UsahawanDigital</p>
+                    <p class="footer-tagline">Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -176,20 +206,18 @@
     <script src="js/auth.js"></script>
     <script src="js/jualan.js"></script>
     <!-- REGISTER SERVICE WORKER (PWA) -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('✅ Service Worker registered successfully');
-                })
-                .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
-                });
-        });
-    }
-</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registered successfully');
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
-
-
