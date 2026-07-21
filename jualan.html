@@ -13,31 +13,7 @@
     <link rel="stylesheet" href="css/style.css?v=3">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        /* Item Row Styles */
-        .item-row { display: flex; gap: 0.5rem; align-items: center; background: #f8fafc; padding: 0.5rem; border-radius: 8px; margin-bottom: 0.5rem; flex-wrap: wrap; }
-        .item-row .item-field { display: flex; flex-direction: column; gap: 0.15rem; }
-        .item-row .item-field label { font-size: 0.6rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; }
-        .item-row .item-field input, .item-row .item-field select { padding: 0.4rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; background: white; width: 100%; }
-        .item-row .item-field input:focus, .item-row .item-field select:focus { outline: none; border-color: #1a5f7a; box-shadow: 0 0 0 2px rgba(26, 95, 122, 0.1); }
-        .item-row .item-field.item-name { flex: 2; min-width: 120px; }
-        .item-row .item-field.item-qty { flex: 0.6; min-width: 60px; }
-        .item-row .item-field.item-price { flex: 0.8; min-width: 80px; }
-        .item-row .item-field.item-subtotal { flex: 0.8; min-width: 80px; text-align: center; font-weight: 700; color: #1a5f7a; background: #e0f2fe; padding: 0.35rem 0.5rem; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; height: 100%; }
-        .item-row .item-field.item-action { flex: 0.4; min-width: 40px; display: flex; align-items: center; justify-content: center; }
-        .item-row .item-field.item-action button { background: #fee2e2; color: #dc2626; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.2s; width: 100%; }
-        .item-row .item-field.item-action button:hover { background: #fecaca; }
-        .item-subtotal-text { font-weight: 700; color: #1a5f7a; font-size: 0.85rem; }
-        .item-row-header { display: flex; gap: 0.5rem; align-items: center; padding: 0.3rem 0.5rem; margin-bottom: 0.3rem; background: #e2e8f0; border-radius: 8px; font-weight: 600; font-size: 0.7rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
-        .item-row-header .header-name { flex: 2; min-width: 150px; padding-left: 0.3rem; }
-        .item-row-header .header-qty { flex: 0.6; min-width: 60px; text-align: center; }
-        .item-row-header .header-price { flex: 0.8; min-width: 80px; text-align: center; }
-        .item-row-header .header-subtotal { flex: 0.8; min-width: 70px; text-align: center; }
-        .item-row-header .header-action { flex: 0.3; min-width: 35px; text-align: center; }
-        @media (max-width: 768px) { .item-row-header { display: none; } .item-row { flex-direction: column; align-items: stretch; } .item-row .item-field { width: 100%; } .item-row .item-field.item-subtotal { min-height: 40px; } }
-        .back-btn { text-decoration: none; color: #1a5f7a; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-        .back-btn:hover { text-decoration: underline; }
-    </style>
+    <!-- YOUR CUSTOM STYLES HERE -->
 </head>
 <body>
     <nav class="navbar">
@@ -51,140 +27,7 @@
         </div>
     </nav>
 
-    <div class="container">
-        <div class="back-button-container">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
-        </div>
-
-        <h2>💰 Rekod Jualan & Perbelanjaan</h2>
-        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item perniagaan anda</p>
-
-        <!-- Form Tambah Rekod -->
-        <div class="form-card">
-            <h3>➕ Tambah Rekod Baru</h3>
-            <form id="jualanForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>📅 Tarikh</label>
-                        <input type="date" id="tarikh" required>
-                    </div>
-                    <div class="form-group">
-                        <label>💰 Jenis Transaksi</label>
-                        <select id="jenis" required>
-                            <option value="jualan">💰 Jualan (Pendapatan)</option>
-                            <option value="belanja">📉 Perbelanjaan (Kos/Beli Stok)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>📁 Kategori</label>
-                        <select id="kategori" required>
-                            <option value="">Pilih kategori</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="items-header">
-                    <span>🛒 Senarai Item</span>
-                    <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
-                </div>
-
-                <div class="item-row-header">
-                    <span class="header-name">📝 Nama Produk</span>
-                    <span class="header-qty">🔢 Kuantiti</span>
-                    <span class="header-price">💰 Harga (RM)</span>
-                    <span class="header-subtotal">💵 Jumlah</span>
-                    <span class="header-action">⚙️</span>
-                </div>
-
-                <div id="itemsList" class="items-list"></div>
-
-                <div class="items-total">
-                    <div class="total-row">
-                        <span>💰 Jumlah Keseluruhan:</span>
-                        <strong id="totalAmountDisplay">RM 0.00</strong>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary" id="submitBtn">💾 Simpan Rekod</button>
-            </form>
-            <div id="formMessage" class="message-box" style="display:none;"></div>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-            <button class="tab-btn active" data-tab="terkini">📋 Senarai Terkini</button>
-            <button class="tab-btn" data-tab="harian">📅 Ringkasan Harian</button>
-            <button class="tab-btn" data-tab="bulanan">📊 Ringkasan Bulanan</button>
-        </div>
-
-        <!-- Tab 1: Senarai Terkini -->
-        <div id="tab-terkini" class="tab-panel active">
-            <div class="rekod-header">
-                <h3>📋 Senarai Rekod Terkini</h3>
-                <div class="filter-section">
-                    <select id="filterJenis" onchange="filterRecords()">
-                        <option value="semua">📌 Semua</option>
-                        <option value="jualan">💰 Jualan</option>
-                        <option value="belanja">📉 Perbelanjaan</option>
-                    </select>
-                    <button class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
-                </div>
-            </div>
-            <div class="rekod-scroll-container">
-                <div id="rekodList" class="rekod-list">
-                    <p class="loading-text">📂 Loading rekod...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 2: Ringkasan Harian -->
-        <div id="tab-harian" class="tab-panel">
-            <h3>📅 Ringkasan Harian (30 Hari Terkini)</h3>
-            <div class="rekod-scroll-container">
-                <div id="dailySummaryList" class="summary-list">
-                    <p class="loading-text">📂 Loading...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 3: Ringkasan Bulanan -->
-        <div id="tab-bulanan" class="tab-panel">
-            <h3>📊 Ringkasan Bulanan</h3>
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
-            </div>
-            <div class="rekod-scroll-container">
-                <div id="monthlySummaryList" class="summary-list">
-                    <p class="loading-text">📂 Loading...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ringkasan Kewangan -->
-        <div class="summary-cards">
-            <div class="summary-card">
-                <div class="summary-icon">💰</div>
-                <div class="summary-details">
-                    <span class="summary-label">Jumlah Jualan</span>
-                    <strong class="summary-value" id="totalJualan">RM 0.00</strong>
-                </div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-icon">📉</div>
-                <div class="summary-details">
-                    <span class="summary-label">Jumlah Perbelanjaan</span>
-                    <strong class="summary-value" id="totalBelanja">RM 0.00</strong>
-                </div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-icon">🎯</div>
-                <div class="summary-details">
-                    <span class="summary-label">Untung Bersih</span>
-                    <strong class="summary-value" id="keuntungan">RM 0.00</strong>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- CONTENT -->
 
     <footer>
         <div class="container">
@@ -202,8 +45,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/supabase.js?v=3"></script>
+    <script src="js/auth.js?v=3"></script>
     <script src="js/jualan.js?v=3"></script>
     <!-- REGISTER SERVICE WORKER (PWA) -->
     <script>
