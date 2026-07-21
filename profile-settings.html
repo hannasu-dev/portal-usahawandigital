@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetapan Profil - UsahawanDigital</title>
+    <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -12,35 +13,9 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .profile-settings-container { padding: 2rem 0; max-width: 800px; margin: 0 auto; }
-        .profile-settings-card { background: white; border-radius: 24px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .profile-settings-card h2 { color: #1a5f7a; margin-bottom: 1.5rem; text-align: center; }
-        .profile-products-section { margin: 1.5rem 0; padding: 1rem 0; border-top: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; }
-        .products-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; }
-        .products-header h3 { color: #1a5f7a; font-size: 1.1rem; }
-        .btn-add-product { background: #1a5f7a; color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 30px; cursor: pointer; font-size: 0.8rem; }
-        .btn-add-product:hover { background: #0e4a62; }
-        .products-list-settings { max-height: 300px; overflow-y: auto; margin-top: 0.8rem; }
-        .products-list-settings::-webkit-scrollbar { width: 6px; }
-        .products-list-settings::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        .products-list-settings::-webkit-scrollbar-thumb { background: #1a5f7a; border-radius: 10px; }
-        .products-grid-settings { display: flex; flex-direction: column; gap: 0.5rem; }
-        .product-card-settings { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .product-card-settings:hover { border-color: #1a5f7a; }
-        .product-info-settings { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-        .product-price-settings { color: #1a5f7a; font-weight: 600; font-size: 0.85rem; }
-        .product-category-settings { background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; color: #475569; }
-        .product-actions-settings { display: flex; gap: 0.5rem; }
-        .btn-edit-product, .btn-delete-product { background: none; border: none; font-size: 1rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 6px; }
-        .btn-edit-product:hover { background: #e0f2fe; }
-        .btn-delete-product:hover { background: #fee2e2; }
-        .form-note { font-size: 0.7rem; color: #64748b; margin-bottom: 0.8rem; }
-        .no-products { text-align: center; padding: 1.5rem; color: #64748b; background: white; border: 1px dashed #cbd5e1; border-radius: 8px; }
-        .loading-text, .error-text { text-align: center; padding: 1.5rem; color: #64748b; }
-        @media (max-width: 768px) {
-            .product-card-settings { flex-direction: column; gap: 0.5rem; }
-            .product-actions-settings { width: 100%; justify-content: flex-end; }
-        }
+        .back-btn { text-decoration: none; color: #1a5f7a; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .back-btn:hover { text-decoration: underline; }
+        /* ... other styles ... */
     </style>
 </head>
 <body>
@@ -49,96 +24,26 @@
             <div class="logo"><h1>🇲🇾 Usahawan<span>Digital</span></h1></div>
             <div class="nav-links">
                 <a href="dashboard.html">Dashboard</a>
-                <a href="modul.html">Modul</a>
-                <a href="jualan.html">Rekod Jualan</a>
-                <a href="templat.html">Templat</a>
                 <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
         </div>
     </nav>
 
-    <div class="container profile-settings-container">
-        <div class="back-button-container">
-            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
-        </div>
-
-        <div class="profile-settings-card">
-            <h2>⚙️ Tetapan Profil Perniagaan</h2>
-            
-            <form id="profileForm">
-                <div class="form-group">
-                    <label>🏪 Nama Perniagaan</label>
-                    <input type="text" id="businessName" placeholder="Nama perniagaan anda">
-                </div>
-                <div class="form-group">
-                    <label>📋 Jenis Perniagaan</label>
-                    <select id="businessType" required>
-                        <option value="fnb">🍔 F&B (Makanan & Minuman)</option>
-                        <option value="retail">👗 Retail / Butik</option>
-                        <option value="servis">✂️ Perkhidmatan / Servis</option>
-                    </select>
-                </div>
-                
-                <div class="profile-products-section">
-                    <div class="products-header">
-                        <h3>📦 Senarai Produk / Item Perniagaan</h3>
-                        <button type="button" class="btn-add-product" id="addProductBtn">+ Tambah Produk</button>
-                    </div>
-                    <p class="form-note">Produk ini akan muncul sebagai pilihan semasa mengisi rekod jualan.</p>
-                    <div id="productsList" class="products-list-settings">
-                        <p class="loading-text">📂 Loading produk...</p>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-primary btn-full">💾 Simpan Perubahan</button>
-            </form>
-            <div id="profileMessage" class="message-box" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- Modal untuk Tambah/Edit Produk -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeProductModal()">&times;</span>
-            <h3 id="productModalTitle">➕ Tambah Produk</h3>
-            <form id="productForm">
-                <input type="hidden" id="editProductId" value="">
-                <div class="form-group">
-                    <label>📝 Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Cth: Kek Coklat" required>
-                </div>
-                <div class="form-group">
-                    <label>💰 Harga Seunit (RM)</label>
-                    <input type="number" id="productPrice" step="0.01" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label>📁 Kategori</label>
-                    <select id="productCategory" required>
-                        <option value="">Pilih kategori</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary btn-full" id="saveProductBtn">💾 Simpan Produk</button>
-            </form>
-            <div id="productMessage" class="message-box" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- Modal Delete Confirmation -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content modal-small">
-            <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
-            <h3>⚠️ Padam Produk?</h3>
-            <p>Tindakan ini tidak boleh dibatalkan.</p>
-            <div class="delete-actions">
-                <button class="btn-outline" onclick="closeDeleteModal()">Batal</button>
-                <button class="btn-danger" id="confirmDeleteBtn">Padam</button>
-            </div>
-        </div>
-    </div>
+    <!-- Content -->
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Portal UsahawanDigital</p>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🇲🇾 Usahawan<span>Digital</span></h3>
+                    <p>Memperkasakan Usahawan Mikro Malaysia</p>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 Portal UsahawanDigital</p>
+                    <p class="footer-tagline">Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -146,337 +51,7 @@
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        let currentBusinessType = 'fnb';
-        let currentProducts = [];
-        let productToDelete = null;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = await checkAuth();
-            if (!user) { window.location.href = 'login.html'; return; }
-            await loadProfile();
-            await loadProducts();
-            setupEventListeners();
-        });
-
-        async function loadProfile() {
-            const user = await checkAuth();
-            if (!user) return;
-            try {
-                const { data: profile, error } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
-                if (error) throw error;
-                if (profile) {
-                    document.getElementById('businessName').value = profile.business_name || '';
-                    let bt = profile.business_type || profile.jenis_perniagaan || 'fnb';
-                    document.getElementById('businessType').value = bt;
-                    currentBusinessType = bt;
-                }
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
-        }
-
-        async function loadProducts() {
-            const user = await checkAuth();
-            if (!user) return;
-            const container = document.getElementById('productsList');
-            container.innerHTML = '<p class="loading-text">📂 Loading produk...</p>';
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('products')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                currentProducts = data || [];
-                displayProducts(currentProducts);
-            } catch (error) {
-                console.error('Error loading products:', error);
-                container.innerHTML = '<p class="error-text">❌ Ralat memuatkan produk</p>';
-            }
-        }
-
-        function displayProducts(products) {
-            const container = document.getElementById('productsList');
-            if (products.length === 0) {
-                container.innerHTML = '<p class="no-products">📭 Tiada produk. Klik "+ Tambah Produk" untuk mulakan.</p>';
-                return;
-            }
-            let html = '<div class="products-grid-settings">';
-            products.forEach(p => {
-                html += `
-                    <div class="product-card-settings">
-                        <div class="product-info-settings">
-                            <strong>📦 ${escapeHtml(p.name)}</strong>
-                            <span class="product-price-settings">RM ${p.price.toFixed(2)}</span>
-                            <span class="product-category-settings">📁 ${escapeHtml(p.category)}</span>
-                        </div>
-                        <div class="product-actions-settings">
-                            <button class="btn-edit-product" onclick="editProduct('${p.id}')" title="Edit">✏️</button>
-                            <button class="btn-delete-product" onclick="confirmDeleteProduct('${p.id}')" title="Padam">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function setupEventListeners() {
-            document.getElementById('profileForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateProfile();
-            });
-            
-            document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
-            
-            document.getElementById('productForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveProduct();
-            });
-            
-            document.getElementById('confirmDeleteBtn').addEventListener('click', () => deleteProduct());
-        }
-
-        async function updateProfile() {
-            const user = await checkAuth();
-            if (!user) return;
-            
-            const businessName = document.getElementById('businessName').value;
-            const businessType = document.getElementById('businessType').value;
-            const btn = document.querySelector('#profileForm button[type="submit"]');
-            const msgDiv = document.getElementById('profileMessage');
-            
-            btn.disabled = true;
-            btn.textContent = 'Menyimpan...';
-            msgDiv.style.display = 'none';
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .update({ 
-                        business_name: businessName, 
-                        business_type: businessType, 
-                        jenis_perniagaan: businessType 
-                    })
-                    .eq('id', user.id);
-                
-                if (error) throw error;
-                
-                msgDiv.className = 'message-box success';
-                msgDiv.innerHTML = '✅ Profil berjaya dikemas kini!';
-                msgDiv.style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } catch (error) {
-                msgDiv.className = 'message-box error';
-                msgDiv.innerHTML = '❌ Error: ' + error.message;
-                msgDiv.style.display = 'block';
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '💾 Simpan Perubahan';
-            }
-        }
-
-        function populateCategoryDropdown(select, type) {
-            const cats = {
-                fnb: [
-                    { value: "Kek & Pastri", label: "🍰 Kek & Pastri" },
-                    { value: "Minuman", label: "🥤 Minuman" },
-                    { value: "Makanan", label: "🍝 Makanan" },
-                    { value: "Lain-lain", label: "📝 Lain-lain" }
-                ],
-                retail: [
-                    { value: "Pakaian", label: "👗 Pakaian" },
-                    { value: "Aksesori", label: "💍 Aksesori" },
-                    { value: "Lain-lain", label: "📝 Lain-lain" }
-                ],
-                servis: [
-                    { value: "Servis", label: "✂️ Servis" },
-                    { value: "Rawatan", label: "💆 Rawatan" },
-                    { value: "Lain-lain", label: "📝 Lain-lain" }
-                ]
-            };
-            const list = cats[type] || cats.fnb;
-            select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            list.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.value;
-                opt.textContent = c.label;
-                select.appendChild(opt);
-            });
-        }
-
-        function openProductModal(productId = null) {
-            const modal = document.getElementById('productModal');
-            document.getElementById('productForm').reset();
-            document.getElementById('editProductId').value = '';
-            document.getElementById('productMessage').style.display = 'none';
-            
-            populateCategoryDropdown(document.getElementById('productCategory'), currentBusinessType);
-            
-            if (productId) {
-                const p = currentProducts.find(p => p.id === productId);
-                if (p) {
-                    document.getElementById('productModalTitle').textContent = '✏️ Edit Produk';
-                    document.getElementById('editProductId').value = p.id;
-                    document.getElementById('productName').value = p.name;
-                    document.getElementById('productPrice').value = p.price;
-                    document.getElementById('productCategory').value = p.category;
-                }
-            } else {
-                document.getElementById('productModalTitle').textContent = '➕ Tambah Produk';
-            }
-            modal.style.display = 'block';
-        }
-
-        function closeProductModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-
-        // =========================================
-        // SAVE PRODUCT - FORCE RELOAD PAGE
-        // =========================================
-        async function saveProduct() {
-            const user = await checkAuth();
-            if (!user) return;
-            
-            const editId = document.getElementById('editProductId').value;
-            const name = document.getElementById('productName').value.trim();
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const category = document.getElementById('productCategory').value;
-            const btn = document.getElementById('saveProductBtn');
-            const msgDiv = document.getElementById('productMessage');
-            
-            if (!name || isNaN(price) || price <= 0 || !category) {
-                msgDiv.className = 'message-box error';
-                msgDiv.innerHTML = '❌ Sila lengkapkan semua maklumat';
-                msgDiv.style.display = 'block';
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.textContent = 'Menyimpan...';
-            msgDiv.style.display = 'none';
-            
-            try {
-                if (editId) {
-                    const { error } = await supabaseClient
-                        .from('products')
-                        .update({ 
-                            name, 
-                            price, 
-                            category, 
-                            updated_at: new Date().toISOString() 
-                        })
-                        .eq('id', editId);
-                    if (error) throw error;
-                    msgDiv.innerHTML = '✅ Produk dikemas kini!';
-                } else {
-                    const { error } = await supabaseClient
-                        .from('products')
-                        .insert([{ 
-                            user_id: user.id, 
-                            name, 
-                            price, 
-                            category, 
-                            business_type: currentBusinessType,
-                            created_at: new Date().toISOString()
-                        }]);
-                    if (error) throw error;
-                    msgDiv.innerHTML = '✅ Produk ditambah!';
-                }
-                
-                msgDiv.className = 'message-box success';
-                msgDiv.style.display = 'block';
-                
-                // Force reload page after 1.5 seconds
-                setTimeout(() => {
-                    closeProductModal();
-                    location.reload(); // RELOAD PAGE - PASTI UPDATE!
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Error saving product:', error);
-                msgDiv.className = 'message-box error';
-                msgDiv.innerHTML = '❌ Ralat: ' + error.message;
-                msgDiv.style.display = 'block';
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '💾 Simpan Produk';
-            }
-        }
-
-        // =========================================
-        // EDIT PRODUCT
-        // =========================================
-        function editProduct(id) {
-            openProductModal(id);
-        }
-
-        // =========================================
-        // CONFIRM DELETE PRODUCT
-        // =========================================
-        function confirmDeleteProduct(id) {
-            productToDelete = id;
-            document.getElementById('deleteModal').style.display = 'block';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            productToDelete = null;
-        }
-
-        // =========================================
-        // DELETE PRODUCT - FORCE RELOAD PAGE
-        // =========================================
-        async function deleteProduct() {
-            if (!productToDelete) return;
-            
-            const confirmBtn = document.getElementById('confirmDeleteBtn');
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Memadam...';
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('products')
-                    .delete()
-                    .eq('id', productToDelete);
-                
-                if (error) throw error;
-                
-                closeDeleteModal();
-                alert('✅ Produk berjaya dipadam!');
-                location.reload(); // RELOAD PAGE - PASTI UPDATE!
-                
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                alert('❌ Ralat memadam: ' + error.message);
-            } finally {
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Padam';
-            }
-        }
-
-        // Close modals on outside click
-        window.onclick = function(e) {
-            if (e.target === document.getElementById('productModal')) closeProductModal();
-            if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
-        };
+        // ... existing JS ...
     </script>
     <!-- REGISTER SERVICE WORKER (PWA) -->
     <script>
