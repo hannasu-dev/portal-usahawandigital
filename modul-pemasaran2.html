@@ -642,5 +642,14 @@
         });
     }
 </script>
+    <!-- Force reload from bfcache (Back/Forward Cache) -->
+    <script>
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                console.log('🔄 Page loaded from bfcache, reloading...');
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 </html>
