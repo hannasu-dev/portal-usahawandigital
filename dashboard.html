@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - UsahawanDigital</title>
-    <!-- ========================================= -->
     <!-- PWA MANIFEST & META TAGS -->
-    <!-- ========================================= -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
@@ -23,9 +21,6 @@
             </div>
             <div class="nav-links" id="navLinks">
                 <a href="dashboard.html">Dashboard</a>
-                <a href="modul.html">Modul</a>
-                <a href="jualan.html">Rekod Jualan</a>
-                <a href="templat.html">Templat</a>
                 <a href="#" id="logoutBtn">Log Keluar</a>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
@@ -73,7 +68,7 @@
         </div>
     </div>
 
-    <!-- Modal Profil (dengan senarai produk) -->
+    <!-- Modal Profil -->
     <div id="profileModal" class="modal">
         <div class="modal-content modal-large">
             <div class="modal-header">
@@ -95,7 +90,6 @@
                     </select>
                 </div>
                 
-                <!-- Products Management inside Profile Modal -->
                 <div class="profile-products-section">
                     <div class="products-header">
                         <h4>📦 Senarai Produk / Item Perniagaan</h4>
@@ -103,7 +97,6 @@
                     </div>
                     <p class="form-note">💡 Produk ini akan muncul dalam dropdown senarai item semasa rekod jualan.</p>
                     
-                    <!-- Scrollable Products List -->
                     <div class="modal-scroll-box">
                         <div id="productsListInModal" class="modal-scroll-list">
                             <div class="loading-state">📂 Loading produk...</div>
@@ -120,7 +113,7 @@
         </div>
     </div>
 
-    <!-- Modal untuk Tambah/Edit Produk -->
+    <!-- Modal Tambah/Edit Produk -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -131,12 +124,12 @@
                 <input type="hidden" id="editProductId" value="">
                 <div class="form-group">
                     <label>📝 Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Cth: Kek Coklat, Air Sirap" required>
+                    <input type="text" id="productName" placeholder="Cth: Kek Coklat" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>💰 Harga Seunit (RM)</label>
-                        <input type="number" id="productPrice" step="0.01" min="0" placeholder="0.00" required>
+                        <input type="number" id="productPrice" step="0.01" min="0" required>
                     </div>
                     <div class="form-group">
                         <label>📁 Kategori</label>
@@ -176,12 +169,6 @@
                     <h3>🇲🇾 Usahawan<span>Digital</span></h3>
                     <p>Memperkasakan Usahawan Mikro Malaysia</p>
                 </div>
-                <div class="footer-links">
-                    <a href="index.html">Utama</a>
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="modul.html">Modul</a>
-                    <a href="templat.html">Templat</a>
-                </div>
                 <div class="footer-copyright">
                     <p>&copy; 2025 Portal UsahawanDigital</p>
                     <p class="footer-tagline">Untuk Usahawan Mikro & Peniaga Kecil Malaysia</p>
@@ -194,9 +181,7 @@
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/dashboard.js"></script>
-    <!-- ========================================= -->
     <!-- REGISTER SERVICE WORKER (PWA) -->
-    <!-- ========================================= -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
