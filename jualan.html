@@ -4,16 +4,185 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekod Jualan - UsahawanDigital</title>
+    
+    <!-- FORCE NO CACHE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <script>
+        // Force refresh if loaded from bfcache
+        (function() {
+            if (window.performance && window.performance.getEntriesByType) {
+                const navEntries = window.performance.getEntriesByType('navigation');
+                if (navEntries.length > 0 && navEntries[0].type === 'back_forward') {
+                    window.location.reload();
+                }
+            }
+        })();
+    </script>
+    
     <!-- PWA MANIFEST & META TAGS -->
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="theme-color" content="#1a5f7a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="css/style.css?v=3">
+    
+    <link rel="stylesheet" href="css/style.css?v=6">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- YOUR CUSTOM STYLES HERE -->
+    
+    <style>
+        /* ===== ITEM ROW STYLES ===== */
+        .item-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .item-row .item-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .item-row .item-field label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .item-row .item-field input,
+        .item-row .item-field select {
+            padding: 0.4rem 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            width: 100%;
+        }
+        .item-row .item-field input:focus,
+        .item-row .item-field select:focus {
+            outline: none;
+            border-color: #1a5f7a;
+            box-shadow: 0 0 0 2px rgba(26, 95, 122, 0.1);
+        }
+        .item-row .item-field.item-name { flex: 2; min-width: 120px; }
+        .item-row .item-field.item-qty { flex: 0.6; min-width: 60px; }
+        .item-row .item-field.item-price { flex: 0.8; min-width: 80px; }
+        .item-row .item-field.item-subtotal { 
+            flex: 0.8; min-width: 80px; text-align: center; font-weight: 700; 
+            color: #1a5f7a; background: #e0f2fe; padding: 0.35rem 0.5rem; 
+            border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; 
+            justify-content: center; height: 100%; 
+        }
+        .item-row .item-field.item-action { flex: 0.4; min-width: 40px; display: flex; align-items: center; justify-content: center; }
+        .item-row .item-field.item-action button { 
+            background: #fee2e2; color: #dc2626; border: none; padding: 0.3rem 0.6rem; 
+            border-radius: 6px; cursor: pointer; font-size: 1rem; transition: all 0.2s; width: 100%; 
+        }
+        .item-row .item-field.item-action button:hover { background: #fecaca; }
+        .item-subtotal-text { font-weight: 700; color: #1a5f7a; font-size: 0.85rem; }
+        
+        /* ===== ITEM ROW HEADER ===== */
+        .item-row-header {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.3rem 0.5rem;
+            margin-bottom: 0.3rem;
+            background: #e2e8f0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .item-row-header .header-name { flex: 2; min-width: 150px; padding-left: 0.3rem; }
+        .item-row-header .header-qty { flex: 0.6; min-width: 60px; text-align: center; }
+        .item-row-header .header-price { flex: 0.8; min-width: 80px; text-align: center; }
+        .item-row-header .header-subtotal { flex: 0.8; min-width: 70px; text-align: center; }
+        .item-row-header .header-action { flex: 0.3; min-width: 35px; text-align: center; }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .item-row-header { display: none; }
+            .item-row { flex-direction: column; align-items: stretch; }
+            .item-row .item-field { width: 100%; }
+            .item-row .item-field.item-subtotal { min-height: 40px; }
+        }
+        
+        /* ===== BACK BUTTON ===== */
+        .back-btn { text-decoration: none; color: #1a5f7a; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+        .back-btn:hover { text-decoration: underline; }
+        
+        /* ===== OTHER STYLES ===== */
+        .form-card { background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .items-header { display: flex; justify-content: space-between; align-items: center; margin: 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        .items-header span { font-weight: 600; color: #1a5f7a; }
+        .btn-add-item { background: #1a5f7a; color: white; border: none; padding: 0.3rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; }
+        .btn-add-item:hover { background: #0e4a62; }
+        .items-list { margin-bottom: 1rem; }
+        .items-total { background: #e0f2fe; padding: 0.8rem 1rem; border-radius: 12px; margin: 1rem 0; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; }
+        .total-row strong { font-size: 1.2rem; color: #1a5f7a; }
+        
+        .rekod-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .filter-section { display: flex; gap: 1rem; }
+        .filter-section select, .filter-section button { padding: 0.4rem 0.8rem; border-radius: 8px; }
+        
+        .tab-nav { display: flex; gap: 0.5rem; margin: 1.5rem 0 1rem; border-bottom: 2px solid #e2e8f0; }
+        .tab-btn { background: none; border: none; padding: 0.5rem 1.2rem; font-size: 0.9rem; cursor: pointer; color: #64748b; transition: all 0.2s; }
+        .tab-btn.active { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; margin-bottom: -2px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        
+        .rekod-scroll-container { max-height: 400px; overflow-y: auto; margin: 1rem 0; border-radius: 12px; }
+        .rekod-scroll-container::-webkit-scrollbar { width: 6px; }
+        .rekod-scroll-container::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .rekod-scroll-container::-webkit-scrollbar-thumb { background: #1a5f7a; border-radius: 10px; }
+        
+        .rekod-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .rekod-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 0.8rem; border-radius: 12px; border-left: 4px solid; }
+        .rekod-item.jualan { border-left-color: #16a34a; }
+        .rekod-item.belanja { border-left-color: #dc2626; }
+        .rekod-info { flex: 1; }
+        .rekod-tarikh { font-size: 0.7rem; color: #64748b; margin-bottom: 0.2rem; }
+        .rekod-keterangan { font-weight: 600; font-size: 0.85rem; }
+        .rekod-items { margin-top: 0.3rem; padding-left: 0.8rem; border-left: 2px solid #e2e8f0; }
+        .rekod-item-detail { font-size: 0.7rem; color: #475569; }
+        .rekod-jumlah { font-weight: 700; font-size: 0.9rem; margin-right: 0.8rem; }
+        .rekod-jumlah.jualan { color: #16a34a; }
+        .rekod-jumlah.belanja { color: #dc2626; }
+        .rekod-delete { background: #fee2e2; border: none; padding: 0.3rem 0.6rem; border-radius: 8px; cursor: pointer; color: #dc2626; transition: background 0.2s; }
+        .rekod-delete:hover { background: #fecaca; }
+        
+        .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+        .summary-card { background: white; border-radius: 16px; padding: 1rem; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .summary-icon { font-size: 2rem; }
+        .summary-details { flex: 1; }
+        .summary-label { display: block; font-size: 0.7rem; color: #64748b; }
+        .summary-value { display: block; font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+        
+        .summary-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .summary-item { background: white; padding: 0.8rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
+        .summary-date { font-weight: 600; color: #1a5f7a; font-size: 0.85rem; }
+        .summary-numbers { display: flex; gap: 1rem; }
+        .summary-numbers .jualan { color: #16a34a; font-weight: 600; font-size: 0.85rem; }
+        .summary-numbers .belanja { color: #dc2626; font-weight: 600; font-size: 0.85rem; }
+        
+        .chart-container { background: white; padding: 1rem; border-radius: 16px; margin: 1rem 0; }
+        .loading-text, .empty-text, .error-text { text-align: center; padding: 2rem; color: #64748b; }
+        .section-desc { text-align: center; color: #64748b; margin-bottom: 2rem; }
+        .back-button-container { margin-bottom: 1.5rem; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -27,7 +196,141 @@
         </div>
     </nav>
 
-    <!-- CONTENT -->
+    <div class="container">
+        <div class="back-button-container">
+            <a href="dashboard.html" class="back-btn">← Kembali ke Dashboard</a>
+        </div>
+
+        <h2>💰 Rekod Jualan & Perbelanjaan</h2>
+        <p class="section-desc">Catat jualan & perbelanjaan dengan detail item perniagaan anda</p>
+
+        <!-- ===== FORM TAMBAH REKOD ===== -->
+        <div class="form-card">
+            <h3>➕ Tambah Rekod Baru</h3>
+            <form id="jualanForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📅 Tarikh</label>
+                        <input type="date" id="tarikh" required>
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Jenis Transaksi</label>
+                        <select id="jenis" required>
+                            <option value="jualan">💰 Jualan (Pendapatan)</option>
+                            <option value="belanja">📉 Perbelanjaan (Kos/Beli Stok)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>📁 Kategori</label>
+                        <select id="kategori" required>
+                            <option value="">Pilih kategori</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ===== ITEM LIST ===== -->
+                <div class="items-header">
+                    <span>🛒 Senarai Item</span>
+                    <button type="button" class="btn-add-item" onclick="addItemRow()">+ Tambah Item</button>
+                </div>
+
+                <div class="item-row-header">
+                    <span class="header-name">📝 Nama Produk</span>
+                    <span class="header-qty">🔢 Kuantiti</span>
+                    <span class="header-price">💰 Harga (RM)</span>
+                    <span class="header-subtotal">💵 Jumlah</span>
+                    <span class="header-action">⚙️</span>
+                </div>
+
+                <div id="itemsList" class="items-list"></div>
+
+                <div class="items-total">
+                    <div class="total-row">
+                        <span>💰 Jumlah Keseluruhan:</span>
+                        <strong id="totalAmountDisplay">RM 0.00</strong>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">💾 Simpan Rekod</button>
+            </form>
+            <div id="formMessage" class="message-box" style="display:none;"></div>
+        </div>
+
+        <!-- ===== TAB NAVIGATION ===== -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="terkini">📋 Senarai Terkini</button>
+            <button class="tab-btn" data-tab="harian">📅 Ringkasan Harian</button>
+            <button class="tab-btn" data-tab="bulanan">📊 Ringkasan Bulanan</button>
+        </div>
+
+        <!-- ===== TAB 1: SENARAI TERKINI ===== -->
+        <div id="tab-terkini" class="tab-panel active">
+            <div class="rekod-header">
+                <h3>📋 Senarai Rekod Terkini</h3>
+                <div class="filter-section">
+                    <select id="filterJenis" onchange="filterRecords()">
+                        <option value="semua">📌 Semua</option>
+                        <option value="jualan">💰 Jualan</option>
+                        <option value="belanja">📉 Perbelanjaan</option>
+                    </select>
+                    <button class="btn-outline" onclick="generateReport()">📄 Jana Laporan PDF</button>
+                </div>
+            </div>
+            <div class="rekod-scroll-container">
+                <div id="rekodList" class="rekod-list">
+                    <p class="loading-text">📂 Loading rekod...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 2: RINGKASAN HARIAN ===== -->
+        <div id="tab-harian" class="tab-panel">
+            <h3>📅 Ringkasan Harian (30 Hari Terkini)</h3>
+            <div class="rekod-scroll-container">
+                <div id="dailySummaryList" class="summary-list">
+                    <p class="loading-text">📂 Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 3: RINGKASAN BULANAN ===== -->
+        <div id="tab-bulanan" class="tab-panel">
+            <h3>📊 Ringkasan Bulanan</h3>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="rekod-scroll-container">
+                <div id="monthlySummaryList" class="summary-list">
+                    <p class="loading-text">📂 Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RINGKASAN KEWANGAN ===== -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-details">
+                    <span class="summary-label">Jumlah Jualan</span>
+                    <strong class="summary-value" id="totalJualan">RM 0.00</strong>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">📉</div>
+                <div class="summary-details">
+                    <span class="summary-label">Jumlah Perbelanjaan</span>
+                    <strong class="summary-value" id="totalBelanja">RM 0.00</strong>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">🎯</div>
+                <div class="summary-details">
+                    <span class="summary-label">Untung Bersih</span>
+                    <strong class="summary-value" id="keuntungan">RM 0.00</strong>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="container">
@@ -44,10 +347,12 @@
         </div>
     </footer>
 
+    <!-- ===== SCRIPTS ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js?v=3"></script>
-    <script src="js/auth.js?v=3"></script>
-    <script src="js/jualan.js?v=3"></script>
+    <script src="js/supabase.js?v=6"></script>
+    <script src="js/auth.js?v=6"></script>
+    <script src="js/jualan.js?v=6"></script>
+    
     <!-- REGISTER SERVICE WORKER (PWA) -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -62,7 +367,8 @@
             });
         }
     </script>
-    <!-- Force reload from bfcache (Back/Forward Cache) -->
+    
+    <!-- FORCE RELOAD FROM BFCACHE -->
     <script>
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
