@@ -1,14 +1,10 @@
-const CACHE_NAME = 'usahawan-digital-v4';
-const ASSETS = [
-    '/',
-    '/index.html',
-    '/dashboard.html',
-    '/login.html',
-    '/register.html',
-    '/modul.html',
-    '/jualan.html',
-    '/templat.html',
-    '/profile-settings.html',
+// =========================================
+// SERVICE WORKER - Fixed clone error
+// =========================================
+
+const CACHE_NAME = 'usahawan-digital-v6';
+
+const STATIC_ASSETS = [
     '/css/style.css',
     '/js/supabase.js',
     '/js/auth.js',
@@ -24,8 +20,8 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('[SW] Caching assets...');
-                return cache.addAll(ASSETS);
+                console.log('[SW] Caching static assets...');
+                return cache.addAll(STATIC_ASSETS);
             })
             .then(() => {
                 console.log('[SW] Install complete!');
@@ -54,78 +50,75 @@ self.addEventListener('activate', event => {
 });
 
 // =========================================
-// FETCH - NO CACHE FOR HTML
+// FETCH - Fixed clone error
 // =========================================
 self.addEventListener('fetch', event => {
     const request = event.request;
     const url = new URL(request.url);
     
-    // HTML files - ALWAYS fetch from network (NO CACHE)
+    // HTML files - ALWAYS from network (NO CACHE)
     if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
         event.respondWith(
             fetch(request, {
                 cache: 'no-store',
                 headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate',
-                    'Pragma': 'no-cache'
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
                 }
+            }).catch(() => {
+                return new Response(
+                    '<h1>Offline</h1><p>Sila sambung ke internet.</p>',
+                    { headers: { 'Content-Type': 'text/html' } }
+                );
             })
         );
         return;
     }
     
-    // Supabase API - NO CACHE
+    // Supabase API - NEVER cache
     if (url.hostname.includes('supabase.co')) {
         event.respondWith(
-            fetch(request, {
-                cache: 'no-store'
-            })
+            fetch(request, { cache: 'no-store' })
         );
         return;
     }
     
-    // Other GET requests - use cache but validate
+    // Static assets - Cache with proper clone handling
     if (request.method === 'GET') {
         event.respondWith(
             caches.match(request)
                 .then(cachedResponse => {
                     if (cachedResponse) {
-                        // Check if cache is still fresh
-                        return fetch(request)
-                            .then(networkResponse => {
-                                if (networkResponse.status === 200) {
-                                    caches.open(CACHE_NAME)
-                                        .then(cache => {
-                                            cache.put(request, networkResponse.clone());
-                                        });
-                                }
-                                return networkResponse;
-                            })
-                            .catch(() => {
-                                return cachedResponse;
-                            });
+                        // Update cache in background WITHOUT cloning error
+                        fetch(request).then(networkResponse => {
+                            if (networkResponse && networkResponse.status === 200) {
+                                // Clone response before using it
+                                const clonedResponse = networkResponse.clone();
+                                caches.open(CACHE_NAME).then(cache => {
+                                    cache.put(request, clonedResponse);
+                                });
+                            }
+                        }).catch(() => {});
+                        return cachedResponse;
                     }
-                    return fetch(request)
-                        .then(networkResponse => {
-                            if (networkResponse.status === 200) {
-                                return caches.open(CACHE_NAME)
-                                    .then(cache => {
-                                        cache.put(request, networkResponse.clone());
-                                        return networkResponse;
-                                    });
-                            }
+                    return fetch(request).then(networkResponse => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            // Clone response before caching
+                            const clonedResponse = networkResponse.clone();
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(request, clonedResponse);
+                            });
                             return networkResponse;
-                        })
-                        .catch(() => {
-                            if (url.pathname.endsWith('.html')) {
-                                return new Response(
-                                    '<h1>Offline</h1><p>Sila sambung ke internet untuk mengakses portal ini.</p>',
-                                    { headers: { 'Content-Type': 'text/html' } }
-                                );
-                            }
-                            return new Response('Offline', { status: 503 });
-                        });
+                        }
+                        return networkResponse;
+                    });
+                })
+                .catch(() => {
+                    return new Response('Resource not available', { status: 503 });
                 })
         );
+        return;
     }
+    
+    // Other requests - just network
+    event.respondWith(fetch(request));
 });
